@@ -35,6 +35,8 @@ ACharacterBase::ACharacterBase()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+
+	SetStats();
 }
 
 // Called when the game starts or when spawned
@@ -58,3 +60,8 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+
+void ACharacterBase::SetStats()
+{
+	MoveSpeed = 1000;
+}

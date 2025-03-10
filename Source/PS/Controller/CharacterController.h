@@ -11,7 +11,6 @@
 #include "CharacterController.generated.h"
 
 class USpringArmComponent;
-class UCameraComponent;
 /**
  * 
  */
@@ -40,11 +39,18 @@ protected:
 	UPROPERTY()
 	UInputAction* MoveCameraAction;
 
+	UPROPERTY()
+	UInputAction* ResetCameraAction;
+
 	void OnRightClick();
 
 	void MoveToMouseCursor();
 
 	void UpdateMouseCursorLocation();
+
+	void ResetCamera();
+
+	void SetBPs();
 
 private:
 	UPROPERTY()
@@ -53,7 +59,7 @@ private:
 	AActor* TargetIndicator;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* CameraComponent;
+	USpringArmComponent* SpringArmComponent;
 
 	void RotateCamera(const FInputActionValue& Value);
 	void MoveCamera(const FInputActionValue& Value);
