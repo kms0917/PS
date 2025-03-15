@@ -14,6 +14,5 @@ ANormalGameMode::ANormalGameMode()
     {
         DefaultPawnClass = PlayerPawnClass.Class;
     }
-
     PlayerControllerClass = ACharacterController::StaticClass();
 }

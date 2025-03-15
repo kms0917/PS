@@ -12,6 +12,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/CharacterBase.h"
+#include "GameMode/NormalGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -24,6 +27,12 @@ ACharacterController::ACharacterController()
     CameraRotateSpeed = 50.0f;
 
     SetBPs();
+}
+
+void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직도 필요함
+{
+    playerCharacter = Cast<ACharacterBase>(GetPawn());
+    
 }
 
 void ACharacterController::BeginPlay()
@@ -40,16 +49,18 @@ void ACharacterController::BeginPlay()
     }
     if (TargetIndicatorClass)
     {
-        TargetIndicator = GetWorld()->SpawnActor<AActor>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
-        if (TargetIndicator)
+        targetIndicator = GetWorld()->SpawnActor<AActor>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+        if (targetIndicator)
         {
-            TargetIndicator->SetActorHiddenInGame(true); // 처음엔 숨김
+            targetIndicator->SetActorHiddenInGame(true); // 처음엔 숨김
         }
     }
     if (APawn* ControlledPawn = GetPawn())
     {
         SpringArmComponent = ControlledPawn->FindComponentByClass<USpringArmComponent>();
+        playerCharacter = Cast<ACharacterBase>(ControlledPawn);
     }
+    gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
 }
 
 void ACharacterController::SetupInputComponent()
@@ -68,8 +79,16 @@ void ACharacterController::SetupInputComponent()
 void ACharacterController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    UpdateMouseCursorLocation();
+    if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
+    {
+        bIsStop = true;
+        UpdateMouseCursorLocation();
+    }
+    else
+    {
+        bIsStop = false;
+    }
+    UpdateCameraRotation();
 }
 
 void ACharacterController::OnRightClick()
@@ -85,8 +104,11 @@ void ACharacterController::MoveToMouseCursor()
 
     if (HitResult.bBlockingHit)
     {
-        APawn* ControlledPawn = GetPawn();
-        if (ControlledPawn)
+        if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
+        {
+            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
+        }
+        else  // 일반 모드에서는 마우스 클릭 위치로 바로 이동
         {
             UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitResult.ImpactPoint);
         }
@@ -103,16 +125,16 @@ void ACharacterController::UpdateMouseCursorLocation()
         FVector TargetLocation = HitResult.ImpactPoint;
 
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
-        if (NavSystem && GetPawn())
+        if (NavSystem && playerCharacter)
         {
             FNavLocation NavLocation;
             if (NavSystem->ProjectPointToNavigation(TargetLocation, NavLocation))
             {
-                FVector CharacterLocation = GetPawn()->GetActorLocation();
-                if (TargetIndicator)
+                FVector CharacterLocation = playerCharacter->GetActorLocation();
+                if (targetIndicator)
                 {
-                    TargetIndicator->SetActorLocation(NavLocation.Location + FVector(0, 0, 5));
-                    TargetIndicator->SetActorHiddenInGame(false); // 보이게 하기
+                    targetIndicator->SetActorLocation(NavLocation.Location + FVector(0, 0, 5));
+                    targetIndicator->SetActorHiddenInGame(false); // 보이게 하기
                 }
 
                 // 네비메시 경로 계산
@@ -121,29 +143,54 @@ void ACharacterController::UpdateMouseCursorLocation()
 
                 if (NavPath && NavPath->IsValid())
                 {
-                    // 캐릭터가 이동 중이 아니면 경로를 그리기
-                    if (GetCharacter()->GetCharacterMovement()->Velocity.SizeSquared() <= 0.0f)
+                    float maxMoveDistance = playerCharacter ? playerCharacter->moveSpeed * 100.0f : 0.0f;  // cm 변환
+                    float totalPathDistance = 0.0f;
+                    bool reachedLimit = false;
+
+                    FVector previousEnd = NavPath->PathPoints[0]; // 첫 지점을 기준으로 설정
+                    stopPoint = FVector::ZeroVector;
+
+                    FColor CylinderColor = FColor::White; // 기본 흰색
+
+                    for (int32 i = 1; i < NavPath->PathPoints.Num(); i++)
                     {
-                        // 경로가 유효한 경우 각 PathPoint들에 대해 원통으로 연결
-                        for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; i++)
-                        {
-                            FVector Start = NavPath->PathPoints[i];
-                            FVector End = NavPath->PathPoints[i + 1];
+                        FVector Start = previousEnd;
+                        FVector End = NavPath->PathPoints[i];
+                        float segmentDistance = FVector::Dist(Start, End);
 
-                            // 경로 사이에 원통 그리기 (흰색 원통, 반지름 10.0f, 길이 = 거리)
-                            FColor CylinderColor = FColor::White;
-                            float CylinderRadius = 10.0f; // 얇은 원통으로 설정
-                            float CylinderLength = (End - Start).Size();
-
-                            DrawDebugCylinder(GetWorld(), Start, End, CylinderRadius, 12, CylinderColor, false, -1, 0, 1);
-                        }
-                        float TotalDistance = 0.0f;
-                        for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; i++)
+                        if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
                         {
-                            TotalDistance += FVector::Dist(NavPath->PathPoints[i], NavPath->PathPoints[i + 1]);
+                            if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
+                            {
+                                float remainingDistance = maxMoveDistance - totalPathDistance;
+                                FVector Direction = (End - Start).GetSafeNormal();
+                                stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
+
+                                // 이동 가능한 거리까지 흰색으로 표시
+                                DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
+
+                                // 초과 부분을 빨간색으로 표시
+                                Start = stopPoint;
+                                if (targetIndicator)
+                                {
+                                    targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 5));
+                                }
+                                CylinderColor = FColor::Red;
+                                reachedLimit = true;
+                            }
                         }
-                        FString DistanceText = FString::Printf(TEXT("이동 거리: %.2f m"), TotalDistance / 100.0f);
-                        GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Cyan, DistanceText);
+                        // 초과한 구간은 계속 빨간색으로 유지
+                        DrawDebugCylinder(GetWorld(), Start, End, 10.0f, 12, CylinderColor, false, -1, 0, 1);
+
+                        totalPathDistance += segmentDistance;
+                        previousEnd = End; // 이전 끝점을 갱신
+                    }
+
+                    totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
+
+                    if (playerCharacter)
+                    {
+                        bIsReachable = (playerCharacter->moveSpeed >= totalDistance);
                     }
                 }
             }
@@ -151,11 +198,12 @@ void ACharacterController::UpdateMouseCursorLocation()
     }
 }
 
+
 void ACharacterController::ResetCamera()
 {
     if (!SpringArmComponent) return;
 
-    FVector CharacterLocation = GetPawn()->GetActorLocation();
+    FVector CharacterLocation = playerCharacter->GetActorLocation();
 
     // ✅ 카메라의 높이는 유지 (현재 SpringArm의 Z값 사용)
     FVector NewLocation = CharacterLocation;
@@ -202,6 +250,11 @@ void ACharacterController::MoveCamera(const FInputActionValue& Value)
     FVector NewLocation = SpringArmComponent->GetComponentLocation();
     NewLocation.Z = CurrentWorldLocation.Z;
     SpringArmComponent->SetWorldLocation(NewLocation);
+}
+
+void ACharacterController::UpdateCameraRotation()
+{
+    cameraRotation = SpringArmComponent->GetComponentRotation();
 }
 
 void ACharacterController::SetBPs()

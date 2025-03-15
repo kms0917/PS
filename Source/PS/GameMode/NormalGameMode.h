@@ -16,4 +16,6 @@ class PS_API ANormalGameMode : public AGameModeBase
 	
 public:
 	ANormalGameMode();
+
+	bool bIsBattle = true;
 };

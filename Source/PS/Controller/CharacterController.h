@@ -11,6 +11,8 @@
 #include "CharacterController.generated.h"
 
 class USpringArmComponent;
+class ACharacterBase;
+class ANormalGameMode;
 /**
  * 
  */
@@ -21,6 +23,18 @@ class PS_API ACharacterController : public APlayerController
 	
 public:
 	ACharacterController();
+
+	void OnTurnChanged();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float totalDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsReachable;
+
+	FRotator cameraRotation;
+
+	bool bIsStop = true;
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,13 +70,20 @@ private:
 	UPROPERTY()
 	TSubclassOf<AActor> TargetIndicatorClass;
 
-	AActor* TargetIndicator;
+	AActor* targetIndicator;
+
+	ACharacterBase* playerCharacter;
+
+	ANormalGameMode* gameMode;
+
+	FVector stopPoint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;
 
 	void RotateCamera(const FInputActionValue& Value);
 	void MoveCamera(const FInputActionValue& Value);
+	void UpdateCameraRotation();
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraMoveSpeed;

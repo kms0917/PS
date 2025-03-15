@@ -25,16 +25,16 @@ ACharacterBase::ACharacterBase()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->SetUsingAbsoluteRotation(true);
-	SpringArmComponent->TargetArmLength = 2000.0f;
-	SpringArmComponent->SetRelativeRotation(FRotator(-60.0f, 45.0f, 0.0f));
-	SpringArmComponent->bDoCollisionTest = false;
+	springArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
+	springArmComponent->SetupAttachment(RootComponent);
+	springArmComponent->SetUsingAbsoluteRotation(true);
+	springArmComponent->TargetArmLength = 2000.0f;
+	springArmComponent->SetRelativeRotation(FRotator(-60.0f, 45.0f, 0.0f));
+	springArmComponent->bDoCollisionTest = false;
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;
+	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	cameraComponent->SetupAttachment(springArmComponent, USpringArmComponent::SocketName);
+	cameraComponent->bUsePawnControlRotation = false;
 
 	SetStats();
 }
@@ -60,8 +60,64 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ACharacterBase::Skill1()
+{
+}
+
+void ACharacterBase::Skill2()
+{
+}
+
+void ACharacterBase::Skill3()
+{
+}
+
+void ACharacterBase::Skill4()
+{
+}
+
+void ACharacterBase::Skill5()
+{
+}
+
+void ACharacterBase::ReflectDamage(int finalDamage)
+{
+}
+
+void ACharacterBase::GetEXP()
+{
+}
+
+void ACharacterBase::SetLevel()
+{
+}
+
 
 void ACharacterBase::SetStats()
 {
-	MoveSpeed = 1000;
+	moveSpeed = 10;
+}
+
+void ACharacterBase::CalcCritical(int correction)
+{
+}
+
+void ACharacterBase::CalcEvasion(int correction)
+{
+}
+
+void ACharacterBase::CalcAccuracy(int correction)
+{
+}
+
+void ACharacterBase::CalcDMG(int correction)
+{
+}
+
+void ACharacterBase::SetCritical()
+{
+}
+
+void ACharacterBase::LevelUp()
+{
 }
