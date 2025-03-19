@@ -25,7 +25,7 @@ ACharacterController::ACharacterController()
     ClickAction = nullptr; 
     CameraMoveSpeed = 1000.0f;
     CameraRotateSpeed = 50.0f;
-
+    
     SetBPs();
 }
 
@@ -73,6 +73,7 @@ void ACharacterController::SetupInputComponent()
         EnhancedInput->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ACharacterController::MoveCamera);
         EnhancedInput->BindAction(RotateCameraAction, ETriggerEvent::Triggered, this, &ACharacterController::RotateCamera);
         EnhancedInput->BindAction(ResetCameraAction, ETriggerEvent::Triggered, this, &ACharacterController::ResetCamera);
+        EnhancedInput->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &ACharacterController::ZoomCamera);
     }
 }
 
@@ -86,8 +87,7 @@ void ACharacterController::Tick(float DeltaTime)
         && FMath::IsNearlyEqual(CharacterLocation.X, SpringArmLocation.X, 15.0f) 
         && FMath::IsNearlyEqual(CharacterLocation.Y, SpringArmLocation.Y, 15.0f))
     {
-        FVector NewSpringArmLocation = FVector(CharacterLocation.X, CharacterLocation.Y, SpringArmLocation.Z);
-        SpringArmComponent->SetRelativeLocation(NewSpringArmLocation);
+        SpringArmComponent->SetRelativeLocation(CharacterLocation);
     }
     if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
@@ -216,11 +216,7 @@ void ACharacterController::ResetCamera()
     if (!SpringArmComponent) return;
 
     FVector CharacterLocation = playerCharacter->GetActorLocation();
-
-    FVector NewLocation = CharacterLocation;
-    NewLocation.Z = SpringArmComponent->GetComponentLocation().Z;
-
-    SpringArmComponent->SetWorldLocation(NewLocation);
+    SpringArmComponent->SetWorldLocation(CharacterLocation);
 }
 
 void ACharacterController::RotateCamera(const FInputActionValue& Value)
@@ -262,6 +258,20 @@ void ACharacterController::MoveCamera(const FInputActionValue& Value)
     SpringArmComponent->SetWorldLocation(NewLocation);
 }
 
+void ACharacterController::ZoomCamera(const FInputActionValue& Value)
+{
+    if (SpringArmComponent)
+    {
+        float AxisValue = Value.Get<float>();
+
+        float NewTargetArmLength = SpringArmComponent->TargetArmLength + (AxisValue * ZoomSpeed);
+
+        NewTargetArmLength = FMath::Clamp(NewTargetArmLength, MinZoomDistance, MaxZoomDistance);
+
+        SpringArmComponent->TargetArmLength = NewTargetArmLength;
+    }
+}
+
 void ACharacterController::UpdateCameraRotation()
 {
     cameraRotation = SpringArmComponent->GetComponentRotation();
@@ -293,6 +303,11 @@ void ACharacterController::SetBPs()
     if (ResetCameraActionFinder.Succeeded())
     {
         ResetCameraAction = ResetCameraActionFinder.Object;
+    }
+    static ConstructorHelpers::FObjectFinder<UInputAction> CameraZoomActionFinder(TEXT("/Game/Input/IA/IA_CameraZoom"));
+    if (CameraZoomActionFinder.Succeeded())
+    {
+        CameraZoomAction = CameraZoomActionFinder.Object;
     }
     static ConstructorHelpers::FClassFinder<AActor> IndicatorBP(TEXT("/Game/Actor/BP_MovePoint"));
     if (IndicatorBP.Succeeded())

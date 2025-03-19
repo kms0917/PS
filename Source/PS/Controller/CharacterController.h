@@ -56,6 +56,9 @@ protected:
 	UPROPERTY()
 	UInputAction* ResetCameraAction;
 
+	UPROPERTY()
+	UInputAction* CameraZoomAction;
+
 	void OnRightClick();
 
 	void MoveToMouseCursor();
@@ -83,6 +86,7 @@ private:
 
 	void RotateCamera(const FInputActionValue& Value);
 	void MoveCamera(const FInputActionValue& Value);
+	void ZoomCamera(const FInputActionValue& Value);
 	void UpdateCameraRotation();
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
@@ -90,4 +94,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraRotateSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float ZoomSpeed = 200.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float MinZoomDistance = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float MaxZoomDistance = 3000.0f;
+
 };
