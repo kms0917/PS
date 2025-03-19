@@ -39,7 +39,6 @@ void ACharacterController::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Enhanced Input 시스템 적용
     if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
     {
         if (DefaultMappingContext)
@@ -61,6 +60,7 @@ void ACharacterController::BeginPlay()
         playerCharacter = Cast<ACharacterBase>(ControlledPawn);
     }
     gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
+    ResetCamera();
 }
 
 void ACharacterController::SetupInputComponent()
@@ -79,18 +79,27 @@ void ACharacterController::SetupInputComponent()
 void ACharacterController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    
+    FVector CharacterLocation = playerCharacter->GetActorLocation();  // 캐릭터의 위치
+    FVector SpringArmLocation = SpringArmComponent->GetComponentLocation();  // 스프링 암의 위치
+    if (!IsInputKeyDown(EKeys::W) && !IsInputKeyDown(EKeys::A) && !IsInputKeyDown(EKeys::S) && !IsInputKeyDown(EKeys::D)
+        && FMath::IsNearlyEqual(CharacterLocation.X, SpringArmLocation.X, 15.0f) 
+        && FMath::IsNearlyEqual(CharacterLocation.Y, SpringArmLocation.Y, 15.0f))
+    {
+        FVector NewSpringArmLocation = FVector(CharacterLocation.X, CharacterLocation.Y, SpringArmLocation.Z);
+        SpringArmComponent->SetRelativeLocation(NewSpringArmLocation);
+    }
     if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
         bIsStop = true;
         UpdateMouseCursorLocation();
-        EnableInput(this);
     }
     else
     {
         bIsStop = false;
-        DisableInput(this);
     }
     UpdateCameraRotation();
+ 
 }
 
 void ACharacterController::OnRightClick()
@@ -100,18 +109,20 @@ void ACharacterController::OnRightClick()
 
 void ACharacterController::MoveToMouseCursor()
 {
-    FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
-    ResetCamera();
-    if (HitResult.bBlockingHit)
+    if (bIsStop)
     {
-        if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
+        FHitResult HitResult;
+        GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+        if (HitResult.bBlockingHit)
         {
-            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
-        }
-        else  // 일반 모드에서는 마우스 클릭 위치로 바로 이동
-        {
-            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitResult.ImpactPoint);
+            if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
+            {
+                UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
+            }
+            else  // 일반 모드에서는 마우스 클릭 위치로 바로 이동
+            {
+                UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitResult.ImpactPoint);
+            }
         }
     }
 }
@@ -206,11 +217,9 @@ void ACharacterController::ResetCamera()
 
     FVector CharacterLocation = playerCharacter->GetActorLocation();
 
-    // ✅ 카메라의 높이는 유지 (현재 SpringArm의 Z값 사용)
     FVector NewLocation = CharacterLocation;
     NewLocation.Z = SpringArmComponent->GetComponentLocation().Z;
 
-    // ✅ SpringArmComponent 위치 초기화
     SpringArmComponent->SetWorldLocation(NewLocation);
 }
 

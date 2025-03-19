@@ -23,7 +23,6 @@ ACharacterBase::ACharacterBase()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 	springArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
-	springArmComponent->SetupAttachment(RootComponent);
 	springArmComponent->SetUsingAbsoluteRotation(true);
 	springArmComponent->TargetArmLength = 2000.0f;
 	springArmComponent->SetRelativeRotation(FRotator(-60.0f, 45.0f, 0.0f));
