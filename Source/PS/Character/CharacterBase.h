@@ -7,6 +7,9 @@
 #include "Components/WidgetComponent.h"
 #include "CharacterBase.generated.h"
 
+class UHealthWidget;
+class ACharacterController;
+
 UCLASS()
 class PS_API ACharacterBase : public ACharacter
 {
@@ -23,15 +26,9 @@ protected:
 	void SetStats();
 
 	void CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
-
 	void CalcEvasion(int correction);
-
 	void CalcAccuracy(int correction);
-
 	void CalcDMG(int correction);
-
-	void SetCritical();		//ReflectDamage에서 호출
-
 	void LevelUp();		//GetEXP 후 호출
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
@@ -63,19 +60,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Skill1();
-
 	virtual void Skill2();
-
 	virtual void Skill3();
-
 	virtual void Skill4();
-
 	virtual void Skill5();		//더 많이 추가
 	
-	void ReflectDamage(int finalDamage);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
-
+	void ReflectDamage(int finalDamage, float acurracyRate, float criticalRate);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
 	void GetEXP();	//아군용
-
 	void SetLevel();	//적군용
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
@@ -154,6 +145,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* springArmComponent;
 
+	ACharacterController* playerController;
+
 	UPROPERTY()
 	UWidgetComponent* widgetComponent;		//체력 및 남은 턴수 표시
+
+	UPROPERTY()
+	UHealthWidget* healthWidget;	//위의 위젯을 캐스팅해서 담을 변수
 };

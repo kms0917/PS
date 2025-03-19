@@ -83,10 +83,12 @@ void ACharacterController::Tick(float DeltaTime)
     {
         bIsStop = true;
         UpdateMouseCursorLocation();
+        EnableInput(this);
     }
     else
     {
         bIsStop = false;
+        DisableInput(this);
     }
     UpdateCameraRotation();
 }
@@ -98,10 +100,9 @@ void ACharacterController::OnRightClick()
 
 void ACharacterController::MoveToMouseCursor()
 {
-    ResetCamera();
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
-
+    ResetCamera();
     if (HitResult.bBlockingHit)
     {
         if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
