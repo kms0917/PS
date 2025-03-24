@@ -9,6 +9,7 @@
 
 class UHealthWidget;
 class ACharacterController;
+class UEquipmentComponent;
 
 UCLASS()
 class PS_API ACharacterBase : public ACharacter
@@ -70,50 +71,37 @@ public:
 	void SetLevel();	//적군용
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
-	float moveSpeed;
-
+	float moveSpeed = 10;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	float currentMoveSpeed;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 ap;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 hp = 100;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentHp;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 str = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentStr = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 mag = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentMag = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 def = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentDef = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 res = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentRes = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 skill = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentSkill = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 speed = 10;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentSpeed = 10;
 
@@ -144,6 +132,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* springArmComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UEquipmentComponent* equipmentComponent;
 
 	ACharacterController* playerController;
 

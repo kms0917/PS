@@ -155,7 +155,7 @@ void ACharacterController::UpdateMouseCursorLocation()
 
                 if (NavPath && NavPath->IsValid())
                 {
-                    float maxMoveDistance = playerCharacter ? playerCharacter->moveSpeed * 100.0f : 0.0f;  // cm 변환
+                    float maxMoveDistance = playerCharacter ? playerCharacter->currentMoveSpeed * 100.0f : 0.0f;  // cm 변환
                     float totalPathDistance = 0.0f;
                     bool reachedLimit = false;
 
@@ -202,7 +202,7 @@ void ACharacterController::UpdateMouseCursorLocation()
 
                     if (playerCharacter)
                     {
-                        bIsReachable = (playerCharacter->moveSpeed >= totalDistance);
+                        bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
                     }
                 }
             }

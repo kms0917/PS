@@ -9,6 +9,7 @@
 #include "Widget/HealthWidget.h"
 #include "Controller/CharacterController.h"
 #include "Kismet/GameplayStatics.h"
+#include "ActorComponent/EquipmentComponent.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -38,6 +39,7 @@ ACharacterBase::ACharacterBase()
 	{
 		widgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
 	}
+	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 
 	SetStats();
 }
@@ -130,7 +132,7 @@ void ACharacterBase::SetLevel()
 
 void ACharacterBase::SetStats()
 {
-	moveSpeed = 10;
+	currentMoveSpeed = moveSpeed;
 	currentHp = hp;
 	currentDef = def;
 	currentMag = mag;
