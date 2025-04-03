@@ -30,22 +30,61 @@ protected:
 
 public:	
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	UWeaponBase* weapon;
+	UWeaponBase* weapon = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	UHelmetBase* helmet;
+	UHelmetBase* helmet = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	UChestBase* chest;
+	UChestBase* chest = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	UGloveBase* glove;
+	UGloveBase* glove = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	ULegBase* leg;
+	ULegBase* leg = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
-	UBootsBase* boots;
+	UBootsBase* boots = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentHp = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentStr = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentMag = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentDef = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentRes = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentSkill = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentSpeed = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	float equipmentMoveSpeed = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentDamage = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentAccuracy = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentEvasion = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentCritical = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 equipmentAp = 0;
 		
 	void EquipWeapon(UWeaponBase* EquipedWeapon);
 	void EquipHelmet(UHelmetBase* EquipedHelmet);
@@ -60,6 +99,8 @@ public:
 	void UnEquipGlove();
 	void UnEquipLeg();
 	void UnEquipBoots();
+
+	void CalcEquipmentStats();
 
 private:
 	UPROPERTY(EditAnyWhere)

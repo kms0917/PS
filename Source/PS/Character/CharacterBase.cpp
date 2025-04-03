@@ -6,10 +6,13 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Widget/HealthWidget.h"
 #include "Controller/CharacterController.h"
-#include "Kismet/GameplayStatics.h"
 #include "ActorComponent/EquipmentComponent.h"
+#include "ActorComponent/SkillComponent.h"
+#include "Objects/SkillBase.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -25,7 +28,7 @@ ACharacterBase::ACharacterBase()
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 	springArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArm"));
 	springArmComponent->SetUsingAbsoluteRotation(true);
-	springArmComponent->TargetArmLength = 2000.0f;
+	springArmComponent->TargetArmLength = 1200.0f;
 	springArmComponent->SetRelativeRotation(FRotator(-60.0f, 45.0f, 0.0f));
 	springArmComponent->bDoCollisionTest = false;
 	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -40,8 +43,7 @@ ACharacterBase::ACharacterBase()
 		widgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
 	}
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
-
-	SetStats();
+	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
 }
 
 void ACharacterBase::BeginPlay()
@@ -49,7 +51,6 @@ void ACharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	playerController = Cast<ACharacterController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	
 	healthWidget = Cast<UHealthWidget>(widgetComponent->GetWidget());
 	if (healthWidget)
 	{
@@ -77,24 +78,25 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
-void ACharacterBase::Skill1()
+void ACharacterBase::SetDefaultEquipments()
 {
-}
+}	   //하위 클래스의 생성자에서 호출해야함
 
-void ACharacterBase::Skill2()
+void ACharacterBase::SetDefaultSkills()
 {
-}
+}	   //하위 클래스 생성자에서 호출
 
-void ACharacterBase::Skill3()
+void ACharacterBase::UseSkill(int i)	//위젯에 연결
 {
-}
-
-void ACharacterBase::Skill4()
-{
-}
-
-void ACharacterBase::Skill5()
-{
+	if (skillComponent->skillList.IsValidIndex(i))
+	{
+		USkillBase* usedSkill = skillComponent->skillList[i];
+		CalcEvasion(usedSkill->evasion);
+		CalcCritical(usedSkill->critical);
+		CalcAccuracy(usedSkill->accuracy);
+		int damage = CalcDamage(usedSkill->damage, usedSkill->magnification, usedSkill->bIsMag);
+		//플레이어 컨트롤러로 위의 값들 + skillRange, attackRange, apUsage 다 넘겨야함
+	}
 }
 
 void ACharacterBase::ReflectDamage(int finalDamage, float acurracyRate, float criticalRate)
@@ -126,36 +128,51 @@ void ACharacterBase::GetEXP()	//일단 고정치로 몹 잡으면 무조건 같�
 	}
 }
 
-void ACharacterBase::SetLevel()
+void ACharacterBase::SetLevel()		//적들의 레벨 스케일링에 사용될 함수, 게임모드 통해 플레이어 캐릭터 레벨 받아와서 레벨 계산
 {
 }
 
-void ACharacterBase::SetStats()
+int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 {
-	currentMoveSpeed = moveSpeed;
-	currentHp = hp;
-	currentDef = def;
-	currentMag = mag;
-	currentRes = res;
-	currentSkill = skill;
-	currentSpeed = speed;
-	currentStr = str;
+	if (!isMag)			//물리 딜
+	{
+		return damage + str * magnification + equipmentComponent->equipmentDamage;
+	}
+	else				//마법 딜
+	{
+		return damage + mag * magnification + equipmentComponent->equipmentDamage;
+	}
 }
 
-void ACharacterBase::CalcCritical(int correction)
+void ACharacterBase::SetStats()		//매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
 {
+	currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed;
+	currentHp = hp + equipmentComponent->equipmentHp;
+	currentDef = def + equipmentComponent->equipmentDef;
+	currentMag = mag + equipmentComponent->equipmentMag;
+	currentRes = res + equipmentComponent->equipmentRes;
+	currentSkill = skill + equipmentComponent->equipmentSkill;
+	currentSpeed = speed + equipmentComponent->equipmentSpeed;
+	currentStr = str + equipmentComponent->equipmentStr;
+	currentAp = ap + equipmentComponent->equipmentAp;
+	CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
+	CalcEvasion(0);
+	CalcAccuracy(0);
 }
 
-void ACharacterBase::CalcEvasion(int correction)
+void ACharacterBase::CalcCritical(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
 {
+	critical = skill + equipmentComponent->equipmentCritical + correction;
 }
 
-void ACharacterBase::CalcAccuracy(int correction)
+void ACharacterBase::CalcEvasion(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
 {
+	evasion = speed * 1.2 + equipmentComponent->equipmentEvasion + correction;
 }
 
-void ACharacterBase::CalcDMG(int correction)
+void ACharacterBase::CalcAccuracy(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
 {
+	accuracy = skill * 1.2 + equipmentComponent->equipmentAccuracy + correction;
 }
 
 void ACharacterBase::LevelUp()

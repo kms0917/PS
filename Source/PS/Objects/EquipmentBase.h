@@ -54,6 +54,9 @@ public:
 	int32 critical = 0;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	int32 ap = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	ACharacterBase* ownerCharacter;
 	
 };

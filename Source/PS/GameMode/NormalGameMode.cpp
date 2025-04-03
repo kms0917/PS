@@ -4,6 +4,7 @@
 #include "NormalGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/Pawn.h"
+
 #include "Character/CharacterBase.h"
 #include "Controller/CharacterController.h"
 
@@ -15,4 +16,12 @@ ANormalGameMode::ANormalGameMode()
         DefaultPawnClass = PlayerPawnClass.Class;
     }
     PlayerControllerClass = ACharacterController::StaticClass();
+}
+
+void ANormalGameMode::BeginPlay()
+{
+    Super::BeginPlay();
+
+    playerController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController());
+    currentCharacter = Cast<ACharacterBase>(playerController->GetPawn());
 }

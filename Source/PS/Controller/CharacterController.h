@@ -13,6 +13,7 @@
 class USpringArmComponent;
 class ACharacterBase;
 class ANormalGameMode;
+class USkillWidget;
 /**
  * 
  */
@@ -43,21 +44,21 @@ protected:
 
 	UPROPERTY()
 	UInputMappingContext* DefaultMappingContext;
-
 	UPROPERTY()
 	UInputAction* ClickAction;
-
 	UPROPERTY()
 	UInputAction* RotateCameraAction;
-
 	UPROPERTY()
 	UInputAction* MoveCameraAction;
-
 	UPROPERTY()
 	UInputAction* ResetCameraAction;
-
 	UPROPERTY()
 	UInputAction* CameraZoomAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<USkillWidget> skillWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	USkillWidget* skillWidgetInstance;
 
 	void OnRightClick();
 
@@ -99,9 +100,9 @@ private:
 	float ZoomSpeed = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float MinZoomDistance = 1000.0f;
+	float MinZoomDistance = 800.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float MaxZoomDistance = 3000.0f;
+	float MaxZoomDistance = 2000.0f;
 
 };

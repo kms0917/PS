@@ -12,10 +12,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Character/CharacterBase.h"
-#include "GameMode/NormalGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Character/CharacterBase.h"
+#include "GameMode/NormalGameMode.h"
+#include "Widget/SkillWidget.h"
 
 
 ACharacterController::ACharacterController()
@@ -29,9 +30,9 @@ ACharacterController::ACharacterController()
     SetBPs();
 }
 
-void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직도 필요함
+void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직, 위젯 내용 갱신도 해야함
 {
-    playerCharacter = Cast<ACharacterBase>(GetPawn());
+    playerCharacter = Cast<ACharacterBase>(GetPawn());      //빙의 캐릭터가 바뀐 후 호출되어야 함, 게임모드에서 관리, 적 캐릭터면 기능 다 잠궈야 함
     
 }
 
@@ -51,7 +52,7 @@ void ACharacterController::BeginPlay()
         targetIndicator = GetWorld()->SpawnActor<AActor>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
         if (targetIndicator)
         {
-            targetIndicator->SetActorHiddenInGame(true); // 처음엔 숨김
+            targetIndicator->SetActorHiddenInGame(true); //처음엔 숨김
         }
     }
     if (APawn* ControlledPawn = GetPawn())
@@ -61,6 +62,16 @@ void ACharacterController::BeginPlay()
     }
     gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
     ResetCamera();
+    if (skillWidgetClass)
+    {
+        UUserWidget* widget = CreateWidget<UUserWidget>(this, skillWidgetClass);
+        skillWidgetInstance = Cast<USkillWidget>(widget);
+        if (skillWidgetInstance)
+        {
+            skillWidgetInstance->UpdateWidget(playerCharacter);     //턴이 바뀔때마다 실행되야함
+            skillWidgetInstance->AddToViewport();
+        }
+    }
 }
 
 void ACharacterController::SetupInputComponent()
@@ -96,10 +107,10 @@ void ACharacterController::Tick(float DeltaTime)
     }
     else
     {
+        targetIndicator->SetActorHiddenInGame(true);
         bIsStop = false;
     }
     UpdateCameraRotation();
- 
 }
 
 void ACharacterController::OnRightClick()
@@ -118,10 +129,16 @@ void ACharacterController::MoveToMouseCursor()
             if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
             {
                 UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
+                playerCharacter->currentMoveSpeed = 0;
+
             }
             else  // 일반 모드에서는 마우스 클릭 위치로 바로 이동
             {
                 UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitResult.ImpactPoint);
+                if (gameMode->bIsBattle)
+                {
+                    playerCharacter->currentMoveSpeed -= totalDistance;
+                }
             }
         }
     }
@@ -145,10 +162,9 @@ void ACharacterController::UpdateMouseCursorLocation()
                 FVector CharacterLocation = playerCharacter->GetActorLocation();
                 if (targetIndicator)
                 {
-                    targetIndicator->SetActorLocation(NavLocation.Location + FVector(0, 0, 5));
+                    targetIndicator->SetActorLocation(NavLocation.Location + FVector(0, 0, 0));
                     targetIndicator->SetActorHiddenInGame(false); // 보이게 하기
                 }
-
                 // 네비메시 경로 계산
                 UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(
                     this, CharacterLocation, NavLocation.Location);
@@ -177,15 +193,13 @@ void ACharacterController::UpdateMouseCursorLocation()
                                 float remainingDistance = maxMoveDistance - totalPathDistance;
                                 FVector Direction = (End - Start).GetSafeNormal();
                                 stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
-
                                 // 이동 가능한 거리까지 흰색으로 표시
                                 DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
-
                                 // 초과 부분을 빨간색으로 표시
                                 Start = stopPoint;
                                 if (targetIndicator)
                                 {
-                                    targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 5));
+                                    targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 0));
                                 }
                                 CylinderColor = FColor::Red;
                                 reachedLimit = true;
@@ -210,7 +224,6 @@ void ACharacterController::UpdateMouseCursorLocation()
     }
 }
 
-
 void ACharacterController::ResetCamera()
 {
     if (!SpringArmComponent) return;
@@ -234,12 +247,12 @@ void ACharacterController::RotateCamera(const FInputActionValue& Value)
 
 void ACharacterController::MoveCamera(const FInputActionValue& Value)
 {
-    if (!SpringArmComponent) return;
+    if (!SpringArmComponent || !playerCharacter) return;
 
     FVector2D MovementVector = Value.Get<FVector2D>();
 
-    FVector Forward = SpringArmComponent->GetForwardVector();  
-    FVector Right = SpringArmComponent->GetRightVector();  
+    FVector Forward = SpringArmComponent->GetForwardVector();
+    FVector Right = SpringArmComponent->GetRightVector();
 
     Forward.Z = 0.0f;
     Right.Z = 0.0f;
@@ -250,12 +263,14 @@ void ACharacterController::MoveCamera(const FInputActionValue& Value)
         * CameraMoveSpeed * GetWorld()->GetDeltaSeconds();
 
     FVector CurrentWorldLocation = SpringArmComponent->GetComponentLocation();
+    FVector NewLocation = CurrentWorldLocation + MoveDirection;
 
-    SpringArmComponent->AddWorldOffset(MoveDirection, true);
+    float DistanceToCharacter = FVector::Dist(NewLocation, playerCharacter->GetActorLocation());
 
-    FVector NewLocation = SpringArmComponent->GetComponentLocation();
-    NewLocation.Z = CurrentWorldLocation.Z;
-    SpringArmComponent->SetWorldLocation(NewLocation);
+    if (DistanceToCharacter <= 1500.0f)
+    {
+        SpringArmComponent->SetWorldLocation(NewLocation);
+    }
 }
 
 void ACharacterController::ZoomCamera(const FInputActionValue& Value)
@@ -313,5 +328,10 @@ void ACharacterController::SetBPs()
     if (IndicatorBP.Succeeded())
     {
         TargetIndicatorClass = IndicatorBP.Class;
+    }
+    static ConstructorHelpers::FClassFinder<USkillWidget> SkillWidgetBP(TEXT("/Game/Widget/W_SkillWidget"));
+    if (SkillWidgetBP.Succeeded())
+    {
+        skillWidgetClass = SkillWidgetBP.Class;
     }
 }
