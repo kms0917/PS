@@ -72,6 +72,8 @@ protected:
 
 	void UpdateMouseCursorLocation();
 
+	void UpdateSkillIndicatorLocation();
+
 	void ResetCamera();
 
 	void SetBPs();
@@ -98,6 +100,7 @@ private:
 	bool bIsSkillMode = false;
 
 	int32 savedAp = -1;
+	float savedSkillRange = -1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;

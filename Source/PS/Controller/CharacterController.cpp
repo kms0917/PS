@@ -40,34 +40,42 @@ void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함�
 
 void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange)
 {
-    savedAp = apUsage;
-    bIsSkillMode = true;
-    if (SkillRangeClass)
+    if (playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
-        FVector spawnLocation = playerCharacter->GetActorLocation();
-        spawnLocation.Z -= 90.0f;
-        skillRangeIndicator = GetWorld()->SpawnActor<ASkillRange>(SkillRangeClass, spawnLocation, FRotator::ZeroRotator);
-        if (skillRangeIndicator)
+        savedAp = apUsage;
+        savedSkillRange = skillRange;
+        bIsSkillMode = true;
+        if (SkillRangeClass)
         {
-            skillRangeIndicator->SetRadius(skillRange);
+            FVector spawnLocation = playerCharacter->GetActorLocation();
+            spawnLocation.Z -= 90.0f;
+            if (skillRangeIndicator)
+            {
+                skillRangeIndicator->Destroy();
+            }
+            skillRangeIndicator = GetWorld()->SpawnActor<ASkillRange>(SkillRangeClass, spawnLocation, FRotator::ZeroRotator);
+            if (skillRangeIndicator)
+            {
+                skillRangeIndicator->SetRadius(skillRange);
+            }
         }
+        if (AttackRangeClass)
+        {
+            FHitResult HitResult;
+            GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+            FVector spawnpoint = HitResult.ImpactPoint;
+            if (attackRangeIndicator)
+            {
+                attackRangeIndicator->Destroy();
+            }
+            attackRangeIndicator = GetWorld()->SpawnActor<ASkillIndicator>(AttackRangeClass, spawnpoint, FRotator::ZeroRotator);
+            if (attackRangeIndicator)
+            {
+                attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
+            }
+        }
+        //targetIndicator를 skillIndicator로 교체, 교체 후의 이동 및 스킬 적중 가능 로직도 필요
     }
-    if (AttackRangeClass)
-    {
-        FHitResult HitResult;
-        GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
-        FVector spawnpoint = HitResult.ImpactPoint;
-        if (attackRangeIndicator)
-        {
-            attackRangeIndicator->Destroy();
-        }
-        attackRangeIndicator = GetWorld()->SpawnActor<ASkillIndicator>(AttackRangeClass, spawnpoint, FRotator::ZeroRotator);
-        if (attackRangeIndicator)
-        {
-            attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
-        }
-    }
-    //targetIndicator를 skillIndicator로 교체, 교체 후의 이동 및 스킬 적중 가능 로직도 필요
 }
 
 void ACharacterController::BeginPlay()
@@ -149,22 +157,35 @@ void ACharacterController::Tick(float DeltaTime)
     else if (bIsSkillMode && playerCharacter)
     {
         targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
+        UpdateSkillIndicatorLocation();
     }
 }
 
 void ACharacterController::OnRightClick()
 {
-    MoveToMouseCursor();
     if (bIsSkillMode)
     {
         StopSkillMode();
+    }
+    else
+    {
+        MoveToMouseCursor();
     }
 }
 
 void ACharacterController::StopSkillMode()
 {
-    bIsSkillMode = false;
-    skillRangeIndicator->Destroy();
+    bIsSkillMode = false; 
+    savedAp = -1;
+    savedSkillRange = -1;
+    if (skillRangeIndicator)
+    {
+        skillRangeIndicator->Destroy();
+    }
+    if (attackRangeIndicator)
+    {
+        attackRangeIndicator->Destroy();
+    }
 }
 
 void ACharacterController::MoveToMouseCursor()
@@ -270,6 +291,20 @@ void ACharacterController::UpdateMouseCursorLocation()
                 }
             }
         }
+    }
+}
+
+void ACharacterController::UpdateSkillIndicatorLocation()
+{
+    FHitResult HitResult;
+    GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+
+    if (HitResult.bBlockingHit && attackRangeIndicator)
+    {
+        FVector TargetLocation = HitResult.ImpactPoint;
+        TargetLocation.Z += 1.0f;
+
+        attackRangeIndicator->SetActorLocation(TargetLocation);
     }
 }
 
