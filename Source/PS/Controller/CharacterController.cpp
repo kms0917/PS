@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Controller/CharacterController.h"
@@ -17,6 +17,8 @@
 #include "Character/CharacterBase.h"
 #include "GameMode/NormalGameMode.h"
 #include "Widget/SkillWidget.h"
+#include "Actors/SkillRange.h"
+#include "Actors/SkillIndicator.h"
 
 
 ACharacterController::ACharacterController()
@@ -34,6 +36,38 @@ void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함�
 {
     playerCharacter = Cast<ACharacterBase>(GetPawn());      //빙의 캐릭터가 바뀐 후 호출되어야 함, 게임모드에서 관리, 적 캐릭터면 기능 다 잠궈야 함
     
+}
+
+void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange)
+{
+    savedAp = apUsage;
+    bIsSkillMode = true;
+    if (SkillRangeClass)
+    {
+        FVector spawnLocation = playerCharacter->GetActorLocation();
+        spawnLocation.Z -= 90.0f;
+        skillRangeIndicator = GetWorld()->SpawnActor<ASkillRange>(SkillRangeClass, spawnLocation, FRotator::ZeroRotator);
+        if (skillRangeIndicator)
+        {
+            skillRangeIndicator->SetRadius(skillRange);
+        }
+    }
+    if (AttackRangeClass)
+    {
+        FHitResult HitResult;
+        GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+        FVector spawnpoint = HitResult.ImpactPoint;
+        if (attackRangeIndicator)
+        {
+            attackRangeIndicator->Destroy();
+        }
+        attackRangeIndicator = GetWorld()->SpawnActor<ASkillIndicator>(AttackRangeClass, spawnpoint, FRotator::ZeroRotator);
+        if (attackRangeIndicator)
+        {
+            attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
+        }
+    }
+    //targetIndicator를 skillIndicator로 교체, 교체 후의 이동 및 스킬 적중 가능 로직도 필요
 }
 
 void ACharacterController::BeginPlay()
@@ -100,22 +134,37 @@ void ACharacterController::Tick(float DeltaTime)
     {
         SpringArmComponent->SetRelativeLocation(CharacterLocation);
     }
-    if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
+    UpdateCameraRotation();
+
+    if (!bIsSkillMode && playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
         bIsStop = true;
         UpdateMouseCursorLocation();
     }
-    else
+    else if (!bIsSkillMode && playerCharacter)
     {
         targetIndicator->SetActorHiddenInGame(true);
         bIsStop = false;
     }
-    UpdateCameraRotation();
+    else if (bIsSkillMode && playerCharacter)
+    {
+        targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
+    }
 }
 
 void ACharacterController::OnRightClick()
 {
     MoveToMouseCursor();
+    if (bIsSkillMode)
+    {
+        StopSkillMode();
+    }
+}
+
+void ACharacterController::StopSkillMode()
+{
+    bIsSkillMode = false;
+    skillRangeIndicator->Destroy();
 }
 
 void ACharacterController::MoveToMouseCursor()
@@ -328,6 +377,16 @@ void ACharacterController::SetBPs()
     if (IndicatorBP.Succeeded())
     {
         TargetIndicatorClass = IndicatorBP.Class;
+    }
+    static ConstructorHelpers::FClassFinder<AActor> SkillRangeBP(TEXT("/Game/Actor/BP_SkillRange"));
+    if (SkillRangeBP.Succeeded())
+    {
+        SkillRangeClass = SkillRangeBP.Class;
+    }
+    static ConstructorHelpers::FClassFinder<AActor> AttackRangeBP(TEXT("/Game/Actor/BP_SkillIndicator"));
+    if (AttackRangeBP.Succeeded())
+    {
+        AttackRangeClass = AttackRangeBP.Class;
     }
     static ConstructorHelpers::FClassFinder<USkillWidget> SkillWidgetBP(TEXT("/Game/Widget/W_SkillWidget"));
     if (SkillWidgetBP.Succeeded())

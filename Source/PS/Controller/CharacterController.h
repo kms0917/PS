@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,6 +14,8 @@ class USpringArmComponent;
 class ACharacterBase;
 class ANormalGameMode;
 class USkillWidget;
+class ASkillRange;
+class ASkillIndicator;
 /**
  * 
  */
@@ -26,6 +28,8 @@ public:
 	ACharacterController();
 
 	void OnTurnChanged();
+
+	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float totalDistance;
@@ -62,6 +66,8 @@ protected:
 
 	void OnRightClick();
 
+	void StopSkillMode();
+
 	void MoveToMouseCursor();
 
 	void UpdateMouseCursorLocation();
@@ -73,14 +79,25 @@ protected:
 private:
 	UPROPERTY()
 	TSubclassOf<AActor> TargetIndicatorClass;
-
 	AActor* targetIndicator;
+
+	UPROPERTY()
+	TSubclassOf<AActor> SkillRangeClass;
+	ASkillRange* skillRangeIndicator;
+
+	UPROPERTY()
+	TSubclassOf<AActor> AttackRangeClass;
+	ASkillIndicator* attackRangeIndicator;
 
 	ACharacterBase* playerCharacter;
 
 	ANormalGameMode* gameMode;
 
 	FVector stopPoint;
+
+	bool bIsSkillMode = false;
+
+	int32 savedAp = -1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;

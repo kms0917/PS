@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Objects/Skills/BasicAttack.h"
@@ -14,6 +14,6 @@ UBasicAttack::UBasicAttack()
 	damage = 0;
 	magnification = 1.0f;
 	bIsMag = false;
-	skillName = FText::FromString("기본 공격");
-	skillScript = FText::FromString("힘에 비례한 일격");
+	skillName = FText::FromString(TEXT("기본 공격"));
+	skillScript = FText::FromString(TEXT("힘에 비례한 일격"));
 }

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Character/Warrior.h"
@@ -54,4 +54,5 @@ void AWarrior::SetDefaultSkills()
 {
 	UBasicAttack* defaultSkill = NewObject<UBasicAttack>(this, UBasicAttack::StaticClass(), TEXT("Basic Attack"));
 	skillComponent->AddSkill(defaultSkill);
+
 }

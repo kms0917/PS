@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "CharacterBase.h"
@@ -95,7 +95,8 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 		CalcCritical(usedSkill->critical);
 		CalcAccuracy(usedSkill->accuracy);
 		int damage = CalcDamage(usedSkill->damage, usedSkill->magnification, usedSkill->bIsMag);
-		//플레이어 컨트롤러로 위의 값들 + skillRange, attackRange, apUsage 다 넘겨야함
+		//UE_LOG(LogTemp, Warning, TEXT("Skill Index Clicked: %d"), i);
+		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange);
 	}
 }
 

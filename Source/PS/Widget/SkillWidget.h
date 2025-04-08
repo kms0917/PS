@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,6 +8,8 @@
 
 class ACharacterBase;
 class UUniformGridPanel;
+class USkillButtonWidget;
+
 /**
  * 
  */
@@ -20,6 +22,10 @@ protected:
 	virtual void NativeConstruct() override;
 
 	ACharacterBase* currentCharacter;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<USkillButtonWidget> SkillButtonClass;
+
 
 public:
 	void UpdateWidget(ACharacterBase* ControlledCharacter);
