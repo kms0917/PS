@@ -156,7 +156,7 @@ void ACharacterController::Tick(float DeltaTime)
     }
     else if (bIsSkillMode && playerCharacter)
     {
-        targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
+        //targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
         UpdateSkillIndicatorLocation();
     }
 }
@@ -299,14 +299,86 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
 
-    if (HitResult.bBlockingHit && attackRangeIndicator)
-    {
-        FVector TargetLocation = HitResult.ImpactPoint;
-        TargetLocation.Z += 1.0f;
+    if (!HitResult.bBlockingHit || !attackRangeIndicator || !playerCharacter) return;
 
-        attackRangeIndicator->SetActorLocation(TargetLocation);
+    // 1. 마우스 위치에 공격범위 인디케이터 이동
+    FVector MouseLocation = HitResult.ImpactPoint;
+    //MouseLocation.Z += 1.0f;
+    attackRangeIndicator->SetActorLocation(MouseLocation);
+
+    // 2. NavMesh 경로 계산
+    UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+    if (!NavSystem) return;
+
+    FNavLocation ProjectedMouseNavLocation;
+    if (!NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation)) return;
+
+    FVector CharacterLocation = playerCharacter->GetActorLocation();
+    UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(this, CharacterLocation, ProjectedMouseNavLocation.Location);
+    if (!NavPath || !NavPath->IsValid()) return;
+
+    // 3. 경로를 일정 간격으로 세분화하여 검사
+    const float SkillRange = savedSkillRange;
+    const float StepSize = 10.0f; //10cm 간격
+    float ClosestDistSq = TNumericLimits<float>::Max();
+    FVector BestLocation = FVector::ZeroVector;
+    bool bFound = false;
+
+    for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; ++i)
+    {
+        FVector Start = NavPath->PathPoints[i];
+        FVector End = NavPath->PathPoints[i + 1];
+        float SegmentLength = FVector::Dist(Start, End);
+        FVector Direction = (End - Start).GetSafeNormal();
+
+        int32 NumSteps = FMath::CeilToInt(SegmentLength / StepSize);
+        for (int32 Step = 0; Step <= NumSteps; ++Step)
+        {
+            FVector Point = Start + Direction * Step * StepSize;
+
+            // 조건 1: 마우스로부터의 거리
+            float DistToMouse = FVector::Dist(Point, MouseLocation);
+            if (DistToMouse > SkillRange) continue;
+
+            // 조건 2: 장애물 없는지 라인트레이스
+            FHitResult LineHit;
+            FCollisionQueryParams TraceParams(FName(TEXT("SkillTrace")), true, this);
+            TraceParams.bReturnPhysicalMaterial = false;
+            TraceParams.AddIgnoredActor(playerCharacter);
+
+            bool bBlocked = GetWorld()->LineTraceSingleByChannel(
+                LineHit,
+                Point + FVector(0, 0, 3),
+                MouseLocation + FVector(0, 0, 3),
+                ECC_Visibility,
+                TraceParams
+            );
+
+            if (!bBlocked)
+            {
+                float DistSqToCharacter = FVector::DistSquared(Point, CharacterLocation);
+                if (DistSqToCharacter < ClosestDistSq)
+                {
+                    ClosestDistSq = DistSqToCharacter;
+                    BestLocation = Point;
+                    bFound = true;
+                }
+            }
+        }
+    }
+
+    // 4. 결과 적용
+    if (bFound)
+    {
+        targetIndicator->SetActorLocation(BestLocation + FVector(0, 0, 1.0f));
+        targetIndicator->SetActorHiddenInGame(false);
+    }
+    else
+    {
+        targetIndicator->SetActorHiddenInGame(true);
     }
 }
+
 
 void ACharacterController::ResetCamera()
 {
