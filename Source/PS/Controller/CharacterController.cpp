@@ -134,6 +134,8 @@ void ACharacterController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     
+    if (!playerCharacter || !SpringArmComponent) return;
+
     FVector CharacterLocation = playerCharacter->GetActorLocation();  // 캐릭터의 위치
     FVector SpringArmLocation = SpringArmComponent->GetComponentLocation();  // 스프링 암의 위치
     if (!IsInputKeyDown(EKeys::W) && !IsInputKeyDown(EKeys::A) && !IsInputKeyDown(EKeys::S) && !IsInputKeyDown(EKeys::D)
@@ -158,6 +160,21 @@ void ACharacterController::Tick(float DeltaTime)
     {
         //targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
         UpdateSkillIndicatorLocation();
+    }
+
+    float Distance = FVector::Dist(SpringArmLocation, CharacterLocation);
+
+    if (Distance <= MaxDistance)
+    {
+        bCanMoveCamera = true;
+    }
+    else
+    {
+        bCanMoveCamera = false;
+
+        FVector Direction = (SpringArmLocation - CharacterLocation).GetSafeNormal();
+        FVector TargetLocation = CharacterLocation + Direction * (MaxDistance - 10.0f);
+        SpringArmComponent->SetWorldLocation(TargetLocation);
     }
 }
 
@@ -403,7 +420,7 @@ void ACharacterController::RotateCamera(const FInputActionValue& Value)
 
 void ACharacterController::MoveCamera(const FInputActionValue& Value)
 {
-    if (!SpringArmComponent || !playerCharacter) return;
+    if (!SpringArmComponent || !playerCharacter || !bCanMoveCamera) return;
 
     FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -418,15 +435,7 @@ void ACharacterController::MoveCamera(const FInputActionValue& Value)
     FVector MoveDirection = (Forward * MovementVector.Y + Right * MovementVector.X)
         * CameraMoveSpeed * GetWorld()->GetDeltaSeconds();
 
-    FVector CurrentWorldLocation = SpringArmComponent->GetComponentLocation();
-    FVector NewLocation = CurrentWorldLocation + MoveDirection;
-
-    float DistanceToCharacter = FVector::Dist(NewLocation, playerCharacter->GetActorLocation());
-
-    if (DistanceToCharacter <= 1500.0f)
-    {
-        SpringArmComponent->SetWorldLocation(NewLocation);
-    }
+    SpringArmComponent->SetWorldLocation(SpringArmComponent->GetComponentLocation() + MoveDirection);
 }
 
 void ACharacterController::ZoomCamera(const FInputActionValue& Value)

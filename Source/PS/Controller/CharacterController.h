@@ -101,6 +101,7 @@ private:
 
 	int32 savedAp = -1;
 	float savedSkillRange = -1;
+	bool bCanMoveCamera = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;
@@ -112,9 +113,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraMoveSpeed;
-
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraRotateSpeed;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float MaxDistance = 1500.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float ZoomSpeed = 200.0f;
