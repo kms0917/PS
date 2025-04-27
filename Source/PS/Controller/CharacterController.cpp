@@ -389,13 +389,69 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     {
         targetIndicator->SetActorLocation(BestLocation + FVector(0, 0, 1.0f));
         targetIndicator->SetActorHiddenInGame(false);
+
+        FNavLocation NavLocation;
+        if (NavSystem->ProjectPointToNavigation(BestLocation, NavLocation))
+        {
+            // 네비메시 경로 계산
+            UNavigationPath* NavPath2 = NavSystem->FindPathToLocationSynchronously(
+                this, CharacterLocation, NavLocation.Location);
+            if (NavPath2 && NavPath2->IsValid())
+            {
+                float maxMoveDistance = playerCharacter ? playerCharacter->currentMoveSpeed * 100.0f : 0.0f;  // cm 변환
+                float totalPathDistance = 0.0f;
+                bool reachedLimit = false;
+
+                FVector previousEnd = NavPath2->PathPoints[0]; // 첫 지점을 기준으로 설정
+                stopPoint = FVector::ZeroVector;
+                FColor CylinderColor = FColor::White; // 기본 흰색
+
+                for (int32 i = 1; i < NavPath2->PathPoints.Num(); i++)
+                {
+                    FVector Start = previousEnd;
+                    FVector End = NavPath2->PathPoints[i];
+                    float segmentDistance = FVector::Dist(Start, End);
+
+                    if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
+                    {
+                        if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
+                        {
+                            float remainingDistance = maxMoveDistance - totalPathDistance;
+                            FVector Direction = (End - Start).GetSafeNormal();
+                            stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
+                            // 이동 가능한 거리까지 흰색으로 표시
+                            DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
+                            // 초과 부분을 빨간색으로 표시
+                            Start = stopPoint;
+                            if (targetIndicator)
+                            {
+                                targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 0));
+                            }
+                            CylinderColor = FColor::Red;
+                            reachedLimit = true;
+                        }
+                    }
+                    // 초과한 구간은 계속 빨간색으로 유지
+                    DrawDebugCylinder(GetWorld(), Start, End, 10.0f, 12, CylinderColor, false, -1, 0, 1);
+
+                    totalPathDistance += segmentDistance;
+                    previousEnd = End; // 이전 끝점을 갱신
+                }
+
+                totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
+
+                if (playerCharacter)
+                {
+                    bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
+                }
+            }
+        }
     }
     else
     {
         targetIndicator->SetActorHiddenInGame(true);
     }
 }
-
 
 void ACharacterController::ResetCamera()
 {
