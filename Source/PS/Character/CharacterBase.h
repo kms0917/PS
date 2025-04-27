@@ -64,7 +64,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void UseSkill(int i);
-	void ReflectDamage(int finalDamage, float acurracyRate, float criticalRate);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
+	void ReflectDamage(int Damage, float acurracyRate, float criticalRate, bool bIsMag);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
 	void GetEXP();	//아군용
 	void SetLevel();	//적군용
 

@@ -100,22 +100,34 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 	}
 }
 
-void ACharacterBase::ReflectDamage(int finalDamage, float acurracyRate, float criticalRate)
+void ACharacterBase::ReflectDamage(int Damage, float acurracyRate, float criticalRate, bool bIsMag)
 {
 	//피공격자의 회피보다 공격자의 명중이 높게 나오면 공격 성공, 물리인지, 마법인지는 마우스에 따라다닐 위젯 컴포넌트에서 대응되는 방어스탯 가져와 계산 후 데미지만 넘겨줌, 데미지 값과 명중, 회심률에 따라 체력만 반영하면 됨
 	if (FMath::RandRange(1, (int)acurracyRate) > evasion)
 	{
-		if (FMath::RandRange(1, 100) <= critical)
+		if (bIsMag)
 		{
-			finalDamage *= 2;
+			Damage -= res;
 		}
-		currentHp -= finalDamage;
+		else
+		{
+			Damage -= def;
+		}
+		if (FMath::RandRange(1, 100) <= criticalRate)
+		{
+			Damage *= 2;
+		}
+		currentHp -= Damage;
 		//체력 컴포넌트 값 변경해줘야함
 		if (currentHp <= 0)
 		{
 			this->Destroy();
 			//게임모드의 큐에서 해당 캐릭터 삭제해줘야함
 		}
+	}
+	else
+	{
+		//회피시의 로직 필요
 	}
 }
 
