@@ -31,7 +31,9 @@ AWarrior::AWarrior()
 	speedGrowth = 55;
 	SetDefaultEquipments();
 	SetDefaultSkills();
+
 	SetStats();
+	SetSkillInfo();
 }
 
 void AWarrior::SetDefaultEquipments()	//추후 인벤토리 생기면 인벤토리에도 장비 추가해야함

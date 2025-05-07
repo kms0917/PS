@@ -32,10 +32,15 @@ void ASkillIndicator::BeginPlay()
 	
 }
 
-void ASkillIndicator::SetSkillIndicator(int32 accuracy, int32 critical, int32 damage, bool isMag, float attackRange)
+void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, float attackRange)
 {
     const float Scale = attackRange / 50.0f;
     SetActorScale3D(FVector(Scale, Scale, 0.01f));
+
+    accuracy = accuracyRate;
+    critical = criticalRate;
+    damage = Damage;
+    bIsMag = isMag;
 }
 
 // Called every frame

@@ -17,6 +17,7 @@
 #include "Character/CharacterBase.h"
 #include "GameMode/NormalGameMode.h"
 #include "Widget/SkillWidget.h"
+#include "Widget/SkillInfoWidget.h"
 #include "Actors/SkillRange.h"
 #include "Actors/SkillIndicator.h"
 
@@ -74,7 +75,6 @@ void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 d
                 attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
             }
         }
-        //targetIndicator를 skillIndicator로 교체, 교체 후의 이동 및 스킬 적중 가능 로직도 필요
     }
 }
 
@@ -97,6 +97,7 @@ void ACharacterController::BeginPlay()
             targetIndicator->SetActorHiddenInGame(true); //처음엔 숨김
         }
     }
+    //이 밑부분들은 턴 개시시마다 실행되어야 함
     if (APawn* ControlledPawn = GetPawn())
     {
         SpringArmComponent = ControlledPawn->FindComponentByClass<USpringArmComponent>();
@@ -336,7 +337,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
 
     // 3. 경로를 일정 간격으로 세분화하여 검사
     const float SkillRange = savedSkillRange;
-    const float StepSize = 10.0f; //10cm 간격
+    const float StepSize = 3.0f; //10cm 간격
     float ClosestDistSq = TNumericLimits<float>::Max();
     FVector BestLocation = FVector::ZeroVector;
     bool bFound = false;

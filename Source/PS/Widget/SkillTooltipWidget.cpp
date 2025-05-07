@@ -11,4 +11,8 @@ void USkillTooltipWidget::SettingTooltip(USkillBase* skill)
 	skillName->SetText(skill->skillName);
 	skillScript->SetText(skill->skillScript);
 	apUsage->SetText(FText::AsNumber(skill->apUsage));
+	damage->SetText(FText::AsNumber(skill->calculatedDamage));
+	accuracy->SetText(FText::AsNumber(skill->calculatedAccuracy));
+	critical->SetText(FText::AsNumber(skill->calculatedCritical));
+	evasion->SetText(FText::AsNumber(skill->calculatedEvasion));
 }

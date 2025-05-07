@@ -14,6 +14,7 @@ class USpringArmComponent;
 class ACharacterBase;
 class ANormalGameMode;
 class USkillWidget;
+class USkillInfoWidget;
 class ASkillRange;
 class ASkillIndicator;
 /**

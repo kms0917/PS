@@ -8,6 +8,7 @@
 #include "CharacterBase.generated.h"
 
 class UHealthWidget;
+class USkillInfoWidget;
 class ACharacterController;
 class UEquipmentComponent;
 class USkillComponent;
@@ -25,10 +26,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SetStats();
-	void CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
-	void CalcEvasion(int correction);
-	void CalcAccuracy(int correction);
+	void SetStats();			//첫 생성시와 매 턴 시작시 호출
+	void SetSkillInfo();		//첫 생성시와 매 턴 시작시 호출
+	int CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
+	int CalcEvasion(int correction);
+	int CalcAccuracy(int correction);
 	int CalcDamage(int damage, float magnification, bool isMag);
 	void LevelUp();		//GetEXP 후 호출
 
@@ -107,26 +109,33 @@ public:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 exp = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 level = 1;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 accuracy;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 evasion;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 critical;
 
 	UPROPERTY(VisibleAnywhere)
 	UEquipmentComponent* equipmentComponent;
-
 	UPROPERTY(VisibleAnywhere)
 	USkillComponent* skillComponent;
 
+	UPROPERTY()
+	UWidgetComponent* skillInfoWidgetComponent;					//공격 범위 안에 들어갈 시 공격 정보를 띄움
+	UPROPERTY()
+	USkillInfoWidget* skillInfoWidget;
+
+	UPROPERTY()
+	bool bIsTargeted = true;
+
 private:
+	void UpdateWidgetRotation();
+	void UpdateSkillInfoWidgetLocation();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* cameraComponent;
 
@@ -136,7 +145,7 @@ private:
 	ACharacterController* playerController;
 
 	UPROPERTY()
-	UWidgetComponent* widgetComponent;		//체력 및 남은 턴수 표시
+	UWidgetComponent* healthWidgetComponent;		//체력 및 남은 턴수 표시
 
 	UPROPERTY()
 	UHealthWidget* healthWidget;	//위의 위젯을 캐스팅해서 담을 변수

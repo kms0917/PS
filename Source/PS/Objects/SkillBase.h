@@ -47,4 +47,16 @@ public:
 
 	UPROPERTY(EditAnyWhere, Category = "Script")
 	FText skillScript = FText::FromString(" ");
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	int32 calculatedDamage = 0;
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	int32 calculatedAccuracy = 0;
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	int32 calculatedCritical = 0;
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	int32 calculatedEvasion = 0;
 };

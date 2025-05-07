@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Widget/HealthWidget.h"
+#include "Widget/SkillInfoWidget.h"
 #include "Controller/CharacterController.h"
 #include "ActorComponent/EquipmentComponent.h"
 #include "ActorComponent/SkillComponent.h"
@@ -35,13 +36,22 @@ ACharacterBase::ACharacterBase()
 	cameraComponent->SetupAttachment(springArmComponent, USpringArmComponent::SocketName);
 	cameraComponent->bUsePawnControlRotation = false;
 
-	widgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
-	widgetComponent->SetupAttachment(RootComponent);
+	healthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
+	healthWidgetComponent->SetupAttachment(RootComponent);
+	skillInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("skillInfoWidget"));
+	//skillInfoWidgetComponent->SetupAttachment(springArmComponent);
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("WidgetBlueprint'/Game/Widget/W_HealthWidget'"));
 	if (WidgetClass.Succeeded())
 	{
-		widgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
+		healthWidgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
 	}
+	static ConstructorHelpers::FClassFinder<UUserWidget> SkillInfoWidgetBP(TEXT("WidgetBlueprint'/Game/Widget/W_SkillInfoWidget'"));
+	if (SkillInfoWidgetBP.Succeeded())
+	{
+		skillInfoWidgetComponent->SetWidgetClass(SkillInfoWidgetBP.Class);
+	}
+
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
 }
@@ -51,14 +61,20 @@ void ACharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	playerController = Cast<ACharacterController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	healthWidget = Cast<UHealthWidget>(widgetComponent->GetWidget());
+	healthWidget = Cast<UHealthWidget>(healthWidgetComponent->GetWidget());
 	if (healthWidget)
 	{
 		healthWidget->SetHealthBar(currentHp, hp);
 		healthWidget->SetTurnText(-1);					//비워놓기, 전투 시작 시 채워야 함
-		widgetComponent->SetDrawSize(FVector2D(250.0f, 30.0f));
-		widgetComponent->SetWidgetSpace(EWidgetSpace::World);
-		widgetComponent->SetRelativeLocation(FVector(0, 0, 200.0f));  // 캐릭터 머리 위로 배치
+		healthWidgetComponent->SetDrawSize(FVector2D(250.0f, 30.0f));
+		healthWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+		healthWidgetComponent->SetRelativeLocation(FVector(0, 0, 200.0f));  // 캐릭터 머리 위로 배치
+	}
+	skillInfoWidget = Cast<USkillInfoWidget>(skillInfoWidgetComponent->GetWidget());
+	if (skillInfoWidget)
+	{
+		skillInfoWidgetComponent->SetDrawSize(FVector2D(800.0f, 90.0f));
+		skillInfoWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
 	}
 }
 
@@ -66,10 +82,11 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FRotator NewRotation = playerController->cameraRotation;
-	NewRotation.Yaw += 180.0f;
-	NewRotation.Pitch += 120.0f;
-	widgetComponent->SetWorldRotation(NewRotation);
+	UpdateWidgetRotation();
+	if (bIsTargeted)
+	{
+		UpdateSkillInfoWidgetLocation();
+	}
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -91,11 +108,10 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 	if (skillComponent->skillList.IsValidIndex(i))
 	{
 		USkillBase* usedSkill = skillComponent->skillList[i];
-		CalcEvasion(usedSkill->evasion);
-		CalcCritical(usedSkill->critical);
-		CalcAccuracy(usedSkill->accuracy);
-		int damage = CalcDamage(usedSkill->damage, usedSkill->magnification, usedSkill->bIsMag);
-		//UE_LOG(LogTemp, Warning, TEXT("Skill Index Clicked: %d"), i);
+		evasion = usedSkill->calculatedEvasion;
+		critical = usedSkill->calculatedCritical;
+		accuracy = usedSkill->calculatedAccuracy;
+		int damage = usedSkill->calculatedDamage;
 		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange);
 	}
 }
@@ -145,6 +161,35 @@ void ACharacterBase::SetLevel()		//적들의 레벨 스케일링에 사용될 �
 {
 }
 
+void ACharacterBase::UpdateWidgetRotation()
+{
+	FRotator NewRotation = playerController->cameraRotation;
+	NewRotation.Yaw += 180.0f;
+	NewRotation.Pitch += 120.0f;
+	healthWidgetComponent->SetWorldRotation(NewRotation);
+	skillInfoWidgetComponent->SetWorldRotation(NewRotation);
+}
+
+void ACharacterBase::UpdateSkillInfoWidgetLocation()
+{
+	if (!skillInfoWidgetComponent || !playerController) return;
+
+	FVector CharacterLocation = GetActorLocation();
+	const FRotator& CameraRot = playerController->cameraRotation;
+
+	FVector CameraRight = FRotationMatrix(CameraRot).GetUnitAxis(EAxis::Y);
+	FVector CameraForward = FRotationMatrix(CameraRot).GetUnitAxis(EAxis::X);
+
+	const float RightOffset = 550.0f;
+	const float ForwardOffset = -60.0f;
+
+	FVector Offset = CameraForward * ForwardOffset + CameraRight * RightOffset;
+
+
+	FVector WidgetWorldLocation = CharacterLocation + Offset;
+	skillInfoWidgetComponent->SetWorldLocation(WidgetWorldLocation);
+}
+
 int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 {
 	if (!isMag)			//물리 딜
@@ -168,24 +213,37 @@ void ACharacterBase::SetStats()		//매 턴 개시 및 하위 클래스 생성자
 	currentSpeed = speed + equipmentComponent->equipmentSpeed;
 	currentStr = str + equipmentComponent->equipmentStr;
 	currentAp = ap + equipmentComponent->equipmentAp;
-	CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
-	CalcEvasion(0);
-	CalcAccuracy(0);
+	critical = CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
+	evasion = CalcEvasion(0);
+	accuracy = CalcAccuracy(0);
 }
 
-void ACharacterBase::CalcCritical(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
+void ACharacterBase::SetSkillInfo()
 {
-	critical = skill + equipmentComponent->equipmentCritical + correction;
+	TArray<USkillBase*> skills = skillComponent->skillList;
+
+	for (int i = 0; i < skills.Num(); i++)
+	{
+		skills[i]->calculatedDamage = CalcDamage(skills[i]->damage, skills[i]->magnification, skills[i]->bIsMag);
+		skills[i]->calculatedAccuracy = CalcAccuracy(skills[i]->accuracy);
+		skills[i]->calculatedCritical = CalcCritical(skills[i]->critical);
+		skills[i]->calculatedEvasion = CalcEvasion(skills[i]->evasion);
+	}
 }
 
-void ACharacterBase::CalcEvasion(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
+int ACharacterBase::CalcCritical(int correction)
 {
-	evasion = speed * 1.2 + equipmentComponent->equipmentEvasion + correction;
+	return (skill + equipmentComponent->equipmentCritical + correction);
 }
 
-void ACharacterBase::CalcAccuracy(int correction)		//턴 개시시 스탯 계산 및 스킬 사용시 호출, correction으로 스킬의 값(스탯 사용한 식일수도) 넘겨줌
+int ACharacterBase::CalcEvasion(int correction)
 {
-	accuracy = skill * 1.2 + equipmentComponent->equipmentAccuracy + correction;
+	return (speed * 1.2 + equipmentComponent->equipmentEvasion + correction);
+}
+
+int ACharacterBase::CalcAccuracy(int correction)
+{
+	return (skill * 1.2 + equipmentComponent->equipmentAccuracy + correction);
 }
 
 void ACharacterBase::LevelUp()

@@ -29,4 +29,15 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* apUsage;
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* damage;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* accuracy;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* critical;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* evasion;
 };

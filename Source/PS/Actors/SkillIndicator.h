@@ -23,6 +23,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComponent;
 
+	int32 damage;
+	int32 accuracy;
+	int32 critical;
+	bool bIsMag;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
