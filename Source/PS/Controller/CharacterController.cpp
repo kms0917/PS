@@ -321,7 +321,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
 
     // 1. 마우스 위치에 공격범위 인디케이터 이동
     FVector MouseLocation = HitResult.ImpactPoint;
-    //MouseLocation.Z += 1.0f;
+    MouseLocation.Z = 1.0f;
     attackRangeIndicator->SetActorLocation(MouseLocation);
 
     // 2. NavMesh 경로 계산
@@ -329,7 +329,14 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     if (!NavSystem) return;
 
     FNavLocation ProjectedMouseNavLocation;
-    if (!NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation)) return;
+    bool bNavProjected = NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation);
+
+    if (!bNavProjected)
+    {
+        const float SearchRadius = 100.0f; // 1m
+        bNavProjected = NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation, FVector(SearchRadius, SearchRadius, 2000.0f));
+        if (!bNavProjected) return;
+    }
 
     FVector CharacterLocation = playerCharacter->GetActorLocation();
     UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(this, CharacterLocation, ProjectedMouseNavLocation.Location);
@@ -348,8 +355,8 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         FVector End = NavPath->PathPoints[i + 1];
         float SegmentLength = FVector::Dist(Start, End);
         FVector Direction = (End - Start).GetSafeNormal();
-
         int32 NumSteps = FMath::CeilToInt(SegmentLength / StepSize);
+
         for (int32 Step = 0; Step <= NumSteps; ++Step)
         {
             FVector Point = Start + Direction * Step * StepSize;
@@ -372,7 +379,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
                 TraceParams
             );
 
-            if (!bBlocked)
+            if (!bBlocked && !bFound)
             {
                 float DistSqToCharacter = FVector::DistSquared(Point, CharacterLocation);
                 if (DistSqToCharacter < ClosestDistSq)

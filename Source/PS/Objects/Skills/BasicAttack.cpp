@@ -5,8 +5,8 @@
 
 UBasicAttack::UBasicAttack()
 {
-	skillRange = 50.0f;
-	attackRange = 10.0f;
+	skillRange = 100.0f;
+	attackRange = 50.0f;
 	apUsage = 1;
 	accuracy = 40;
 	critical = 0;
