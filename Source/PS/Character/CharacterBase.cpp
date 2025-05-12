@@ -45,11 +45,13 @@ ACharacterBase::ACharacterBase()
 	if (WidgetClass.Succeeded())
 	{
 		healthWidgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
+		healthWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 	static ConstructorHelpers::FClassFinder<UUserWidget> SkillInfoWidgetBP(TEXT("WidgetBlueprint'/Game/Widget/W_SkillInfoWidget'"));
 	if (SkillInfoWidgetBP.Succeeded())
 	{
 		skillInfoWidgetComponent->SetWidgetClass(SkillInfoWidgetBP.Class);
+		skillInfoWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));

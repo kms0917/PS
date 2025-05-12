@@ -8,6 +8,7 @@
 #include "MovePoint.generated.h"
 
 class ACharacterController;
+class UDistanceWidget;
 
 UCLASS()
 class PS_API AMovePoint : public AActor
@@ -32,6 +33,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* SphereComponent;
 
+	void SetReachableText();
+	void HideReachableText();
+
 private:
 	ACharacterController* PlayerController;
+
+	UDistanceWidget* distanceWidget;
 };

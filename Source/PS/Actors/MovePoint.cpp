@@ -5,6 +5,7 @@
 #include "Widget/DistanceWidget.h"
 #include "Controller/CharacterController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/TextBlock.h"
 
 // Sets default values
 AMovePoint::AMovePoint()
@@ -32,7 +33,7 @@ void AMovePoint::BeginPlay()
 	Super::BeginPlay();
 	
 	PlayerController = Cast<ACharacterController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-
+	distanceWidget = Cast<UDistanceWidget>(WidgetComponent->GetWidget());
 }
 
 // Called every frame
@@ -45,5 +46,15 @@ void AMovePoint::Tick(float DeltaTime)
 	NewRotation.Pitch += 120.0f;
 	WidgetComponent->SetWorldRotation(NewRotation);
 
+}
+
+void AMovePoint::SetReachableText()
+{
+	distanceWidget->ReachableText->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AMovePoint::HideReachableText()
+{
+	distanceWidget->ReachableText->SetVisibility(ESlateVisibility::Collapsed);
 }
 

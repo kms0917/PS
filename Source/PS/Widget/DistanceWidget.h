@@ -22,12 +22,11 @@ public:
 
     virtual void NativeConstruct() override;
 
-protected:
-    UPROPERTY(meta = (BindWidget))
-    class UTextBlock* DistanceText;
-
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* ReachableText;
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* DistanceText;
 
 private:
     ACharacterController* playerController;

@@ -14,19 +14,9 @@ void UDistanceWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 	if (playerController && DistanceText && ReachableText)
 	{
 		DistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f m"), playerController->totalDistance)));
-
-	/*	if (!playerController->bIsReachable && gameMode->bIsBattle)
-		{
-			ReachableText->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			ReachableText->SetVisibility(ESlateVisibility::Collapsed);
-		}*/
-		if (!playerController->bIsStop)
+		if (!playerController->bIsStop || ReachableText->Visibility == ESlateVisibility::Visible)
 		{
 			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
-	//		ReachableText->SetVisibility(ESlateVisibility::Collapsed);
 		}
 		else
 		{

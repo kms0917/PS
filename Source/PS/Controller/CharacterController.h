@@ -17,6 +17,7 @@ class USkillWidget;
 class USkillInfoWidget;
 class ASkillRange;
 class ASkillIndicator;
+class AMovePoint;
 /**
  * 
  */
@@ -82,7 +83,7 @@ protected:
 private:
 	UPROPERTY()
 	TSubclassOf<AActor> TargetIndicatorClass;
-	AActor* targetIndicator;
+	AMovePoint* targetIndicator;
 
 	UPROPERTY()
 	TSubclassOf<AActor> SkillRangeClass;
@@ -104,6 +105,8 @@ private:
 	float savedSkillRange = -1;
 	bool bCanMoveCamera = true;
 
+	FVector2D LastMousePosition = FVector2D::ZeroVector;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;
 
@@ -111,6 +114,9 @@ private:
 	void MoveCamera(const FInputActionValue& Value);
 	void ZoomCamera(const FInputActionValue& Value);
 	void UpdateCameraRotation();
+	void CheckCameraAttachtoCharacter();
+	void CheckCharacterMove();
+	void SetNavPath();
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraMoveSpeed;

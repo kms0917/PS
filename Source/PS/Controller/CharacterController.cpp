@@ -20,6 +20,7 @@
 #include "Widget/SkillInfoWidget.h"
 #include "Actors/SkillRange.h"
 #include "Actors/SkillIndicator.h"
+#include "Actors/MovePoint.h"
 
 
 ACharacterController::ACharacterController()
@@ -41,7 +42,7 @@ void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함�
 
 void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange)
 {
-    if (playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
+    if (bIsStop)
     {
         savedAp = apUsage;
         savedSkillRange = skillRange;
@@ -91,7 +92,7 @@ void ACharacterController::BeginPlay()
     }
     if (TargetIndicatorClass)
     {
-        targetIndicator = GetWorld()->SpawnActor<AActor>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
+        targetIndicator = GetWorld()->SpawnActor<AMovePoint>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
         if (targetIndicator)
         {
             targetIndicator->SetActorHiddenInGame(true); //처음엔 숨김
@@ -137,46 +138,18 @@ void ACharacterController::Tick(float DeltaTime)
     
     if (!playerCharacter || !SpringArmComponent) return;
 
-    FVector CharacterLocation = playerCharacter->GetActorLocation();  // 캐릭터의 위치
-    FVector SpringArmLocation = SpringArmComponent->GetComponentLocation();  // 스프링 암의 위치
-    if (!IsInputKeyDown(EKeys::W) && !IsInputKeyDown(EKeys::A) && !IsInputKeyDown(EKeys::S) && !IsInputKeyDown(EKeys::D)
-        && FMath::IsNearlyEqual(CharacterLocation.X, SpringArmLocation.X, 15.0f) 
-        && FMath::IsNearlyEqual(CharacterLocation.Y, SpringArmLocation.Y, 15.0f))
+    CheckCameraAttachtoCharacter();     //카메라 이동 보조
+    UpdateCameraRotation();         //위젯 각도 조절 위한 값 저장
+    CheckCharacterMove();           //멈춰있는지 여부에 따라 flag 변경해 targetIndicator에서 위젯 표시 제어
+    if (!bIsSkillMode && playerCharacter && bIsStop)
     {
-        SpringArmComponent->SetRelativeLocation(CharacterLocation);
-    }
-    UpdateCameraRotation();
-
-    if (!bIsSkillMode && playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
-    {
-        bIsStop = true;
         UpdateMouseCursorLocation();
-    }
-    else if (!bIsSkillMode && playerCharacter)
-    {
-        targetIndicator->SetActorHiddenInGame(true);
-        bIsStop = false;
     }
     else if (bIsSkillMode && playerCharacter)
     {
-        //targetIndicator->SetActorHiddenInGame(true);    //스킬 모드일땐 targetIndicator 안보이도록
         UpdateSkillIndicatorLocation();
     }
-
-    float Distance = FVector::Dist(SpringArmLocation, CharacterLocation);
-
-    if (Distance <= MaxDistance)
-    {
-        bCanMoveCamera = true;
-    }
-    else
-    {
-        bCanMoveCamera = false;
-
-        FVector Direction = (SpringArmLocation - CharacterLocation).GetSafeNormal();
-        FVector TargetLocation = CharacterLocation + Direction * (MaxDistance - 10.0f);
-        SpringArmComponent->SetWorldLocation(TargetLocation);
-    }
+    SetNavPath();                   //targetIndicator까지의 경로 표시
 }
 
 void ACharacterController::OnRightClick()
@@ -235,231 +208,107 @@ void ACharacterController::MoveToMouseCursor()
 void ACharacterController::UpdateMouseCursorLocation()
 {
     FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 
     if (HitResult.bBlockingHit)
     {
         FVector TargetLocation = HitResult.ImpactPoint;
-
-        UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
-        if (NavSystem && playerCharacter)
-        {
-            FNavLocation NavLocation;
-            if (NavSystem->ProjectPointToNavigation(TargetLocation, NavLocation))
-            {
-                FVector CharacterLocation = playerCharacter->GetActorLocation();
-                if (targetIndicator)
-                {
-                    targetIndicator->SetActorLocation(NavLocation.Location + FVector(0, 0, 0));
-                    targetIndicator->SetActorHiddenInGame(false); // 보이게 하기
-                }
-                // 네비메시 경로 계산
-                UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(
-                    this, CharacterLocation, NavLocation.Location);
-
-                if (NavPath && NavPath->IsValid())
-                {
-                    float maxMoveDistance = playerCharacter ? playerCharacter->currentMoveSpeed * 100.0f : 0.0f;  // cm 변환
-                    float totalPathDistance = 0.0f;
-                    bool reachedLimit = false;
-
-                    FVector previousEnd = NavPath->PathPoints[0]; // 첫 지점을 기준으로 설정
-                    stopPoint = FVector::ZeroVector;
-
-                    FColor CylinderColor = FColor::White; // 기본 흰색
-
-                    for (int32 i = 1; i < NavPath->PathPoints.Num(); i++)
-                    {
-                        FVector Start = previousEnd;
-                        FVector End = NavPath->PathPoints[i];
-                        float segmentDistance = FVector::Dist(Start, End);
-
-                        if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
-                        {
-                            if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
-                            {
-                                float remainingDistance = maxMoveDistance - totalPathDistance;
-                                FVector Direction = (End - Start).GetSafeNormal();
-                                stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
-                                // 이동 가능한 거리까지 흰색으로 표시
-                                DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
-                                // 초과 부분을 빨간색으로 표시
-                                Start = stopPoint;
-                                if (targetIndicator)
-                                {
-                                    targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 0));
-                                }
-                                CylinderColor = FColor::Red;
-                                reachedLimit = true;
-                            }
-                        }
-                        // 초과한 구간은 계속 빨간색으로 유지
-                        DrawDebugCylinder(GetWorld(), Start, End, 10.0f, 12, CylinderColor, false, -1, 0, 1);
-
-                        totalPathDistance += segmentDistance;
-                        previousEnd = End; // 이전 끝점을 갱신
-                    }
-
-                    totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
-
-                    if (playerCharacter)
-                    {
-                        bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
-                    }
-                }
-            }
-        }
+        targetIndicator->SetActorLocation(TargetLocation);
     }
 }
 
 void ACharacterController::UpdateSkillIndicatorLocation()
 {
+    if (!attackRangeIndicator || !targetIndicator || !playerCharacter) return;
+
     FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
+    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+    if (!HitResult.bBlockingHit) return;
 
-    if (!HitResult.bBlockingHit || !attackRangeIndicator || !playerCharacter) return;
-
-    // 1. 마우스 위치에 공격범위 인디케이터 이동
     FVector MouseLocation = HitResult.ImpactPoint;
-    MouseLocation.Z = 1.0f;
     attackRangeIndicator->SetActorLocation(MouseLocation);
 
-    // 2. NavMesh 경로 계산
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSystem) return;
 
-    FNavLocation ProjectedMouseNavLocation;
-    bool bNavProjected = NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation);
+    FVector CharacterLocation = playerCharacter->GetActorLocation();
+    const float SearchRadius = savedSkillRange;
 
-    if (!bNavProjected)
+    // Fibonacci Sphere Sampling
+    TArray<FVector> Samples;
+    const int NumSamples = 100;
+    float Offset = 2.f / NumSamples;
+    float Increment = PI * (3.f - FMath::Sqrt(5.f));
+
+    for (int i = 0; i < NumSamples; ++i)
     {
-        const float SearchRadius = 100.0f; // 1m
-        bNavProjected = NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation, FVector(SearchRadius, SearchRadius, 2000.0f));
-        if (!bNavProjected) return;
+        float Y = ((i * Offset) - 1.f) + (Offset / 2.f);
+        float Radius = FMath::Sqrt(1.f - Y * Y);
+        float Theta = i * Increment;
+
+        float X = FMath::Cos(Theta) * Radius;
+        float Z = FMath::Sin(Theta) * Radius;
+
+        FVector Sample = FVector(X, Y, Z) * SearchRadius + MouseLocation;
+        Samples.Add(Sample);
     }
 
-    FVector CharacterLocation = playerCharacter->GetActorLocation();
-    UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(this, CharacterLocation, ProjectedMouseNavLocation.Location);
-    if (!NavPath || !NavPath->IsValid()) return;
-
-    // 3. 경로를 일정 간격으로 세분화하여 검사
-    const float SkillRange = savedSkillRange;
-    const float StepSize = 3.0f; //10cm 간격
-    float ClosestDistSq = TNumericLimits<float>::Max();
-    FVector BestLocation = FVector::ZeroVector;
+    FNavLocation BestLocation;
+    float ShortestPath = TNumericLimits<float>::Max();
     bool bFound = false;
 
-    for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; ++i)
+    for (const FVector& Sample : Samples)
     {
-        FVector Start = NavPath->PathPoints[i];
-        FVector End = NavPath->PathPoints[i + 1];
-        float SegmentLength = FVector::Dist(Start, End);
-        FVector Direction = (End - Start).GetSafeNormal();
-        int32 NumSteps = FMath::CeilToInt(SegmentLength / StepSize);
+        FNavLocation ProjectedPoint;
+        if (!NavSystem->ProjectPointToNavigation(Sample, ProjectedPoint)) continue;
 
-        for (int32 Step = 0; Step <= NumSteps; ++Step)
+        // 장애물 체크
+        FHitResult ObstacleHit;
+        FCollisionQueryParams TraceParams(FName("SkillObstacleTrace"), true, this);
+        TraceParams.AddIgnoredActor(playerCharacter);
+        TraceParams.AddIgnoredActor(targetIndicator);
+
+        bool bBlocked = GetWorld()->LineTraceSingleByChannel(
+            ObstacleHit,
+            ProjectedPoint.Location + FVector(0, 0, 3),
+            MouseLocation + FVector(0, 0, 3),
+            ECC_Visibility,
+            TraceParams
+        );
+
+        if (bBlocked) continue;
+
+        UNavigationPath* Path = NavSystem->FindPathToLocationSynchronously(
+            this, CharacterLocation, ProjectedPoint.Location);
+
+        if (Path && Path->IsValid() && Path->PathPoints.Num() > 1)
         {
-            FVector Point = Start + Direction * Step * StepSize;
-
-            // 조건 1: 마우스로부터의 거리
-            float DistToMouse = FVector::Dist(Point, MouseLocation);
-            if (DistToMouse > SkillRange) continue;
-
-            // 조건 2: 장애물 없는지 라인트레이스
-            FHitResult LineHit;
-            FCollisionQueryParams TraceParams(FName(TEXT("SkillTrace")), true, this);
-            TraceParams.bReturnPhysicalMaterial = false;
-            TraceParams.AddIgnoredActor(playerCharacter);
-
-            bool bBlocked = GetWorld()->LineTraceSingleByChannel(
-                LineHit,
-                Point + FVector(0, 0, 3),
-                MouseLocation + FVector(0, 0, 3),
-                ECC_Visibility,
-                TraceParams
-            );
-
-            if (!bBlocked && !bFound)
+            float PathLength = 0.f;
+            for (int i = 1; i < Path->PathPoints.Num(); ++i)
             {
-                float DistSqToCharacter = FVector::DistSquared(Point, CharacterLocation);
-                if (DistSqToCharacter < ClosestDistSq)
-                {
-                    ClosestDistSq = DistSqToCharacter;
-                    BestLocation = Point;
-                    bFound = true;
-                }
+                PathLength += FVector::Dist(Path->PathPoints[i - 1], Path->PathPoints[i]);
+            }
+
+            if (PathLength < ShortestPath)
+            {
+                ShortestPath = PathLength;
+                BestLocation = ProjectedPoint;
+                bFound = true;
             }
         }
     }
 
-    // 4. 결과 적용
     if (bFound)
     {
-        targetIndicator->SetActorLocation(BestLocation + FVector(0, 0, 1.0f));
+        targetIndicator->SetActorLocation(BestLocation.Location);
         targetIndicator->SetActorHiddenInGame(false);
-
-        FNavLocation NavLocation;
-        if (NavSystem->ProjectPointToNavigation(BestLocation, NavLocation))
-        {
-            // 네비메시 경로 계산
-            UNavigationPath* NavPath2 = NavSystem->FindPathToLocationSynchronously(
-                this, CharacterLocation, NavLocation.Location);
-            if (NavPath2 && NavPath2->IsValid())
-            {
-                float maxMoveDistance = playerCharacter ? playerCharacter->currentMoveSpeed * 100.0f : 0.0f;  // cm 변환
-                float totalPathDistance = 0.0f;
-                bool reachedLimit = false;
-
-                FVector previousEnd = NavPath2->PathPoints[0]; // 첫 지점을 기준으로 설정
-                stopPoint = FVector::ZeroVector;
-                FColor CylinderColor = FColor::White; // 기본 흰색
-
-                for (int32 i = 1; i < NavPath2->PathPoints.Num(); i++)
-                {
-                    FVector Start = previousEnd;
-                    FVector End = NavPath2->PathPoints[i];
-                    float segmentDistance = FVector::Dist(Start, End);
-
-                    if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
-                    {
-                        if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
-                        {
-                            float remainingDistance = maxMoveDistance - totalPathDistance;
-                            FVector Direction = (End - Start).GetSafeNormal();
-                            stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
-                            // 이동 가능한 거리까지 흰색으로 표시
-                            DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
-                            // 초과 부분을 빨간색으로 표시
-                            Start = stopPoint;
-                            if (targetIndicator)
-                            {
-                                targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 0));
-                            }
-                            CylinderColor = FColor::Red;
-                            reachedLimit = true;
-                        }
-                    }
-                    // 초과한 구간은 계속 빨간색으로 유지
-                    DrawDebugCylinder(GetWorld(), Start, End, 10.0f, 12, CylinderColor, false, -1, 0, 1);
-
-                    totalPathDistance += segmentDistance;
-                    previousEnd = End; // 이전 끝점을 갱신
-                }
-
-                totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
-
-                if (playerCharacter)
-                {
-                    bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
-                }
-            }
-        }
     }
     else
     {
         targetIndicator->SetActorHiddenInGame(true);
     }
 }
+
 
 void ACharacterController::ResetCamera()
 {
@@ -519,6 +368,118 @@ void ACharacterController::ZoomCamera(const FInputActionValue& Value)
 void ACharacterController::UpdateCameraRotation()
 {
     cameraRotation = SpringArmComponent->GetComponentRotation();
+}
+
+void ACharacterController::CheckCameraAttachtoCharacter()
+{
+    FVector CharacterLocation = playerCharacter->GetActorLocation();  // 캐릭터의 위치
+    FVector SpringArmLocation = SpringArmComponent->GetComponentLocation();  // 스프링 암의 위치
+    if (!IsInputKeyDown(EKeys::W) && !IsInputKeyDown(EKeys::A) && !IsInputKeyDown(EKeys::S) && !IsInputKeyDown(EKeys::D)
+        && FMath::IsNearlyEqual(CharacterLocation.X, SpringArmLocation.X, 15.0f)
+        && FMath::IsNearlyEqual(CharacterLocation.Y, SpringArmLocation.Y, 15.0f))
+    {
+        SpringArmComponent->SetRelativeLocation(CharacterLocation);
+    }
+    //카메라 최대 이동 제어
+    float Distance = FVector::Dist(SpringArmLocation, CharacterLocation);
+    if (Distance <= MaxDistance)
+    {
+        bCanMoveCamera = true;
+    }
+    else
+    {
+        bCanMoveCamera = false;
+
+        FVector Direction = (SpringArmLocation - CharacterLocation).GetSafeNormal();
+        FVector TargetLocation = CharacterLocation + Direction * (MaxDistance - 10.0f);
+        SpringArmComponent->SetWorldLocation(TargetLocation);
+    }
+}
+
+void ACharacterController::CheckCharacterMove()
+{
+    if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
+    {
+        targetIndicator->SetActorHiddenInGame(false);
+        bIsStop = true;
+    }
+    else
+    {
+        targetIndicator->SetActorHiddenInGame(true);
+        bIsStop = false;
+    }
+}
+
+void ACharacterController::SetNavPath()
+{
+    if (targetIndicator && bIsStop)
+    {
+        FVector CharacterLocation = playerCharacter->GetActorLocation();
+        UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+        FNavLocation NavLocation;
+        if (NavSystem->ProjectPointToNavigation(targetIndicator->GetActorLocation(), NavLocation))
+        {
+            targetIndicator->HideReachableText();
+            // 네비메시 경로 계산
+            UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(
+                this, CharacterLocation, NavLocation.Location);
+
+            if (NavPath && NavPath->IsValid())
+            {
+                float maxMoveDistance = playerCharacter ? playerCharacter->currentMoveSpeed * 100.0f : 0.0f;  // cm 변환
+                float totalPathDistance = 0.0f;
+                bool reachedLimit = false;
+
+                FVector previousEnd = NavPath->PathPoints[0]; // 첫 지점을 기준으로 설정
+                stopPoint = FVector::ZeroVector;
+
+                FColor CylinderColor = FColor::White; // 기본 흰색
+
+                for (int32 i = 1; i < NavPath->PathPoints.Num(); i++)
+                {
+                    FVector Start = previousEnd;
+                    FVector End = NavPath->PathPoints[i];
+                    float segmentDistance = FVector::Dist(Start, End);
+
+                    if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
+                    {
+                        if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
+                        {
+                            float remainingDistance = maxMoveDistance - totalPathDistance;
+                            FVector Direction = (End - Start).GetSafeNormal();
+                            stopPoint = Start + Direction * remainingDistance; // 🚀 stopPoint 저장
+                            // 이동 가능한 거리까지 흰색으로 표시
+                            DrawDebugCylinder(GetWorld(), Start, stopPoint, 10.0f, 12, FColor::White, false, -1, 0, 1);
+                            // 초과 부분을 빨간색으로 표시
+                            Start = stopPoint;
+                            if (targetIndicator)
+                            {
+                                //targetIndicator->SetActorLocation(stopPoint + FVector(0, 0, 0));
+                            }
+                            CylinderColor = FColor::Red;
+                            reachedLimit = true;
+                        }
+                    }
+                    // 초과한 구간은 계속 빨간색으로 유지
+                    DrawDebugCylinder(GetWorld(), Start, End, 10.0f, 12, CylinderColor, false, -1, 0, 1);
+
+                    totalPathDistance += segmentDistance;
+                    previousEnd = End; // 이전 끝점을 갱신
+                }
+
+                totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
+
+                if (playerCharacter)
+                {
+                    bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
+                }
+            }
+        }
+        else
+        {
+            targetIndicator->SetReachableText();
+        }
+    }
 }
 
 void ACharacterController::SetBPs()
