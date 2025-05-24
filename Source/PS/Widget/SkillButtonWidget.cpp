@@ -13,6 +13,7 @@
 void USkillButtonWidget::SettingButton(USkillBase* Skill, int32 index)
 {
 	skillIndex = index;
+	skillAp = Skill->apUsage;
 	if (skillButton)	//스킬 정보를 이용해 버튼 정보 구성
 	{
 		skillNameText->SetText(Skill->skillName);

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "SkillIndicator.generated.h"
 
+class ACharacterBase;
+
 UCLASS()
 class PS_API ASkillIndicator : public AActor
 {
@@ -16,20 +18,32 @@ public:
 	ASkillIndicator();
 
 	void SetSkillIndicator(int32 accuracy, int32 critical, int32 damage, bool isMag, float attackRange);
+	void InitAttack();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComponent;
+	UPROPERTY(EditAnywhere)
+	TArray<ACharacterBase*> overlappedCharacters;
 
 	int32 damage;
 	int32 accuracy;
 	int32 critical;
 	bool bIsMag;
 
-public:	
+	ACharacterBase* playerCharacter;
+
+private:	
+	UFUNCTION()
+	void OverlapWithCharacter(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	//virtual void Tick(float DeltaTime) override;
 
 };

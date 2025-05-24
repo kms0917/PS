@@ -2,12 +2,17 @@
 
 
 #include "Actors/SkillIndicator.h"
+#include "Character/CharacterBase.h"
+#include "Controller/CharacterController.h"
+#include "Objects/SkillBase.h"
+
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASkillIndicator::ASkillIndicator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
     MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
     RootComponent = MeshComponent;
@@ -22,7 +27,9 @@ ASkillIndicator::ASkillIndicator()
         MeshComponent->SetMaterial(0, Mat.Object);
     }
 
-    MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    MeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    MeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +37,35 @@ void ASkillIndicator::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    OnActorBeginOverlap.AddDynamic(this, &ASkillIndicator::OverlapWithCharacter);
+    OnActorEndOverlap.AddDynamic(this, &ASkillIndicator::OverlapEnd);
+
+    playerCharacter = Cast<ACharacterController>(UGameplayStatics::GetPlayerController(GetWorld(), 0))->playerCharacter;
+}
+
+void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* OtherActor)
+{
+    if (!OtherActor || OtherActor == this) return;
+    
+    if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
+    {
+        Casted->TargettedOn(accuracy, critical, damage, bIsMag);
+        overlappedCharacters.Add(Casted);
+    }
+}
+
+void ASkillIndicator::OverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+{
+    if (!OtherActor || OtherActor == this) return;
+
+    if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
+    {
+        if (overlappedCharacters.Contains(Casted))
+        {
+            overlappedCharacters.Remove(Casted);
+            Casted->TargettedOff();
+        }
+    }
 }
 
 void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, float attackRange)
@@ -43,10 +79,20 @@ void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, 
     bIsMag = isMag;
 }
 
-// Called every frame
-void ASkillIndicator::Tick(float DeltaTime)
+void ASkillIndicator::InitAttack()
 {
-	Super::Tick(DeltaTime);
+    if (overlappedCharacters.Num() > 0)
+    {
+        for (int32 i = overlappedCharacters.Num() - 1; i >= 0; --i)
+        {
+            ACharacterBase* Character = overlappedCharacters[i];
+            if (IsValid(Character)) // 유효성 검사 (optional, safety)
+            {
+                playerCharacter->currentUsedSkill->overlappedCharacters.Add(Character);
 
+                // ReflectDamage 내부에서 Destroy()가 호출될 수 있으므로,
+                // 후처리로 Remove도 고려 가능
+            }
+        }
+    }
 }
-

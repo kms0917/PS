@@ -49,3 +49,17 @@ void USkillWidget::UpdateWidget(ACharacterBase* ControlledCharacter)	//턴이 �
 		}
 	}
 }
+
+void USkillWidget::UpdateButtons(int32 currentAp)
+{
+	int32 NumChildren = SkillGridPanel->GetChildrenCount();
+
+	for (int32 i = 0; i < NumChildren; ++i)
+	{
+		UWidget* Child = SkillGridPanel->GetChildAt(i);
+		if (USkillButtonWidget* SkillButton = Cast<USkillButtonWidget>(Child))
+		{
+			SkillButton->SetIsEnabled(currentAp >= SkillButton->skillAp);
+		}
+	}
+}

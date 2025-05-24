@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnyWhere, Category = "Skill")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Skill")
 	TArray<USkillBase*> skillList;
 
 	void AddSkill(USkillBase* newSkill);

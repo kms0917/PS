@@ -13,6 +13,12 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/SViewport.h"
+#include "AI/Navigation/NavigationTypes.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "AIController.h"
 
 #include "Character/CharacterBase.h"
 #include "GameMode/NormalGameMode.h"
@@ -95,7 +101,7 @@ void ACharacterController::BeginPlay()
         targetIndicator = GetWorld()->SpawnActor<AMovePoint>(TargetIndicatorClass, FVector::ZeroVector, FRotator::ZeroRotator);
         if (targetIndicator)
         {
-            targetIndicator->SetActorHiddenInGame(true); //처음엔 숨김
+            targetIndicator->SetActorHiddenInGame(false);
         }
     }
     //이 밑부분들은 턴 개시시마다 실행되어야 함
@@ -129,6 +135,7 @@ void ACharacterController::SetupInputComponent()
         EnhancedInput->BindAction(RotateCameraAction, ETriggerEvent::Triggered, this, &ACharacterController::RotateCamera);
         EnhancedInput->BindAction(ResetCameraAction, ETriggerEvent::Triggered, this, &ACharacterController::ResetCamera);
         EnhancedInput->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &ACharacterController::ZoomCamera);
+        EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACharacterController::OnLeftClick);
     }
 }
 
@@ -150,17 +157,40 @@ void ACharacterController::Tick(float DeltaTime)
         UpdateSkillIndicatorLocation();
     }
     SetNavPath();                   //targetIndicator까지의 경로 표시
+    CheckShortMove();
 }
 
 void ACharacterController::OnRightClick()
 {
+    if (IsMouseOverUI() || playerCharacter->IsMontagePlayed())
+    {
+        return;
+    }
     if (bIsSkillMode)
     {
         StopSkillMode();
     }
     else
     {
-        MoveToMouseCursor();
+        MoveTotargetIndicator();
+    }
+}
+
+void ACharacterController::OnLeftClick()
+{
+    if (!bIsSkillMode) return;
+
+    if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
+    {
+        attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
+        attackPoint = attackRangeIndicator->GetActorLocation();
+        if (gameMode->bIsBattle)
+        {
+            playerCharacter->currentAp -= savedAp;
+            skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
+        }
+        MoveTotargetIndicator();
+        EndSkillMode();
     }
 }
 
@@ -177,29 +207,49 @@ void ACharacterController::StopSkillMode()
     {
         attackRangeIndicator->Destroy();
     }
+    playerCharacter->currentUsedSkill = nullptr;
 }
 
-void ACharacterController::MoveToMouseCursor()
+void ACharacterController::EndSkillMode()
 {
-    if (bIsStop)
+    bIsSkillMode = false;
+    savedAp = -1;
+    savedSkillRange = -1;
+    if (skillRangeIndicator)
     {
-        FHitResult HitResult;
-        GetHitResultUnderCursor(ECC_WorldStatic, false, HitResult);
-        if (HitResult.bBlockingHit)
-        {
-            if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector)  // 배틀 모드일 때 이동 거리 제한 적용
-            {
-                UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
-                playerCharacter->currentMoveSpeed = 0;
+        skillRangeIndicator->Destroy();
+    }
+    if (attackRangeIndicator)
+    {
+        attackRangeIndicator->Destroy();
+    }
+    bUseSkill = true;
+}
 
-            }
-            else  // 일반 모드에서는 마우스 클릭 위치로 바로 이동
+void ACharacterController::MoveTotargetIndicator()
+{
+    if (bIsStop && !(targetIndicator->IsHidden()))
+    {
+        if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
+        {
+            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
+            playerCharacter->currentMoveSpeed = 0;
+
+        }
+        else if (stopPoint == FVector::ZeroVector) // 일반 모드에서는 마우스 클릭 위치로 바로 이동
+        {
+            if (totalDistance <= 0.50)
             {
-                UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitResult.ImpactPoint);
-                if (gameMode->bIsBattle)
-                {
-                    playerCharacter->currentMoveSpeed -= totalDistance;
-                }
+                shortMoveTarget = targetIndicator->GetActorLocation();
+                bIsShortDistanceMove = true;
+            }
+            else
+            {
+                UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, targetIndicator->GetActorLocation());
+            }
+            if (gameMode->bIsBattle)
+            {
+                playerCharacter->currentMoveSpeed -= totalDistance;
             }
         }
     }
@@ -214,6 +264,7 @@ void ACharacterController::UpdateMouseCursorLocation()
     {
         FVector TargetLocation = HitResult.ImpactPoint;
         targetIndicator->SetActorLocation(TargetLocation);
+        targetIndicator->SetActorHiddenInGame(false);
     }
 }
 
@@ -225,7 +276,19 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
     if (!HitResult.bBlockingHit) return;
 
+    AActor* HitActor = HitResult.GetActor();
+    if (HitActor)
+    {
+        // 특정 클래스인지 확인
+        if (HitActor->IsA(ASkillRange::StaticClass()))
+        {
+            targetIndicator->SetActorHiddenInGame(true);
+            bIsMoving = true;
+        }
+    }
+
     FVector MouseLocation = HitResult.ImpactPoint;
+    MouseLocation.Z += 5.0f;
     attackRangeIndicator->SetActorLocation(MouseLocation);
 
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
@@ -298,7 +361,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         }
     }
 
-    if (bFound)
+    if (bFound && !bIsMoving)
     {
         targetIndicator->SetActorLocation(BestLocation.Location);
         targetIndicator->SetActorHiddenInGame(false);
@@ -308,7 +371,6 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         targetIndicator->SetActorHiddenInGame(true);
     }
 }
-
 
 void ACharacterController::ResetCamera()
 {
@@ -400,19 +462,45 @@ void ACharacterController::CheckCharacterMove()
 {
     if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
-        targetIndicator->SetActorHiddenInGame(false);
         bIsStop = true;
+        if (bUseSkill && bIsMoving)
+        {
+            playerCharacter->OnSkillAutoMoveFinished(attackPoint);
+            bUseSkill = false;
+        }
+        bIsMoving = false;
     }
     else
     {
         targetIndicator->SetActorHiddenInGame(true);
         bIsStop = false;
+        bIsMoving = true;
+    }
+}
+
+void ACharacterController::CheckShortMove()
+{
+    if (bIsShortDistanceMove && shortMoveTarget != FVector::ZeroVector)
+    {
+        FVector Delta = shortMoveTarget - playerCharacter->GetActorLocation();
+        Delta.Z = 0.f;
+
+        if (!Delta.IsNearlyZero(5.0f))
+        {
+            FVector Direction = Delta.GetSafeNormal();
+            playerCharacter->AddMovementInput(Direction, 1.0f);
+        }
+        else
+        {
+            shortMoveTarget = FVector::ZeroVector;
+            bIsShortDistanceMove = false; // 도착 완료
+        }
     }
 }
 
 void ACharacterController::SetNavPath()
 {
-    if (targetIndicator && bIsStop)
+    if (targetIndicator && bIsStop && !bIsMoving)
     {
         FVector CharacterLocation = playerCharacter->GetActorLocation();
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
@@ -458,6 +546,7 @@ void ACharacterController::SetNavPath()
                             }
                             CylinderColor = FColor::Red;
                             reachedLimit = true;
+                            targetIndicator->SetReachableText();
                         }
                     }
                     // 초과한 구간은 계속 빨간색으로 유지
@@ -514,6 +603,11 @@ void ACharacterController::SetBPs()
     {
         CameraZoomAction = CameraZoomActionFinder.Object;
     }
+    static ConstructorHelpers::FObjectFinder<UInputAction> AttackActionFinder(TEXT("/Game/Input/IA/IA_Attack"));
+    if (AttackActionFinder.Succeeded())
+    {
+        AttackAction = AttackActionFinder.Object;
+    }
     static ConstructorHelpers::FClassFinder<AActor> IndicatorBP(TEXT("/Game/Actor/BP_MovePoint"));
     if (IndicatorBP.Succeeded())
     {
@@ -534,4 +628,13 @@ void ACharacterController::SetBPs()
     {
         skillWidgetClass = SkillWidgetBP.Class;
     }
+}
+
+bool ACharacterController::IsMouseOverUI() const
+{
+    FWidgetPath widgetPath = FSlateApplication::Get().LocateWindowUnderMouse(FSlateApplication::Get().GetCursorPos(), FSlateApplication::Get().GetInteractiveTopLevelWindows(), true);
+    TSharedPtr viewPort = FSlateApplication::Get().GetGameViewport();
+    bool overViewPort = widgetPath.IsValid() && (widgetPath.GetLastWidget() == viewPort.ToSharedRef());
+
+    return !overViewPort;
 }

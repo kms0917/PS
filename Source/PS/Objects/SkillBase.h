@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "SkillBase.generated.h"
 
+class ACharacterBase;
 /**
  * 
  */
@@ -15,6 +16,18 @@ class PS_API USkillBase : public UObject
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY()
+	TArray<ACharacterBase*> overlappedCharacters;
+
+	UPROPERTY()
+	UAnimMontage* skillMontage;		//하위 클래스인 스킬 인스턴스에서 할당
+
+	UPROPERTY()
+	float PlayRate = 1.0f;
+
+	UFUNCTION()
+	void ApllyDamage();
+
 	UPROPERTY(EditAnyWhere, Category = "Skill")
 	float skillRange = 0;
 

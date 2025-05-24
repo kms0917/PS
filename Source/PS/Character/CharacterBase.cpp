@@ -39,7 +39,6 @@ ACharacterBase::ACharacterBase()
 	healthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
 	healthWidgetComponent->SetupAttachment(RootComponent);
 	skillInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("skillInfoWidget"));
-	//skillInfoWidgetComponent->SetupAttachment(springArmComponent);
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("WidgetBlueprint'/Game/Widget/W_HealthWidget'"));
 	if (WidgetClass.Succeeded())
@@ -75,7 +74,8 @@ void ACharacterBase::BeginPlay()
 	skillInfoWidget = Cast<USkillInfoWidget>(skillInfoWidgetComponent->GetWidget());
 	if (skillInfoWidget)
 	{
-		skillInfoWidgetComponent->SetDrawSize(FVector2D(800.0f, 90.0f));
+		skillInfoWidget->SetVisibility(ESlateVisibility::Collapsed);
+		skillInfoWidgetComponent->SetDrawSize(FVector2D(1000.0f, 120.0f));
 		skillInfoWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
 	}
 }
@@ -97,6 +97,37 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ACharacterBase::OnSkillAutoMoveFinished(FVector attackPoint)
+{
+	if (currentUsedSkill && currentUsedSkill->skillMontage)
+	{
+		FVector Direction = attackPoint - GetActorLocation();
+		Direction.Z = 0.0f; // 수평 회전만 고려
+		if (!Direction.IsNearlyZero())
+		{
+			FRotator NewRotation = Direction.Rotation();
+			SetActorRotation(NewRotation);
+		}
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(currentUsedSkill->skillMontage, currentUsedSkill->PlayRate);
+			UE_LOG(LogTemp, Warning, TEXT("Skill montage played after auto-move"));
+		}
+	}
+}
+
+bool ACharacterBase::IsMontagePlayed()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		return AnimInstance->IsAnyMontagePlaying();
+	}
+	return false;
+}
+
 void ACharacterBase::SetDefaultEquipments()
 {
 }	   //하위 클래스의 생성자에서 호출해야함
@@ -110,6 +141,7 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 	if (skillComponent->skillList.IsValidIndex(i))
 	{
 		USkillBase* usedSkill = skillComponent->skillList[i];
+		currentUsedSkill = usedSkill;
 		evasion = usedSkill->calculatedEvasion;
 		critical = usedSkill->calculatedCritical;
 		accuracy = usedSkill->calculatedAccuracy;
@@ -118,25 +150,16 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 	}
 }
 
-void ACharacterBase::ReflectDamage(int Damage, float acurracyRate, float criticalRate, bool bIsMag)
+void ACharacterBase::ReflectDamage()
 {
-	//피공격자의 회피보다 공격자의 명중이 높게 나오면 공격 성공, 물리인지, 마법인지는 마우스에 따라다닐 위젯 컴포넌트에서 대응되는 방어스탯 가져와 계산 후 데미지만 넘겨줌, 데미지 값과 명중, 회심률에 따라 체력만 반영하면 됨
-	if (FMath::RandRange(1, (int)acurracyRate) > evasion)
+	if (FMath::RandRange(1, 100) <= savedAccuracy)
 	{
-		if (bIsMag)
+		if (FMath::RandRange(1, 100) <= savedCritical)
 		{
-			Damage -= res;
+			savedDamage *= 2;
 		}
-		else
-		{
-			Damage -= def;
-		}
-		if (FMath::RandRange(1, 100) <= criticalRate)
-		{
-			Damage *= 2;
-		}
-		currentHp -= Damage;
-		//체력 컴포넌트 값 변경해줘야함
+		currentHp -= savedDamage;
+		healthWidget->SetHealthBar(currentHp, hp);
 		if (currentHp <= 0)
 		{
 			this->Destroy();
@@ -147,6 +170,9 @@ void ACharacterBase::ReflectDamage(int Damage, float acurracyRate, float critica
 	{
 		//회피시의 로직 필요
 	}
+	savedAccuracy = 0;
+	savedDamage = 0;
+	savedCritical = 0;	//부자연스러우면 targetedOff에서 실행, 조건달아서 현재 캐릭터의 currentUsedSkill의 overlappedCharacter 확인해서 분기
 }
 
 void ACharacterBase::GetEXP()	//일단 고정치로 몹 잡으면 무조건 같은 양의 경험치 얻도록
@@ -161,6 +187,34 @@ void ACharacterBase::GetEXP()	//일단 고정치로 몹 잡으면 무조건 같�
 
 void ACharacterBase::SetLevel()		//적들의 레벨 스케일링에 사용될 함수, 게임모드 통해 플레이어 캐릭터 레벨 받아와서 레벨 계산
 {
+}
+
+void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag)
+{
+	if (isMag)	//마딜이면
+	{
+		Damage -= res;
+	}
+	else
+	{
+		Damage -= def;
+	}
+	savedAccuracy = (((float)accuracyRate - (float)evasion) / (float)accuracyRate) * 100;
+	savedDamage = Damage;
+	savedCritical = criticalRate;
+
+	skillInfoWidget->SettingWidget(savedAccuracy, criticalRate, Damage);
+	skillInfoWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void ACharacterBase::TargettedOff()
+{
+	//savedAccuracy = 0;
+	//savedDamage = 0;
+	//savedCritical = 0;
+
+	skillInfoWidget->RessetWidget();
+	skillInfoWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void ACharacterBase::UpdateWidgetRotation()

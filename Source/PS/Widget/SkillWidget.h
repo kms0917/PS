@@ -30,6 +30,8 @@ protected:
 public:
 	void UpdateWidget(ACharacterBase* ControlledCharacter);
 
+	void UpdateButtons(int32 currentAp);
+
 private:
 	UPROPERTY(EditAnyWhere, meta = (BindWidget))
 	UUniformGridPanel* SkillGridPanel;

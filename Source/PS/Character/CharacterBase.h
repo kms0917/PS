@@ -12,6 +12,7 @@ class USkillInfoWidget;
 class ACharacterController;
 class UEquipmentComponent;
 class USkillComponent;
+class USkillBase;
 
 UCLASS()
 class PS_API ACharacterBase : public ACharacter
@@ -65,17 +66,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnSkillAutoMoveFinished(FVector attackPoint);
+	bool IsMontagePlayed();
+
 	void UseSkill(int i);
-	void ReflectDamage(int Damage, float acurracyRate, float criticalRate, bool bIsMag);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
+	void ReflectDamage();	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
 	void GetEXP();	//아군용
 	void SetLevel();	//적군용
+	void TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag);
+	void TargettedOff();
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	float moveSpeed = 10;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	float currentMoveSpeed;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
-	int32 ap;
+	int32 ap = 2;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 currentAp;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
@@ -118,10 +124,16 @@ public:
 	int32 evasion;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 critical;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 savedDamage = 0;		//targetted 됐을때 공격이 일어나면 사용할 실제 받을 데미지 값
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 savedAccuracy = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 savedCritical = 0;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnyWhere, Transient)
 	UEquipmentComponent* equipmentComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnyWhere, Transient)
 	USkillComponent* skillComponent;
 
 	UPROPERTY()
@@ -131,6 +143,11 @@ public:
 
 	UPROPERTY()
 	bool bIsTargeted = true;
+
+	UPROPERTY()
+	USkillBase* currentUsedSkill;
+	UPROPERTY()
+	bool bDidApplyDamage = false;
 
 private:
 	void UpdateWidgetRotation();

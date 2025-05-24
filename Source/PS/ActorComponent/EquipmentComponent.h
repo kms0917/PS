@@ -29,22 +29,22 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UWeaponBase* weapon = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UHelmetBase* helmet = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UChestBase* chest = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UGloveBase* glove = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	ULegBase* leg = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Equipment")
+	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UBootsBase* boots = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")

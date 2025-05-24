@@ -2,4 +2,16 @@
 
 
 #include "Objects/SkillBase.h"
+#include "Character/CharacterBase.h"
 
+void USkillBase::ApllyDamage()
+{
+	for (ACharacterBase* Character : overlappedCharacters)
+	{
+		if (Character)
+		{
+			Character->ReflectDamage();
+		}
+	}
+	overlappedCharacters.Empty();
+}

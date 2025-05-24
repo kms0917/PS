@@ -20,6 +20,8 @@ class PS_API USkillButtonWidget : public UUserWidget
 public:
 	FOnSkillButtonClicked OnSkillButtonClicked;
 
+	int32 skillAp;
+
 	void SettingButton(USkillBase* Skill, int32 index);
 
 	virtual void NativeDestruct() override;

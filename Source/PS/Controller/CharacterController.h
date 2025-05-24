@@ -42,6 +42,10 @@ public:
 	FRotator cameraRotation;
 
 	bool bIsStop = true;
+	bool bIsMoving = false;
+	bool bUseSkill = false;
+
+	ACharacterBase* playerCharacter;
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,6 +64,8 @@ protected:
 	UInputAction* ResetCameraAction;
 	UPROPERTY()
 	UInputAction* CameraZoomAction;
+	UPROPERTY()
+	UInputAction* AttackAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<USkillWidget> skillWidgetClass;
@@ -67,18 +73,15 @@ protected:
 	USkillWidget* skillWidgetInstance;
 
 	void OnRightClick();
-
+	void OnLeftClick();
 	void StopSkillMode();
-
-	void MoveToMouseCursor();
-
+	void EndSkillMode();
+	void MoveTotargetIndicator();
 	void UpdateMouseCursorLocation();
-
 	void UpdateSkillIndicatorLocation();
-
 	void ResetCamera();
-
 	void SetBPs();
+	bool IsMouseOverUI() const;
 
 private:
 	UPROPERTY()
@@ -93,11 +96,13 @@ private:
 	TSubclassOf<AActor> AttackRangeClass;
 	ASkillIndicator* attackRangeIndicator;
 
-	ACharacterBase* playerCharacter;
-
 	ANormalGameMode* gameMode;
 
+	UPROPERTY(EditAnyWhere)
 	FVector stopPoint;
+
+	bool bIsShortDistanceMove = false;
+	FVector shortMoveTarget = FVector::ZeroVector;
 
 	bool bIsSkillMode = false;
 
@@ -106,6 +111,7 @@ private:
 	bool bCanMoveCamera = true;
 
 	FVector2D LastMousePosition = FVector2D::ZeroVector;
+	FVector attackPoint = FVector::ZeroVector;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent;
@@ -116,6 +122,7 @@ private:
 	void UpdateCameraRotation();
 	void CheckCameraAttachtoCharacter();
 	void CheckCharacterMove();
+	void CheckShortMove();
 	void SetNavPath();
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
@@ -133,5 +140,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float MaxZoomDistance = 2000.0f;
-
 };

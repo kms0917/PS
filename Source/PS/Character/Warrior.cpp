@@ -29,6 +29,7 @@ AWarrior::AWarrior()
 	resGrowth = 35;
 	skillGrowth = 55;
 	speedGrowth = 55;
+	ap = 2;
 	SetDefaultEquipments();
 	SetDefaultSkills();
 
