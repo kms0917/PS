@@ -24,4 +24,7 @@ void ANormalGameMode::BeginPlay()
 
     playerController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController());
     currentCharacter = Cast<ACharacterBase>(playerController->GetPawn());
+    freindlyCharacters.Add(currentCharacter);
+
+    bIsBattle = true;
 }

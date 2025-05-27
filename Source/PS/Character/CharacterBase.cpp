@@ -7,6 +7,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 #include "Widget/HealthWidget.h"
 #include "Widget/SkillInfoWidget.h"
@@ -55,8 +57,13 @@ ACharacterBase::ACharacterBase()
 
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
+
+	UAIPerceptionStimuliSourceComponent* StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
+	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	StimuliSource->bAutoRegister = true;
 }
 
+//위젯 및 플레이어 컨트롤러 세팅
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -80,6 +87,7 @@ void ACharacterBase::BeginPlay()
 	}
 }
 
+//위젯 가시성 조절
 void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -91,12 +99,7 @@ void ACharacterBase::Tick(float DeltaTime)
 	}
 }
 
-void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
+//플레이어 컨트롤러에서만 호출
 void ACharacterBase::OnSkillAutoMoveFinished(FVector attackPoint)
 {
 	if (currentUsedSkill && currentUsedSkill->skillMontage)
@@ -113,11 +116,11 @@ void ACharacterBase::OnSkillAutoMoveFinished(FVector attackPoint)
 		if (AnimInstance)
 		{
 			AnimInstance->Montage_Play(currentUsedSkill->skillMontage, currentUsedSkill->PlayRate);
-			UE_LOG(LogTemp, Warning, TEXT("Skill montage played after auto-move"));
 		}
 	}
 }
 
+//플레이어 컨트롤러에서 입력 막기위해 몽타뉴 플레이중인지 반환
 bool ACharacterBase::IsMontagePlayed()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -128,15 +131,18 @@ bool ACharacterBase::IsMontagePlayed()
 	return false;
 }
 
+//하위 클래스의 생성자에서 오버라이드해서 호출
 void ACharacterBase::SetDefaultEquipments()
 {
-}	   //하위 클래스의 생성자에서 호출해야함
+}
 
+//하위 클래스의 생성자에서 오버라이드해서 호출
 void ACharacterBase::SetDefaultSkills()
 {
-}	   //하위 클래스 생성자에서 호출
+}	   
 
-void ACharacterBase::UseSkill(int i)	//위젯에 연결
+//플레이어 컨트롤러 주도하에 위젯에서 호출됨
+void ACharacterBase::UseSkill(int i)	
 {
 	if (skillComponent->skillList.IsValidIndex(i))
 	{
@@ -150,6 +156,7 @@ void ACharacterBase::UseSkill(int i)	//위젯에 연결
 	}
 }
 
+//스킬 사용시의 AnimNotify 통해 targetted 된 객체들의 함수를 사용되는 skill object에서 호출
 void ACharacterBase::ReflectDamage()
 {
 	if (FMath::RandRange(1, 100) <= savedAccuracy)
@@ -164,10 +171,12 @@ void ACharacterBase::ReflectDamage()
 		{
 			this->Destroy();
 			//게임모드의 큐에서 해당 캐릭터 삭제해줘야함
+			//게임모드에서 아군 캐릭터들의 목록 소유하고 있어야함, 게임모드에서 아군 캐릭터들의 경험치 습득함수 작동시켜줘야함
 		}
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("evade!"));
 		//회피시의 로직 필요
 	}
 	savedAccuracy = 0;
@@ -175,7 +184,8 @@ void ACharacterBase::ReflectDamage()
 	savedCritical = 0;	//부자연스러우면 targetedOff에서 실행, 조건달아서 현재 캐릭터의 currentUsedSkill의 overlappedCharacter 확인해서 분기
 }
 
-void ACharacterBase::GetEXP()	//일단 고정치로 몹 잡으면 무조건 같은 양의 경험치 얻도록
+//얻는 수치는 조절 필요, 적이 죽을때 게임모드에서 호출해서 모든 아군 캐릭터 경험치 습득해줘야함
+void ACharacterBase::GetEXP()	
 {
 	exp += 10;
 	while (exp >= 100)
@@ -185,10 +195,16 @@ void ACharacterBase::GetEXP()	//일단 고정치로 몹 잡으면 무조건 같�
 	}
 }
 
-void ACharacterBase::SetLevel()		//적들의 레벨 스케일링에 사용될 함수, 게임모드 통해 플레이어 캐릭터 레벨 받아와서 레벨 계산
+//적들의 레벨 스케일링에 사용될 함수, 게임모드 통해 플레이어 캐릭터 레벨 받아와서 레벨 계산
+void ACharacterBase::SetLevel(int32 levelScaleAmount)
 {
+	while (level == levelScaleAmount)
+	{
+		LevelUp();
+	}
 }
 
+//skillIndicator와 오버렙 시 호출
 void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag)
 {
 	if (isMag)	//마딜이면
@@ -207,6 +223,7 @@ void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 D
 	skillInfoWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
+//skillIndicator와 오버렙 끝날시 호출
 void ACharacterBase::TargettedOff()
 {
 	//savedAccuracy = 0;
@@ -217,6 +234,7 @@ void ACharacterBase::TargettedOff()
 	skillInfoWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+//위젯 각도조절
 void ACharacterBase::UpdateWidgetRotation()
 {
 	FRotator NewRotation = playerController->cameraRotation;
@@ -226,6 +244,7 @@ void ACharacterBase::UpdateWidgetRotation()
 	skillInfoWidgetComponent->SetWorldRotation(NewRotation);
 }
 
+//Targetted 됐을 시 띄울 위젯 컴포넌트 위치 조절
 void ACharacterBase::UpdateSkillInfoWidgetLocation()
 {
 	if (!skillInfoWidgetComponent || !playerController) return;
@@ -246,6 +265,7 @@ void ACharacterBase::UpdateSkillInfoWidgetLocation()
 	skillInfoWidgetComponent->SetWorldLocation(WidgetWorldLocation);
 }
 
+//skillToolTip에 띄울 값 계산
 int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 {
 	if (!isMag)			//물리 딜
@@ -258,7 +278,8 @@ int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 	}
 }
 
-void ACharacterBase::SetStats()		//매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
+//자원 및 스탯 초기화, 매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
+void ACharacterBase::SetStats()		
 {
 	currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed;
 	currentHp = hp + equipmentComponent->equipmentHp;
@@ -274,6 +295,7 @@ void ACharacterBase::SetStats()		//매 턴 개시 및 하위 클래스 생성자
 	accuracy = CalcAccuracy(0);
 }
 
+//스킬들의 내부 값들을 미리 계산, 하위 클래스의 생성자와 턴 개시 시 호출해야함
 void ACharacterBase::SetSkillInfo()
 {
 	TArray<USkillBase*> skills = skillComponent->skillList;
@@ -287,21 +309,25 @@ void ACharacterBase::SetSkillInfo()
 	}
 }
 
+//치명타 확률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcCritical(int correction)
 {
 	return (skill + equipmentComponent->equipmentCritical + correction);
 }
 
+//회피율 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcEvasion(int correction)
 {
 	return (speed * 1.2 + equipmentComponent->equipmentEvasion + correction);
 }
 
+//명중률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcAccuracy(int correction)
 {
 	return (skill * 1.2 + equipmentComponent->equipmentAccuracy + correction);
 }
 
+//레벨업, 경험치 얻는 함수에서 사용
 void ACharacterBase::LevelUp()
 {
 	const int32 MaxGrowth = 100;
