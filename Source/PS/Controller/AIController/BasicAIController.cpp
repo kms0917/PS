@@ -5,11 +5,13 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Character/CharacterBase.h"
+#include "GameMode/NormalGameMode.h"
 
 #include "Perception/AISenseConfig_Sight.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
 #include "GenericTeamAgentInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 ABasicAIController::ABasicAIController()
 {
@@ -28,8 +30,8 @@ ABasicAIController::ABasicAIController()
 		SightConfig->PeripheralVisionAngleDegrees = 50.f; // 전방 부채꼴 시야
 		SightConfig->SetMaxAge(5.f);
 		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-		SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-		SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+		SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
+		SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
 
 		AIPerceptionComponent->ConfigureSense(*SightConfig);
 		AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
@@ -92,7 +94,7 @@ void ABasicAIController::NotifyCustomDamage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AI 피해 감지 → 회전 탐색 시작"));
 
-	Step = 0;
+	Step = 1;
 
 	GetWorld()->GetTimerManager().SetTimer(
 		RotationTimerHandle,
@@ -136,16 +138,41 @@ void ABasicAIController::Tick(float DeltaTime)
 
 void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AI 감지 성공"));
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AI 감지 성공 → 타겟: %s"), *Actor->GetName());
-
-		// 여기서 원하는 동작 추가 (예: 전투 상태로 전환, 블랙보드에 타겟 설정 등)
-
-		// 감지되었으니 회전 중단 (선택 사항)
 		GetWorld()->GetTimerManager().ClearTimer(RotationTimerHandle);
-		UE_LOG(LogTemp, Warning, TEXT("감지 성공 → 회전 탐색 중단"));
+		ANormalGameMode* gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (gameMode)
+		{
+			gameMode->bIsBattle = true;
+		}
+
+		// 주변 범위 감지
+		TArray<FOverlapResult> Overlaps;
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(7000.f); // 예: 1000 단위 반경
+		FCollisionObjectQueryParams QueryParams;
+		QueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		GetWorld()->OverlapMultiByObjectType(
+			Overlaps,
+			GetPawn()->GetActorLocation(),
+			FQuat::Identity,
+			QueryParams,
+			Sphere
+		);
+		for (auto& Result : Overlaps)
+		{
+			ACharacterBase* NearbyChar = Cast<ACharacterBase>(Result.GetActor());
+			if (NearbyChar)
+			{
+				// GameMode에 등록
+				if (gameMode)
+				{
+					gameMode->RegisterBattleCharacters(NearbyChar);
+				}
+			}
+		}
 	}
 }
 
@@ -157,6 +184,7 @@ void ABasicAIController::PerformScanRotation()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RotationTimerHandle);
 		UE_LOG(LogTemp, Warning, TEXT("회전 탐색 종료"));
+		Step = 1;
 		return;
 	}
 

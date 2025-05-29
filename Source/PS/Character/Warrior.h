@@ -18,6 +18,7 @@ public:
 	AWarrior();
 
 protected:
+	virtual void BeginPlay() override;
 
 public:
 	virtual void SetDefaultEquipments() override;

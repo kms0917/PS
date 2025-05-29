@@ -17,6 +17,9 @@ class PS_API AGoblinWarrior : public ACharacterBase
 public:
 	AGoblinWarrior();
 
+protected:
+	virtual void BeginPlay() override;
+
 	virtual void SetDefaultEquipments() override;
 	virtual void SetDefaultSkills() override;
 };

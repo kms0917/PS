@@ -25,6 +25,17 @@ void ANormalGameMode::BeginPlay()
     playerController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController());
     currentCharacter = Cast<ACharacterBase>(playerController->GetPawn());
     freindlyCharacters.Add(currentCharacter);
+}
 
-    bIsBattle = true;
+void ANormalGameMode::RegisterBattleCharacters(ACharacterBase* registedCharacter)
+{
+    if (registedCharacter && !battleCharacters.Contains(registedCharacter))
+    {
+        battleCharacters.Add(registedCharacter);
+    }
+}
+
+void ANormalGameMode::ClearBattleCharacters()
+{
+    battleCharacters.Empty();
 }

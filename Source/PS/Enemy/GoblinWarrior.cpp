@@ -32,7 +32,13 @@ AGoblinWarrior::AGoblinWarrior()
 
 	SetStats();
 	SetSkillInfo();
-	TeamId = FGenericTeamId(1);
+}
+
+void AGoblinWarrior::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetGenericTeamId(FGenericTeamId(1));
 }
 
 void AGoblinWarrior::SetDefaultEquipments()

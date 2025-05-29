@@ -17,7 +17,7 @@ class USkillBase;
 class UAIPerceptionStimuliSourceComponent;
 
 UCLASS()
-class PS_API ACharacterBase : public ACharacter
+class PS_API ACharacterBase : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -61,7 +61,7 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 speedGrowth = 10;
 
-	FGenericTeamId TeamId = FGenericTeamId(255); // 기본 무소속
+	FGenericTeamId TeamId; // 기본 무소속
 
 public:
 	// Called every frame
@@ -76,6 +76,9 @@ public:
 	void SetLevel(int32 levelScaleAmount);	//적군용
 	void TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag);
 	void TargettedOff();
+
+	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamId) override { TeamId = NewTeamId; }
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	float moveSpeed = 10;

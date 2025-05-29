@@ -16,6 +16,7 @@
 #include "ActorComponent/EquipmentComponent.h"
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/SkillBase.h"
+#include "Controller/AIController/BasicAIController.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -164,6 +165,7 @@ void ACharacterBase::ReflectDamage()
 		if (FMath::RandRange(1, 100) <= savedCritical)
 		{
 			savedDamage *= 2;
+			UE_LOG(LogTemp, Warning, TEXT("critical!"));
 		}
 		currentHp -= savedDamage;
 		healthWidget->SetHealthBar(currentHp, hp);
@@ -178,6 +180,14 @@ void ACharacterBase::ReflectDamage()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("evade!"));
 		//회피시의 로직 필요
+	}
+	if (currentHp > 0 && TeamId == FGenericTeamId(1))
+	{
+		ABasicAIController* MyAIController = Cast<ABasicAIController>(GetController());
+		if (MyAIController)
+		{
+			MyAIController->NotifyCustomDamage();
+		}
 	}
 	savedAccuracy = 0;
 	savedDamage = 0;
