@@ -19,6 +19,7 @@ public:
 
 	void SetSkillIndicator(int32 accuracy, int32 critical, int32 damage, bool isMag, float attackRange);
 	void InitAttack();
+	void SetUnvisible();
 
 protected:
 	// Called when the game starts or when spawned

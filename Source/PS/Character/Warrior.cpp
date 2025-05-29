@@ -12,6 +12,8 @@
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/Skills/BasicAttack.h"
 
+#include "GenericTeamAgentInterface.h"
+
 AWarrior::AWarrior()
 {
 	hp = 28;
@@ -35,6 +37,7 @@ AWarrior::AWarrior()
 
 	SetStats();
 	SetSkillInfo();
+	TeamId = FGenericTeamId(0);
 }
 
 void AWarrior::SetDefaultEquipments()	//추후 인벤토리 생기면 인벤토리에도 장비 추가해야함

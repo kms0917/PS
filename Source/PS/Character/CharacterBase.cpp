@@ -58,8 +58,8 @@ ACharacterBase::ACharacterBase()
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
 
-	UAIPerceptionStimuliSourceComponent* StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
-	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
+	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass()); // 시야 감지 등록
 	StimuliSource->bAutoRegister = true;
 }
 

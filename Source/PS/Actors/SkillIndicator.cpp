@@ -96,3 +96,18 @@ void ASkillIndicator::InitAttack()
         }
     }
 }
+
+void ASkillIndicator::SetUnvisible()
+{
+    if (overlappedCharacters.Num() > 0)
+    {
+        for (int32 i = overlappedCharacters.Num() - 1; i >= 0; --i)
+        {
+            ACharacterBase* Character = overlappedCharacters[i];
+            if (IsValid(Character))
+            {
+                Character->TargettedOff();
+            }
+        }
+    }
+}

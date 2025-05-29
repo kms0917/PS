@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/WidgetComponent.h"
+#include "GenericTeamAgentInterface.h"
 #include "CharacterBase.generated.h"
 
 class UHealthWidget;
@@ -13,6 +14,7 @@ class ACharacterController;
 class UEquipmentComponent;
 class USkillComponent;
 class USkillBase;
+class UAIPerceptionStimuliSourceComponent;
 
 UCLASS()
 class PS_API ACharacterBase : public ACharacter
@@ -58,6 +60,8 @@ protected:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 speedGrowth = 10;
+
+	FGenericTeamId TeamId = FGenericTeamId(255); // 기본 무소속
 
 public:
 	// Called every frame
@@ -146,6 +150,8 @@ public:
 	UPROPERTY()
 	bool bDidApplyDamage = false;
 
+	ACharacterController* playerController;
+
 private:
 	void UpdateWidgetRotation();
 	void UpdateSkillInfoWidgetLocation();
@@ -156,11 +162,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* springArmComponent;
 
-	ACharacterController* playerController;
-
 	UPROPERTY()
 	UWidgetComponent* healthWidgetComponent;		//체력 및 남은 턴수 표시
 
 	UPROPERTY()
 	UHealthWidget* healthWidget;	//위의 위젯을 캐스팅해서 담을 변수
+
+	UPROPERTY(VisibleAnywhere)
+	UAIPerceptionStimuliSourceComponent* StimuliSource;
 };

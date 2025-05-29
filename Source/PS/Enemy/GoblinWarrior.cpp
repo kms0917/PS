@@ -7,6 +7,8 @@
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/Skills/GoblinSlash.h"
 
+#include "GenericTeamAgentInterface.h"
+
 AGoblinWarrior::AGoblinWarrior()
 {
 	hp = 25;
@@ -30,6 +32,7 @@ AGoblinWarrior::AGoblinWarrior()
 
 	SetStats();
 	SetSkillInfo();
+	TeamId = FGenericTeamId(1);
 }
 
 void AGoblinWarrior::SetDefaultEquipments()

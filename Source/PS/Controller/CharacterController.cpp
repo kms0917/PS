@@ -182,7 +182,7 @@ void ACharacterController::OnLeftClick()
 
     if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
     {
-        attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
+        //attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
         attackPoint = attackRangeIndicator->GetActorLocation();
         if (gameMode->bIsBattle)
         {
@@ -191,6 +191,15 @@ void ACharacterController::OnLeftClick()
         }
         MoveTotargetIndicator();
         EndSkillMode();
+    }
+}
+
+void ACharacterController::InitAttack()
+{
+    if (attackRangeIndicator)
+    {
+        attackRangeIndicator->InitAttack();
+        attackRangeIndicator->Destroy();
     }
 }
 
@@ -219,10 +228,10 @@ void ACharacterController::EndSkillMode()
     {
         skillRangeIndicator->Destroy();
     }
-    if (attackRangeIndicator)
-    {
-        attackRangeIndicator->Destroy();
-    }
+    //if (attackRangeIndicator)
+    //{
+    //    attackRangeIndicator->SetActorHiddenInGame(true);
+    //}
     bUseSkill = true;
 }
 
@@ -270,7 +279,7 @@ void ACharacterController::UpdateMouseCursorLocation()
 
 void ACharacterController::UpdateSkillIndicatorLocation()
 {
-    if (!attackRangeIndicator || !targetIndicator || !playerCharacter) return;
+    if (!attackRangeIndicator->WasRecentlyRendered(0.0f)|| !targetIndicator || !playerCharacter) return;
 
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
