@@ -45,16 +45,5 @@ void AMovePoint::Tick(float DeltaTime)
 	NewRotation.Yaw += 180.0f;
 	NewRotation.Pitch += 120.0f;
 	WidgetComponent->SetWorldRotation(NewRotation);
-
-}
-
-void AMovePoint::SetReachableText()
-{
-	distanceWidget->ReachableText->SetVisibility(ESlateVisibility::Visible);
-}
-
-void AMovePoint::HideReachableText()
-{
-	distanceWidget->ReachableText->SetVisibility(ESlateVisibility::Collapsed);
 }
 

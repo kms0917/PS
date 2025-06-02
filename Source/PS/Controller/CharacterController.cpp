@@ -40,12 +40,14 @@ ACharacterController::ACharacterController()
     SetBPs();
 }
 
-void ACharacterController::OnTurnChanged()  //턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직, 위젯 내용 갱신도 해야함
+//턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직, 위젯 내용 갱신도 해야함
+void ACharacterController::OnTurnChanged() 
 {
     playerCharacter = Cast<ACharacterBase>(GetPawn());      //빙의 캐릭터가 바뀐 후 호출되어야 함, 게임모드에서 관리, 적 캐릭터면 기능 다 잠궈야 함
     
 }
 
+//위젯에서 스킬 클릭 시 스킬모드 진입
 void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange)
 {
     if (bIsStop)
@@ -160,9 +162,10 @@ void ACharacterController::Tick(float DeltaTime)
     CheckShortMove();
 }
 
+//우클릭 해 이동
 void ACharacterController::OnRightClick()
 {
-    if (IsMouseOverUI() || playerCharacter->IsMontagePlayed())
+    if (IsMouseOverUI() || playerCharacter->IsMontagePlayed() || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn))
     {
         return;
     }
@@ -176,15 +179,16 @@ void ACharacterController::OnRightClick()
     }
 }
 
+//좌클릭 해 공격
 void ACharacterController::OnLeftClick()
 {
-    if (!bIsSkillMode) return;
+    if (!bIsSkillMode || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn)) return;
 
     if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
     {
         //attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
         attackPoint = attackRangeIndicator->GetActorLocation();
-        if (gameMode->bIsBattle)
+        if (playerCharacter->bIsBattle)
         {
             playerCharacter->currentAp -= savedAp;
             skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
@@ -194,6 +198,7 @@ void ACharacterController::OnLeftClick()
     }
 }
 
+//애님 노티파이에서 공격 할 때 사용
 void ACharacterController::InitAttack()
 {
     if (attackRangeIndicator)
@@ -203,6 +208,19 @@ void ACharacterController::InitAttack()
     }
 }
 
+//전투 시작시 이동 및 입력 멈춤
+void ACharacterController::StartCombatMode()
+{   
+    if (bUseSkill)
+    {
+        bUseSkill = false;
+        StopSkillMode();
+    }
+    StopMovement();
+    skillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+//스킬 취소로 스킬모드 종료
 void ACharacterController::StopSkillMode()
 {
     bIsSkillMode = false; 
@@ -219,6 +237,7 @@ void ACharacterController::StopSkillMode()
     playerCharacter->currentUsedSkill = nullptr;
 }
 
+//스킬 사용으로 스킬모드 종료
 void ACharacterController::EndSkillMode()
 {
     bIsSkillMode = false;
@@ -235,11 +254,12 @@ void ACharacterController::EndSkillMode()
     bUseSkill = true;
 }
 
+//마우스 우클릭 시 이동
 void ACharacterController::MoveTotargetIndicator()
 {
     if (bIsStop && !(targetIndicator->IsHidden()))
     {
-        if (gameMode->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
+        if (playerCharacter->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
         {
             UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
             playerCharacter->currentMoveSpeed = 0;
@@ -256,7 +276,7 @@ void ACharacterController::MoveTotargetIndicator()
             {
                 UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, targetIndicator->GetActorLocation());
             }
-            if (gameMode->bIsBattle)
+            if (playerCharacter->bIsBattle)
             {
                 playerCharacter->currentMoveSpeed -= totalDistance;
             }
@@ -264,6 +284,7 @@ void ACharacterController::MoveTotargetIndicator()
     }
 }
 
+//마우스 위치에 targetIndicator 표시
 void ACharacterController::UpdateMouseCursorLocation()
 {
     FHitResult HitResult;
@@ -277,6 +298,7 @@ void ACharacterController::UpdateMouseCursorLocation()
     }
 }
 
+//스킬모드에서 자동이동점 계산 및 표시
 void ACharacterController::UpdateSkillIndicatorLocation()
 {
     if (!attackRangeIndicator->WasRecentlyRendered(0.0f)|| !targetIndicator || !playerCharacter) return;
@@ -381,6 +403,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     }
 }
 
+//카메라 캐릭터 위치로 이동
 void ACharacterController::ResetCamera()
 {
     if (!SpringArmComponent) return;
@@ -389,6 +412,7 @@ void ACharacterController::ResetCamera()
     SpringArmComponent->SetWorldLocation(CharacterLocation);
 }
 
+//카메라 회전
 void ACharacterController::RotateCamera(const FInputActionValue& Value)
 {
     if (!SpringArmComponent) return;
@@ -402,6 +426,7 @@ void ACharacterController::RotateCamera(const FInputActionValue& Value)
     SpringArmComponent->SetWorldRotation(NewRotation);
 }
 
+//카메라 이동
 void ACharacterController::MoveCamera(const FInputActionValue& Value)
 {
     if (!SpringArmComponent || !playerCharacter || !bCanMoveCamera) return;
@@ -422,6 +447,7 @@ void ACharacterController::MoveCamera(const FInputActionValue& Value)
     SpringArmComponent->SetWorldLocation(SpringArmComponent->GetComponentLocation() + MoveDirection);
 }
 
+//카메라 줌
 void ACharacterController::ZoomCamera(const FInputActionValue& Value)
 {
     if (SpringArmComponent)
@@ -436,11 +462,13 @@ void ACharacterController::ZoomCamera(const FInputActionValue& Value)
     }
 }
 
+//위젯 컴포넌트의 각도조절 위해 카메라 각도 저장
 void ACharacterController::UpdateCameraRotation()
 {
     cameraRotation = SpringArmComponent->GetComponentRotation();
 }
 
+//카메라가 캐릭터와 붙어있는지 확인
 void ACharacterController::CheckCameraAttachtoCharacter()
 {
     FVector CharacterLocation = playerCharacter->GetActorLocation();  // 캐릭터의 위치
@@ -467,6 +495,7 @@ void ACharacterController::CheckCameraAttachtoCharacter()
     }
 }
 
+//현재 캐릭터가 움직이고 있는지 확인 및 자동이동 후 스킬 사용까지
 void ACharacterController::CheckCharacterMove()
 {
     if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
@@ -487,6 +516,7 @@ void ACharacterController::CheckCharacterMove()
     }
 }
 
+//SimpleMove로 처리되지 않는 매우 작은 움직임 처리
 void ACharacterController::CheckShortMove()
 {
     if (bIsShortDistanceMove && shortMoveTarget != FVector::ZeroVector)
@@ -507,8 +537,11 @@ void ACharacterController::CheckShortMove()
     }
 }
 
+//targetIndicator까지의 네비메시 경로 표시
 void ACharacterController::SetNavPath()
 {
+    if (playerCharacter->bIsBattle && !playerCharacter->bMyTurn) return;
+    
     if (targetIndicator && bIsStop && !bIsMoving)
     {
         FVector CharacterLocation = playerCharacter->GetActorLocation();
@@ -516,7 +549,6 @@ void ACharacterController::SetNavPath()
         FNavLocation NavLocation;
         if (NavSystem->ProjectPointToNavigation(targetIndicator->GetActorLocation(), NavLocation))
         {
-            targetIndicator->HideReachableText();
             // 네비메시 경로 계산
             UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(
                 this, CharacterLocation, NavLocation.Location);
@@ -538,7 +570,7 @@ void ACharacterController::SetNavPath()
                     FVector End = NavPath->PathPoints[i];
                     float segmentDistance = FVector::Dist(Start, End);
 
-                    if (gameMode->bIsBattle) // 전투 모드일 때만 제한 적용
+                    if (playerCharacter->bIsBattle) // 전투 모드일 때만 제한 적용
                     {
                         if (!reachedLimit && totalPathDistance + segmentDistance > maxMoveDistance)
                         {
@@ -555,7 +587,6 @@ void ACharacterController::SetNavPath()
                             }
                             CylinderColor = FColor::Red;
                             reachedLimit = true;
-                            targetIndicator->SetReachableText();
                         }
                     }
                     // 초과한 구간은 계속 빨간색으로 유지
@@ -566,20 +597,12 @@ void ACharacterController::SetNavPath()
                 }
 
                 totalDistance = totalPathDistance / 100.0f; // 미터 단위 변환
-
-                if (playerCharacter)
-                {
-                    bIsReachable = (playerCharacter->currentMoveSpeed >= totalDistance);
-                }
             }
-        }
-        else
-        {
-            targetIndicator->SetReachableText();
         }
     }
 }
 
+//BP들 세팅
 void ACharacterController::SetBPs()
 {
     static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Input/IMC_ChracterInput"));
@@ -639,6 +662,7 @@ void ACharacterController::SetBPs()
     }
 }
 
+//마우스가 위젯에 올라가있는지 체크해 위젯에 올라갈 시 입력 안되도록
 bool ACharacterController::IsMouseOverUI() const
 {
     FWidgetPath widgetPath = FSlateApplication::Get().LocateWindowUnderMouse(FSlateApplication::Get().GetCursorPos(), FSlateApplication::Get().GetInteractiveTopLevelWindows(), true);

@@ -25,8 +25,8 @@ ABasicAIController::ABasicAIController()
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	if (SightConfig)
 	{
-		SightConfig->SightRadius = 1500.f;
-		SightConfig->LoseSightRadius = 1800.f;
+		SightConfig->SightRadius = 900.f;
+		SightConfig->LoseSightRadius = 1200.f;
 		SightConfig->PeripheralVisionAngleDegrees = 50.f; // 전방 부채꼴 시야
 		SightConfig->SetMaxAge(5.f);
 		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
@@ -73,11 +73,15 @@ void ABasicAIController::SwitchBehaviorTree(UBehaviorTree* NewBT)
 	}
 }
 
-//매개변수 받아서 patrol/combat BT 변경하는 함수, 게임모드에서 전투 시작시 호출해야할듯
+//매개변수 받아서 patrol/combat BT 변경하는 함수, 전투 시작시 호출해야할듯
 void ABasicAIController::SetIsInCombat(bool bCombat)
 {
 	if (BlackboardComp)
 	{
+		if (bCombat && BlackboardComp->GetValueAsBool("IsInCombat"))
+		{
+			return;
+		}
 		BlackboardComp->SetValueAsBool("IsInCombat", bCombat);
 		if (bCombat && CombatBT)
 		{
@@ -94,7 +98,7 @@ void ABasicAIController::NotifyCustomDamage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AI 피해 감지 → 회전 탐색 시작"));
 
-	Step = 1;
+	Step = 0;
 
 	GetWorld()->GetTimerManager().SetTimer(
 		RotationTimerHandle,
@@ -125,7 +129,7 @@ void ABasicAIController::DrawSightConeDebug()
 		12,
 		FColor::Green,
 		false,
-		1.0f // 1초 지속
+		0.01f // 1초 지속
 	);
 }
 
@@ -138,53 +142,43 @@ void ABasicAIController::Tick(float DeltaTime)
 
 void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.WasSuccessfullySensed())
+	if (Stimulus.WasSuccessfullySensed() && !(BlackboardComp->GetValueAsBool("IsInCombat")))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AI 감지 성공 → 타겟: %s"), *Actor->GetName());
-		GetWorld()->GetTimerManager().ClearTimer(RotationTimerHandle);
-		ANormalGameMode* gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		if (gameMode)
-		{
-			gameMode->bIsBattle = true;
-		}
+		// 감지 시작
+		UE_LOG(LogTemp, Warning, TEXT("감지 시작: %s"), *Actor->GetName());
+		CurrentlySeenTarget = Actor;
 
-		// 주변 범위 감지
-		TArray<FOverlapResult> Overlaps;
-		FCollisionShape Sphere = FCollisionShape::MakeSphere(7000.f); // 예: 1000 단위 반경
-		FCollisionObjectQueryParams QueryParams;
-		QueryParams.AddObjectTypesToQuery(ECC_Pawn);
-
-		GetWorld()->OverlapMultiByObjectType(
-			Overlaps,
-			GetPawn()->GetActorLocation(),
-			FQuat::Identity,
-			QueryParams,
-			Sphere
-		);
-		for (auto& Result : Overlaps)
+		// 타이머 시작 (이미 있으면 무시)
+		if (!GetWorld()->GetTimerManager().IsTimerActive(ConfirmSightingTimerHandle))
 		{
-			ACharacterBase* NearbyChar = Cast<ACharacterBase>(Result.GetActor());
-			if (NearbyChar)
-			{
-				// GameMode에 등록
-				if (gameMode)
-				{
-					gameMode->RegisterBattleCharacters(NearbyChar);
-				}
-			}
+			GetWorld()->GetTimerManager().SetTimer(
+				ConfirmSightingTimerHandle,
+				this,
+				&ABasicAIController::ConfirmSighting,
+				ConfirmSightingTime,
+				false
+			);
 		}
+	}
+	else
+	{
+		// 감지 종료 → 타이머 취소
+		UE_LOG(LogTemp, Warning, TEXT("감지 종료: %s"), *Actor->GetName());
+
+		GetWorld()->GetTimerManager().ClearTimer(ConfirmSightingTimerHandle);
+		CurrentlySeenTarget = nullptr;
 	}
 }
 
 void ABasicAIController::PerformScanRotation()
 {
-	if (!ControlledPawn) return;
+	if (!ControlledPawn || BlackboardComp->GetValueAsBool("IsInCombat")) return;
 
 	if (Step >= MaxSteps)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RotationTimerHandle);
 		UE_LOG(LogTemp, Warning, TEXT("회전 탐색 종료"));
-		Step = 1;
+		Step = 0;
 		return;
 	}
 
@@ -198,4 +192,19 @@ void ABasicAIController::PerformScanRotation()
 	}
 
 	Step++;
+}
+
+//아군 캐릭터 감지 확인 됐을 시 전투 시작
+void ABasicAIController::ConfirmSighting()
+{
+	if (CurrentlySeenTarget.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("전투 시작 조건 만족: %s"), *CurrentlySeenTarget->GetName());
+
+		ANormalGameMode* gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (gameMode)
+		{
+			gameMode->StartCombat(GetPawn()->GetActorLocation());
+		}
+	}
 }

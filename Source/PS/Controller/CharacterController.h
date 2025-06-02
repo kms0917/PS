@@ -36,9 +36,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float totalDistance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bIsReachable;
-
 	FRotator cameraRotation;
 
 	bool bIsStop = true;
@@ -48,6 +45,8 @@ public:
 	ACharacterBase* playerCharacter;
 
 	void InitAttack();
+
+	void StartCombatMode();
 
 protected:
 	virtual void BeginPlay() override;
@@ -141,5 +140,5 @@ private:
 	float MinZoomDistance = 800.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float MaxZoomDistance = 2000.0f;
+	float MaxZoomDistance = 3000.0f;
 };

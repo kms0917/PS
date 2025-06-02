@@ -11,6 +11,7 @@
 #include "BasicAIController.generated.h"
 
 class ACharacterBase;
+class ANormalGameMode;
 /**
  * 
  */
@@ -57,13 +58,18 @@ protected:
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	void PerformScanRotation();
-
+	void ConfirmSighting();
+	
 	FTimerHandle RotationTimerHandle;
 
-	int32 Step = 1;
+	int32 Step = 0;
 	const int32 MaxSteps = 4;            // 딱 4번 회전
 	const float AnglePerStep = 90.f;     // 90도씩
 	const float RotationInterval = 1.5f; // 회전 간격
+	
+	FTimerHandle ConfirmSightingTimerHandle;
+	float ConfirmSightingTime = 0.1f; // 예: 0.2초 이상 감지 시 전투 시작
+	TWeakObjectPtr<AActor> CurrentlySeenTarget;
 
 	ACharacterBase* ControlledPawn;
 };

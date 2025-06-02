@@ -26,15 +26,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* WidgetComponent;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* SphereComponent;
-
-	void SetReachableText();
-	void HideReachableText();
 
 private:
 	ACharacterController* PlayerController;

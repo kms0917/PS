@@ -244,6 +244,12 @@ void ACharacterBase::TargettedOff()
 	skillInfoWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+//게임모드에서 턴 기입할때 사용
+void ACharacterBase::SetTurnText(int32 turn)
+{
+	healthWidget->SetTurnText(turn);
+}
+
 //위젯 각도조절
 void ACharacterBase::UpdateWidgetRotation()
 {

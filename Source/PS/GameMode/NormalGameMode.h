@@ -22,11 +22,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void InitTurn();
+
 public:
 	void RegisterBattleCharacters(ACharacterBase* registedCharacter);
 	void ClearBattleCharacters();
-
-	bool bIsBattle;
+	void StartCombat(FVector BattleLocation);
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<ACharacterBase*> battleCharacters;		//전투 시작시 여기에 모든 캐릭터들 다 넣은 후 턴순서 계산해 정렬한 후 차례대로 관리

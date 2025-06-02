@@ -76,6 +76,7 @@ public:
 	void SetLevel(int32 levelScaleAmount);	//적군용
 	void TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag);
 	void TargettedOff();
+	void SetTurnText(int32 turn);
 
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamId) override { TeamId = NewTeamId; }
@@ -147,6 +148,12 @@ public:
 
 	UPROPERTY()
 	bool bIsTargeted = true;
+
+	UPROPERTY()
+	bool bMyTurn = false;
+
+	UPROPERTY()
+	bool bIsBattle = false;
 
 	UPROPERTY()
 	USkillBase* currentUsedSkill;

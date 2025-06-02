@@ -3,9 +3,12 @@
 
 #include "Widget/DistanceWidget.h"
 #include "Controller/CharacterController.h"
+#include "GameMode/NormalGameMode.h"
+#include "Character/CharacterBase.h"
+
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameMode/NormalGameMode.h"
+
 
 void UDistanceWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 {
@@ -13,14 +16,26 @@ void UDistanceWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 
 	if (playerController && DistanceText && ReachableText)
 	{
-		DistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f m"), playerController->totalDistance)));
-		if (!playerController->bIsStop || ReachableText->Visibility == ESlateVisibility::Visible)
+		if (playerController->playerCharacter->bIsBattle && !playerController->playerCharacter->bMyTurn)
 		{
 			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
+			ReachableText->SetVisibility(ESlateVisibility::Collapsed);
+			return;
+		}
+		DistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f m"), playerController->totalDistance)));
+		if (!playerController->bIsStop)
+		{
+			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		else if ((playerController->playerCharacter->bIsBattle && playerController->totalDistance > playerController->playerCharacter->currentMoveSpeed))
+		{
+			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
+			ReachableText->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
 			DistanceText->SetVisibility(ESlateVisibility::Visible);
+			ReachableText->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 }
