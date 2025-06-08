@@ -34,6 +34,8 @@ public:
 	void NotifyCustomDamage();
 	void DrawSightConeDebug();
 	virtual void Tick(float DeltaTime) override;
+	void DoAIDamage();
+	void EndTurn();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -68,7 +70,7 @@ protected:
 	const float RotationInterval = 1.5f; // 회전 간격
 	
 	FTimerHandle ConfirmSightingTimerHandle;
-	float ConfirmSightingTime = 0.1f; // 예: 0.2초 이상 감지 시 전투 시작
+	float ConfirmSightingTime = 0.2f; // 예: 0.3초 이상 감지 시 전투 시작
 	TWeakObjectPtr<AActor> CurrentlySeenTarget;
 
 	ACharacterBase* ControlledPawn;

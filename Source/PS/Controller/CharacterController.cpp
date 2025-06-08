@@ -211,11 +211,13 @@ void ACharacterController::InitAttack()
 //전투 시작시 이동 및 입력 멈춤
 void ACharacterController::StartCombatMode()
 {   
-    if (bUseSkill)
-    {
-        bUseSkill = false;
-        StopSkillMode();
-    }
+    //if (bUseSkill)
+    //{
+    //    bUseSkill = false;
+    //    StopSkillMode();
+    //}
+    bUseSkill = false;
+    StopSkillMode();
     StopMovement();
     skillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
 }

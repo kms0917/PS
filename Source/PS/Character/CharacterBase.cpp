@@ -215,7 +215,7 @@ void ACharacterBase::SetLevel(int32 levelScaleAmount)
 }
 
 //skillIndicator와 오버렙 시 호출
-void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag)
+void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, bool isEnemy)
 {
 	if (isMag)	//마딜이면
 	{
@@ -228,9 +228,12 @@ void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 D
 	savedAccuracy = (((float)accuracyRate - (float)evasion) / (float)accuracyRate) * 100;
 	savedDamage = Damage;
 	savedCritical = criticalRate;
-
-	skillInfoWidget->SettingWidget(savedAccuracy, criticalRate, Damage);
-	skillInfoWidget->SetVisibility(ESlateVisibility::Visible);
+	if (!isEnemy)
+	{
+		bIsTargeted = true;
+		skillInfoWidget->SettingWidget(savedAccuracy, criticalRate, Damage);
+		skillInfoWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 //skillIndicator와 오버렙 끝날시 호출
@@ -239,9 +242,10 @@ void ACharacterBase::TargettedOff()
 	//savedAccuracy = 0;
 	//savedDamage = 0;
 	//savedCritical = 0;
-
+	
 	skillInfoWidget->RessetWidget();
 	skillInfoWidget->SetVisibility(ESlateVisibility::Collapsed);
+	bIsTargeted = false;
 }
 
 //게임모드에서 턴 기입할때 사용
@@ -286,11 +290,11 @@ int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 {
 	if (!isMag)			//물리 딜
 	{
-		return damage + str * magnification + equipmentComponent->equipmentDamage;
+		return damage + currentStr * magnification + equipmentComponent->equipmentDamage;
 	}
 	else				//마법 딜
 	{
-		return damage + mag * magnification + equipmentComponent->equipmentDamage;
+		return damage + currentMag * magnification + equipmentComponent->equipmentDamage;
 	}
 }
 
@@ -328,19 +332,19 @@ void ACharacterBase::SetSkillInfo()
 //치명타 확률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcCritical(int correction)
 {
-	return (skill + equipmentComponent->equipmentCritical + correction);
+	return (currentSkill + equipmentComponent->equipmentCritical + correction);
 }
 
 //회피율 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcEvasion(int correction)
 {
-	return (speed * 1.2 + equipmentComponent->equipmentEvasion + correction);
+	return (currentSpeed * 1.2 + equipmentComponent->equipmentEvasion + correction);
 }
 
 //명중률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcAccuracy(int correction)
 {
-	return (skill * 1.2 + equipmentComponent->equipmentAccuracy + correction);
+	return (currentSkill * 1.2 + equipmentComponent->equipmentAccuracy + correction);
 }
 
 //레벨업, 경험치 얻는 함수에서 사용

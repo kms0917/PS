@@ -49,7 +49,7 @@ void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* Othe
     
     if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
     {
-        Casted->TargettedOn(accuracy, critical, damage, bIsMag);
+        Casted->TargettedOn(accuracy, critical, damage, bIsMag, false);
         overlappedCharacters.Add(Casted);
     }
 }

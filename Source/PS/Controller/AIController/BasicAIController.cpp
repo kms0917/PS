@@ -58,12 +58,13 @@ void ABasicAIController::OnPossess(APawn* InPawn)
 		UseBlackboard(PatrolBT->BlackboardAsset, BlackboardComp);
 		BlackboardComp->SetValueAsBool(TEXT("IsInCombat"), false);
 		BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), false);
+		BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), false);
 		BlackboardComp->SetValueAsVector(TEXT("HomeLocation"), InPawn->GetActorLocation());
 		BehaviorComp->StartTree(*PatrolBT);
 		UE_LOG(LogTemp, Warning, TEXT("aicontroller"));
 	}
 }
-//새로운 BT 사용하는 함수, 아마 안쓸듯?
+
 void ABasicAIController::SwitchBehaviorTree(UBehaviorTree* NewBT)
 {
 	if (NewBT && BlackboardComp)
@@ -94,6 +95,7 @@ void ABasicAIController::SetIsInCombat(bool bCombat)
 	}
 }
 
+//데미지 받았을 시
 void ABasicAIController::NotifyCustomDamage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AI 피해 감지 → 회전 탐색 시작"));
@@ -140,6 +142,29 @@ void ABasicAIController::Tick(float DeltaTime)
 	DrawSightConeDebug();
 }
 
+//ai의 애님 노티파이에서 실행시킬 함수, 현재 블랙보드의 target에 데미지 줌
+void ABasicAIController::DoAIDamage()
+{
+	ACharacterBase* targetCharacter = Cast<ACharacterBase>(BlackboardComp->GetValueAsObject(TEXT("TargetActor")));
+	if (targetCharacter)
+	{
+		targetCharacter->ReflectDamage();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("notify : target missing"));
+	}
+}
+
+//EndTurnTask에서 실행시킬 함수, 블랙보드의 값들 초기화
+void ABasicAIController::EndTurn()
+{
+	BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), false);
+	BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), false);
+	BlackboardComp->SetValueAsObject(TEXT("TargetActor"), nullptr);
+	BlackboardComp->SetValueAsObject(TEXT("SelectedSkill"), nullptr);
+}
+
 void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Stimulus.WasSuccessfullySensed() && !(BlackboardComp->GetValueAsBool("IsInCombat")))
@@ -170,6 +195,7 @@ void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus St
 	}
 }
 
+//데미지 받았을 시 주변 탐색
 void ABasicAIController::PerformScanRotation()
 {
 	if (!ControlledPawn || BlackboardComp->GetValueAsBool("IsInCombat")) return;
@@ -200,7 +226,7 @@ void ABasicAIController::ConfirmSighting()
 	if (CurrentlySeenTarget.IsValid())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("전투 시작 조건 만족: %s"), *CurrentlySeenTarget->GetName());
-
+		CurrentlySeenTarget = nullptr;
 		ANormalGameMode* gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (gameMode)
 		{

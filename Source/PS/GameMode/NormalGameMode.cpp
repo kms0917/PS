@@ -31,6 +31,7 @@ void ANormalGameMode::BeginPlay()
 //정렬된 battleCharacters에서 가장 앞에 있는 캐릭터의 컨트롤러를 ai컨트롤러로 캐스팅, 성공 시 ai 컨트롤러의 턴 개시 함수 실행, 실패 시 해당 캐릭터로 플레이어컨트롤러 빙의
 void ANormalGameMode::InitTurn()
 {
+
 }
 
 //전투 시작 시 전투 캐릭터들의 배열에 캐릭터 추가
@@ -100,4 +101,5 @@ void ANormalGameMode::StartCombat(FVector BattleLocation)
 	{
 		battleCharacters[i]->SetTurnText(i);
 	}
+	InitTurn();
 }

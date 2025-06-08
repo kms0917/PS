@@ -20,7 +20,7 @@ void UAnimNotify_DealDamage::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
     {
         Character->playerController->InitAttack();
         Character->currentUsedSkill->ApllyDamage();
-        Character->bDidApplyDamage = true;
+        //Character->bDidApplyDamage = true;
         Character->currentUsedSkill = nullptr;
     }
 }
