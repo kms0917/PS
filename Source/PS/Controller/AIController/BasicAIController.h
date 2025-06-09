@@ -35,6 +35,7 @@ public:
 	void DrawSightConeDebug();
 	virtual void Tick(float DeltaTime) override;
 	void DoAIDamage();
+	void StartTurn();
 	void EndTurn();
 
 protected:

@@ -41,10 +41,21 @@ ACharacterController::ACharacterController()
 }
 
 //턴이 왔을때 실행시킬 함수, 행동력 회복 등의 로직, 위젯 내용 갱신도 해야함
-void ACharacterController::OnTurnChanged() 
+void ACharacterController::InitTurn() 
 {
-    playerCharacter = Cast<ACharacterBase>(GetPawn());      //빙의 캐릭터가 바뀐 후 호출되어야 함, 게임모드에서 관리, 적 캐릭터면 기능 다 잠궈야 함
-    
+    if (gameMode->currentCharacter)
+    {
+        SpringArmComponent = gameMode->currentCharacter->FindComponentByClass<USpringArmComponent>();
+        playerCharacter = gameMode->currentCharacter;
+        playerCharacter->bMyTurn = true;
+    }
+    if (skillWidgetInstance)
+    {
+        skillWidgetInstance->UpdateWidget(playerCharacter);     //턴이 바뀔때마다 실행되야함
+        skillWidgetInstance->AddToViewport();
+        skillWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+    }
+    ResetCamera();
 }
 
 //위젯에서 스킬 클릭 시 스킬모드 진입
@@ -106,13 +117,13 @@ void ACharacterController::BeginPlay()
             targetIndicator->SetActorHiddenInGame(false);
         }
     }
+    gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
     //이 밑부분들은 턴 개시시마다 실행되어야 함
     if (APawn* ControlledPawn = GetPawn())
     {
         SpringArmComponent = ControlledPawn->FindComponentByClass<USpringArmComponent>();
         playerCharacter = Cast<ACharacterBase>(ControlledPawn);
     }
-    gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
     ResetCamera();
     if (skillWidgetClass)
     {
@@ -254,6 +265,12 @@ void ACharacterController::EndSkillMode()
     //    attackRangeIndicator->SetActorHiddenInGame(true);
     //}
     bUseSkill = true;
+}
+
+//턴 종료 위젯에 연결해 턴 관련 변수 초기화 및 GameMode의 EndTurn 호출해야 함
+void ACharacterController::EndTurn()
+{
+
 }
 
 //마우스 우클릭 시 이동

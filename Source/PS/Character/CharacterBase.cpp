@@ -17,6 +17,7 @@
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/SkillBase.h"
 #include "Controller/AIController/BasicAIController.h"
+#include "GameMode/NormalGameMode.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -172,8 +173,16 @@ void ACharacterBase::ReflectDamage()
 		if (currentHp <= 0)
 		{
 			this->Destroy();
-			//게임모드의 큐에서 해당 캐릭터 삭제해줘야함
-			//게임모드에서 아군 캐릭터들의 목록 소유하고 있어야함, 게임모드에서 아군 캐릭터들의 경험치 습득함수 작동시켜줘야함
+			ANormalGameMode* GM = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
+			if (GM)
+			{
+				GM->battleCharacters.Remove(this);
+				GM->GetEXP();
+				if (TeamId == FGenericTeamId(0))
+				{
+					GM->freindlyCharacters.Remove(this);
+				}
+			}
 		}
 	}
 	else
@@ -197,7 +206,7 @@ void ACharacterBase::ReflectDamage()
 //얻는 수치는 조절 필요, 적이 죽을때 게임모드에서 호출해서 모든 아군 캐릭터 경험치 습득해줘야함
 void ACharacterBase::GetEXP()	
 {
-	exp += 10;
+	exp += 20;
 	while (exp >= 100)
 	{
 		exp -= 100;

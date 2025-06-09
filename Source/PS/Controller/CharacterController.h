@@ -29,7 +29,7 @@ class PS_API ACharacterController : public APlayerController
 public:
 	ACharacterController();
 
-	void OnTurnChanged();
+	void InitTurn();
 
 	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange);
 
@@ -77,6 +77,7 @@ protected:
 	void OnLeftClick();
 	void StopSkillMode();
 	void EndSkillMode();
+	void EndTurn();
 	void MoveTotargetIndicator();
 	void UpdateMouseCursorLocation();
 	void UpdateSkillIndicatorLocation();

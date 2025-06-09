@@ -156,13 +156,31 @@ void ABasicAIController::DoAIDamage()
 	}
 }
 
+void ABasicAIController::StartTurn()
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), true);
+		BlackboardComp->SetValueAsObject(TEXT("TargetActor"), nullptr);
+		BlackboardComp->SetValueAsObject(TEXT("SelectedSkill"), nullptr);
+	}
+}
+
 //EndTurnTask에서 실행시킬 함수, 블랙보드의 값들 초기화
 void ABasicAIController::EndTurn()
 {
-	BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), false);
-	BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), false);
-	BlackboardComp->SetValueAsObject(TEXT("TargetActor"), nullptr);
-	BlackboardComp->SetValueAsObject(TEXT("SelectedSkill"), nullptr);
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), false);
+		BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), false);
+		BlackboardComp->SetValueAsObject(TEXT("TargetActor"), nullptr);
+		BlackboardComp->SetValueAsObject(TEXT("SelectedSkill"), nullptr);
+	}
+	ANormalGameMode* GM = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GM)
+	{
+		GM->EndTurn();
+	}
 }
 
 void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

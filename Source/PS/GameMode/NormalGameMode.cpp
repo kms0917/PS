@@ -25,13 +25,45 @@ void ANormalGameMode::BeginPlay()
 
     playerController = Cast<ACharacterController>(GetWorld()->GetFirstPlayerController());
     currentCharacter = Cast<ACharacterBase>(playerController->GetPawn());
-    freindlyCharacters.Add(currentCharacter);
+	if (currentCharacter)
+	{
+		freindlyCharacters.Add(currentCharacter);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("currnetCharacter Cast Failed"));
+	}
 }
 
 //정렬된 battleCharacters에서 가장 앞에 있는 캐릭터의 컨트롤러를 ai컨트롤러로 캐스팅, 성공 시 ai 컨트롤러의 턴 개시 함수 실행, 실패 시 해당 캐릭터로 플레이어컨트롤러 빙의
 void ANormalGameMode::InitTurn()
 {
+	if (battleCharacters[0]->GetGenericTeamId() == FGenericTeamId(0))	//아군일경우
+	{
+		currentCharacter = battleCharacters[0];
+		playerController->Possess(battleCharacters[0]);
+		playerController->InitTurn();
+	}
+	else
+	{
+		ABasicAIController* AICon = Cast<ABasicAIController>(battleCharacters[0]->GetController());
+		if (AICon)
+		{
+			AICon->StartTurn();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AICon Cast Failed_GameMode"));
+		}
+	}
+}
 
+void ANormalGameMode::GetEXP()
+{
+	for (int i = 0; i < freindlyCharacters.Num(); i++)
+	{
+		freindlyCharacters[i]->GetEXP();
+	}
 }
 
 //전투 시작 시 전투 캐릭터들의 배열에 캐릭터 추가
@@ -102,4 +134,10 @@ void ANormalGameMode::StartCombat(FVector BattleLocation)
 		battleCharacters[i]->SetTurnText(i);
 	}
 	InitTurn();
+}
+
+//playerController의 EndTurn과 AIController의 EndTurn에서 호출, battleCharacters배열정리 후 TurnText 갱신 및 전투 종료 확인 후 InitTurn호출
+void ANormalGameMode::EndTurn()
+{
+
 }
