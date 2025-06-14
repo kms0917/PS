@@ -27,7 +27,7 @@ EBTNodeResult::Type UBTTask_SetAttackTarget_Offensive::ExecuteTask(UBehaviorTree
 	if (!AICon || !AIPawn || !BB) return EBTNodeResult::Failed;
 
 	ANormalGameMode* gameMode = Cast<ANormalGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	TArray<ACharacterBase*> characters = gameMode->freindlyCharacters;
+	TArray<ACharacterBase*> characters = gameMode->friendlyCharacters;
 	TArray<USkillBase*> skills = AIPawn->skillComponent->skillList;
 
 	ACharacterBase* LowestHPCharacter = nullptr;
@@ -59,7 +59,7 @@ EBTNodeResult::Type UBTTask_SetAttackTarget_Offensive::ExecuteTask(UBehaviorTree
 
 	if (LowestHPCharacter && SkillToUse)
 	{
-		LowestHPCharacter->TargettedOn(SkillToUse->calculatedAccuracy, SkillToUse->calculatedCritical, SkillToUse->calculatedDamage, SkillToUse->bIsMag, true);
+		LowestHPCharacter->TargettedOn(SkillToUse->calculatedAccuracy, SkillToUse->calculatedCritical, SkillToUse->calculatedDamage, SkillToUse->bIsMag, true, SkillToUse->bIsHeal);
 		BB->SetValueAsObject("TargetActor", LowestHPCharacter);
 		BB->SetValueAsVector("MovePoint", BestMovePoint);
 		BB->SetValueAsObject("SelectedSkill", SkillToUse); // 필요시

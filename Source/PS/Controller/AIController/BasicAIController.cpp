@@ -6,6 +6,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Character/CharacterBase.h"
 #include "GameMode/NormalGameMode.h"
+#include "Objects/SkillBase.h"
 
 #include "Perception/AISenseConfig_Sight.h"
 #include "GameFramework/Character.h"
@@ -146,9 +147,11 @@ void ABasicAIController::Tick(float DeltaTime)
 void ABasicAIController::DoAIDamage()
 {
 	ACharacterBase* targetCharacter = Cast<ACharacterBase>(BlackboardComp->GetValueAsObject(TEXT("TargetActor")));
+	USkillBase* selectedSkill = Cast<USkillBase>(BlackboardComp->GetValueAsObject(TEXT("SelectedSkill")));
 	if (targetCharacter)
 	{
-		targetCharacter->ReflectDamage();
+		targetCharacter->ReflectDamage(selectedSkill->bIsHeal);
+		BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), true);
 	}
 	else
 	{

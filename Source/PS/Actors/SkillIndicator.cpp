@@ -49,7 +49,7 @@ void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* Othe
     
     if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
     {
-        Casted->TargettedOn(accuracy, critical, damage, bIsMag, false);
+        Casted->TargettedOn(accuracy, critical, damage, bIsMag, false, IsHeal);
         overlappedCharacters.Add(Casted);
     }
 }
@@ -68,11 +68,12 @@ void ASkillIndicator::OverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
     }
 }
 
-void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, float attackRange)
+void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, float attackRange, bool isHeal)
 {
     const float Scale = attackRange / 50.0f;
     SetActorScale3D(FVector(Scale, Scale, 0.01f));
 
+    IsHeal = isHeal;
     accuracy = accuracyRate;
     critical = criticalRate;
     damage = Damage;

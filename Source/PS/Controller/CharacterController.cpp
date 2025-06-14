@@ -19,6 +19,8 @@
 #include "AI/Navigation/NavigationTypes.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "AIController.h"
+#include "Slate/SObjectWidget.h"
+#include "Components/Button.h"
 
 #include "Character/CharacterBase.h"
 #include "GameMode/NormalGameMode.h"
@@ -47,25 +49,26 @@ void ACharacterController::InitTurn()
     {
         SpringArmComponent = gameMode->currentCharacter->FindComponentByClass<USpringArmComponent>();
         playerCharacter = gameMode->currentCharacter;
-        playerCharacter->bMyTurn = true;
+        playerCharacter->TurnStart();
     }
     if (skillWidgetInstance)
     {
-        skillWidgetInstance->UpdateWidget(playerCharacter);     //턴이 바뀔때마다 실행되야함
-        skillWidgetInstance->AddToViewport();
+        skillWidgetInstance->UpdateWidget(playerCharacter); 
         skillWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+        skillWidgetInstance->SetEndButton(true);
     }
     ResetCamera();
 }
 
 //위젯에서 스킬 클릭 시 스킬모드 진입
-void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange)
+void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting)
 {
     if (bIsStop)
     {
         savedAp = apUsage;
         savedSkillRange = skillRange;
         bIsSkillMode = true;
+        bIsTargeting = isTargeting;
         if (SkillRangeClass)
         {
             FVector spawnLocation = playerCharacter->GetActorLocation();
@@ -92,7 +95,7 @@ void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 d
             attackRangeIndicator = GetWorld()->SpawnActor<ASkillIndicator>(AttackRangeClass, spawnpoint, FRotator::ZeroRotator);
             if (attackRangeIndicator)
             {
-                attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
+                attackRangeIndicator->SetSkillIndicator(accuracy, critical, damage, isMag, attackRange, isHeal);        //공격범위 표시 후 tick에서 마우스 트래킹 및 스킬 사용 여부 판별
             }
         }
     }
@@ -133,6 +136,7 @@ void ACharacterController::BeginPlay()
         {
             skillWidgetInstance->UpdateWidget(playerCharacter);     //턴이 바뀔때마다 실행되야함
             skillWidgetInstance->AddToViewport();
+            skillWidgetInstance->SetEndButton(false);
         }
     }
 }
@@ -194,7 +198,7 @@ void ACharacterController::OnRightClick()
 void ACharacterController::OnLeftClick()
 {
     if (!bIsSkillMode || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn)) return;
-
+    
     if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
     {
         //attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
@@ -231,6 +235,14 @@ void ACharacterController::StartCombatMode()
     StopSkillMode();
     StopMovement();
     skillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+//전투 종료
+void ACharacterController::EndCombat()
+{
+    skillWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+    skillWidgetInstance->UpdateWidget(playerCharacter);
+    skillWidgetInstance->SetEndButton(false);
 }
 
 //스킬 취소로 스킬모드 종료
@@ -270,7 +282,16 @@ void ACharacterController::EndSkillMode()
 //턴 종료 위젯에 연결해 턴 관련 변수 초기화 및 GameMode의 EndTurn 호출해야 함
 void ACharacterController::EndTurn()
 {
+    playerCharacter->TurnEnd();
 
+    if (skillWidgetInstance)
+    {
+        skillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    if (gameMode)
+    {
+        gameMode->EndTurn();
+    }
 }
 
 //마우스 우클릭 시 이동
@@ -686,7 +707,8 @@ bool ACharacterController::IsMouseOverUI() const
 {
     FWidgetPath widgetPath = FSlateApplication::Get().LocateWindowUnderMouse(FSlateApplication::Get().GetCursorPos(), FSlateApplication::Get().GetInteractiveTopLevelWindows(), true);
     TSharedPtr viewPort = FSlateApplication::Get().GetGameViewport();
-    bool overViewPort = widgetPath.IsValid() && (widgetPath.GetLastWidget() == viewPort.ToSharedRef());
+    bool overViewPort = widgetPath.IsValid() && widgetPath.Widgets.Num() > 0 && (widgetPath.Widgets.Last().Widget == viewPort || widgetPath.Widgets.Last().Widget->GetTypeAsString() == TEXT("SObjectWidget"));
+    //UE_LOG(LogTemp, Warning, TEXT("Mouse is over widget: %s"), *widgetPath.Widgets.Last().Widget->GetTypeAsString());
 
     return !overViewPort;
 }

@@ -17,7 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	ASkillIndicator();
 
-	void SetSkillIndicator(int32 accuracy, int32 critical, int32 damage, bool isMag, float attackRange);
+	void SetSkillIndicator(int32 accuracy, int32 critical, int32 damage, bool isMag, float attackRange, bool IsHeal);
 	void InitAttack();
 	void SetUnvisible();
 
@@ -34,6 +34,7 @@ protected:
 	int32 accuracy;
 	int32 critical;
 	bool bIsMag;
+	bool IsHeal;
 
 	ACharacterBase* playerCharacter;
 

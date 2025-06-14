@@ -71,12 +71,14 @@ public:
 	bool IsMontagePlayed();
 
 	void UseSkill(int i);
-	void ReflectDamage();	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
+	void ReflectDamage(bool isHeal);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
 	void GetEXP();	//아군용
 	void SetLevel(int32 levelScaleAmount);	//적군용
-	void TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, bool isEnemy);
+	void TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, bool isEnemy, bool isHeal);
 	void TargettedOff();
 	void SetTurnText(int32 turn);
+	void TurnStart();
+	void TurnEnd();
 
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamId) override { TeamId = NewTeamId; }

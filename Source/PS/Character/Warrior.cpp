@@ -11,6 +11,7 @@
 #include "Objects/Boots/IronBoots.h"
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/Skills/BasicAttack.h"
+#include "Objects/Skills/Heal.h"
 
 #include "GenericTeamAgentInterface.h"
 
@@ -66,5 +67,6 @@ void AWarrior::SetDefaultSkills()
 {
 	UBasicAttack* defaultSkill = NewObject<UBasicAttack>(this, UBasicAttack::StaticClass(), TEXT("Basic Attack"));
 	skillComponent->AddSkill(defaultSkill);
-
+	UHeal* defaultSkill2 = NewObject<UHeal>(this, UHeal::StaticClass(), TEXT("Heal"));
+	skillComponent->AddSkill(defaultSkill2);
 }

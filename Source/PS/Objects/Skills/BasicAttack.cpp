@@ -5,7 +5,7 @@
 
 UBasicAttack::UBasicAttack()
 {
-	skillRange = 100.0f;
+	skillRange = 200.0f;
 	attackRange = 50.0f;
 	apUsage = 1;
 	accuracy = 40;
@@ -14,6 +14,7 @@ UBasicAttack::UBasicAttack()
 	damage = 0;
 	magnification = 1.0f;
 	bIsMag = false;
+	bIsHeal = false;
 	skillName = FText::FromString(TEXT("기본 공격"));
 	skillScript = FText::FromString(TEXT("힘에 비례한 물리 공격"));
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/StableSwordOutwardSlash_UE_Anim_Montage"));

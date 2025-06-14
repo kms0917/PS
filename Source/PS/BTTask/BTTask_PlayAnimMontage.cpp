@@ -47,7 +47,7 @@ EBTNodeResult::Type UBTTask_PlayAnimMontage::ExecuteTask(UBehaviorTreeComponent&
 	else
 	{
 		BB->SetValueAsBool(TEXT("EndMyTurn"), true);
-		UE_LOG(LogTemp, Warning, TEXT("EndMyTurn Set"));
+		UE_LOG(LogTemp, Warning, TEXT("EndMyTurn Set(애니메이션 필요 x)"));
 		return EBTNodeResult::Succeeded;
 	}
 

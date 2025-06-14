@@ -8,6 +8,7 @@
 UBTTask_WaitTurnEnd::UBTTask_WaitTurnEnd()
 {
 	NodeName = TEXT("Wait Turn End");
+	bNotifyTick = true;
 }
 
 EBTNodeResult::Type UBTTask_WaitTurnEnd::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)

@@ -27,7 +27,7 @@ void ANormalGameMode::BeginPlay()
     currentCharacter = Cast<ACharacterBase>(playerController->GetPawn());
 	if (currentCharacter)
 	{
-		freindlyCharacters.Add(currentCharacter);
+		friendlyCharacters.Add(currentCharacter);
 	}
 	else
 	{
@@ -58,11 +58,48 @@ void ANormalGameMode::InitTurn()
 	}
 }
 
+//캐릭터가 죽을시 호출, 전투가 종료되었는지 확인
+void ANormalGameMode::EndCombat()
+{
+	if (battleCharacters.Num() != friendlyCharacters.Num())	//전투종료 확인
+	{
+		return;
+	}
+	else
+	{
+		ClearBattleCharacters();
+		if (playerController)
+		{
+			playerController->EndCombat(); 
+			currentCharacter = friendlyCharacters[0];
+			playerController->Possess(currentCharacter);
+		}
+	}
+}
+
+//아군 캐릭터들 경험치 습득
 void ANormalGameMode::GetEXP()
 {
-	for (int i = 0; i < freindlyCharacters.Num(); i++)
+	for (int i = 0; i < friendlyCharacters.Num(); i++)
 	{
-		freindlyCharacters[i]->GetEXP();
+		friendlyCharacters[i]->GetEXP();
+	}
+}
+
+//전투중인 캐릭터들의 턴 표시 갱신
+void ANormalGameMode::SetBattleCharactersTurnText()
+{
+	for (int i = 0; i < battleCharacters.Num(); i++)
+	{
+		battleCharacters[i]->SetTurnText(i);
+	}
+}
+
+void ANormalGameMode::ClearTurnText()
+{
+	for (int i = 0; i < battleCharacters.Num(); i++)
+	{
+		battleCharacters[i]->SetTurnText(-1);
 	}
 }
 
@@ -79,6 +116,12 @@ void ANormalGameMode::RegisterBattleCharacters(ACharacterBase* registedCharacter
 //전투중인 캐릭터들의 배열 비움
 void ANormalGameMode::ClearBattleCharacters()
 {
+	ClearTurnText();
+	for (int i = 0; i < battleCharacters.Num(); i++)
+	{
+		battleCharacters[i]->bIsBattle = false;
+		battleCharacters[i]->currentAp = battleCharacters[i]->ap;
+	}
     battleCharacters.Empty();
 }
 
@@ -129,15 +172,19 @@ void ANormalGameMode::StartCombat(FVector BattleLocation)
 	// 저장된 점수를 기준으로 정렬
 	battleCharacters.Sort([&RollMap](ACharacterBase& A, ACharacterBase& B) { return RollMap[&A] > RollMap[&B]; });
 
-	for (int i = 0; i < battleCharacters.Num(); i++)
-	{
-		battleCharacters[i]->SetTurnText(i);
-	}
+	SetBattleCharactersTurnText();
 	InitTurn();
 }
 
 //playerController의 EndTurn과 AIController의 EndTurn에서 호출, battleCharacters배열정리 후 TurnText 갱신 및 전투 종료 확인 후 InitTurn호출
 void ANormalGameMode::EndTurn()
 {
-
+	if (battleCharacters.Num() > 1)
+	{
+		ACharacterBase* temp = battleCharacters[0];
+		battleCharacters.RemoveAt(0);
+		battleCharacters.Add(temp);
+		SetBattleCharactersTurnText();
+		InitTurn();
+	}
 }

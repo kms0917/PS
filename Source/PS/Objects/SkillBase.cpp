@@ -10,7 +10,7 @@ void USkillBase::ApllyDamage()
 	{
 		if (Character)
 		{
-			Character->ReflectDamage();
+			Character->ReflectDamage(bIsHeal);
 		}
 	}
 	overlappedCharacters.Empty();

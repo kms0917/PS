@@ -30,7 +30,7 @@ protected:
 	UTextBlock* apUsage;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* damage;
+	UTextBlock* dmgOrheal;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* accuracy;

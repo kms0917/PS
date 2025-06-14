@@ -154,13 +154,23 @@ void ACharacterBase::UseSkill(int i)
 		critical = usedSkill->calculatedCritical;
 		accuracy = usedSkill->calculatedAccuracy;
 		int damage = usedSkill->calculatedDamage;
-		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange);
+		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange, usedSkill->bIsHeal, usedSkill->bIsTargeting);
 	}
 }
 
 //스킬 사용시의 AnimNotify 통해 targetted 된 객체들의 함수를 사용되는 skill object에서 호출
-void ACharacterBase::ReflectDamage()
+void ACharacterBase::ReflectDamage(bool isHeal)
 {
+	if (isHeal)
+	{
+		currentHp += savedDamage;
+		if (currentHp > hp)
+		{
+			currentHp = hp;
+			healthWidget->SetHealthBar(currentHp, hp);
+		}
+		return;
+	}
 	if (FMath::RandRange(1, 100) <= savedAccuracy)
 	{
 		if (FMath::RandRange(1, 100) <= savedCritical)
@@ -178,9 +188,11 @@ void ACharacterBase::ReflectDamage()
 			{
 				GM->battleCharacters.Remove(this);
 				GM->GetEXP();
+				GM->EndCombat();		//전투 종료 확인
+				GM->SetBattleCharactersTurnText();
 				if (TeamId == FGenericTeamId(0))
 				{
-					GM->freindlyCharacters.Remove(this);
+					GM->friendlyCharacters.Remove(this);
 				}
 			}
 		}
@@ -224,13 +236,13 @@ void ACharacterBase::SetLevel(int32 levelScaleAmount)
 }
 
 //skillIndicator와 오버렙 시 호출
-void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, bool isEnemy)
+void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 Damage, bool isMag, bool isEnemy, bool isHeal)
 {
-	if (isMag)	//마딜이면
+	if (isMag && !isHeal)	//마딜이면
 	{
 		Damage -= res;
 	}
-	else
+	else if (!isHeal)
 	{
 		Damage -= def;
 	}
@@ -240,7 +252,7 @@ void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 D
 	if (!isEnemy)
 	{
 		bIsTargeted = true;
-		skillInfoWidget->SettingWidget(savedAccuracy, criticalRate, Damage);
+		skillInfoWidget->SettingWidget(savedAccuracy, criticalRate, Damage, isHeal);
 		skillInfoWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
@@ -261,6 +273,20 @@ void ACharacterBase::TargettedOff()
 void ACharacterBase::SetTurnText(int32 turn)
 {
 	healthWidget->SetTurnText(turn);
+}
+
+//스탯 초기화 및 turn 변수 세팅
+void ACharacterBase::TurnStart()
+{
+	bMyTurn = true;
+	SetStats();
+	SetSkillInfo();
+}
+
+//턴 변수 false로
+void ACharacterBase::TurnEnd()
+{
+	bMyTurn = false;
 }
 
 //위젯 각도조절

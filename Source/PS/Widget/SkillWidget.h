@@ -32,7 +32,12 @@ public:
 
 	void UpdateButtons(int32 currentAp);
 
+	void SetEndButton(bool visibility);
+
 private:
 	UPROPERTY(EditAnyWhere, meta = (BindWidget))
 	UUniformGridPanel* SkillGridPanel;
+
+	UPROPERTY(EditAnyWhere, meta = (BindWidget))
+	class UButton* EndButton;
 };

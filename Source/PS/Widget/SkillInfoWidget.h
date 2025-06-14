@@ -16,7 +16,7 @@ class PS_API USkillInfoWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SettingWidget(int32 accuracy, int32 critical, int32 damage);		//skillIndicator에서 최종 계산 후 계산된 값을 넘겨줌
+	void SettingWidget(int32 accuracy, int32 critical, int32 damage, bool isHeal);		//skillIndicator에서 최종 계산 후 계산된 값을 넘겨줌
 	void RessetWidget();
 
 protected:

@@ -31,7 +31,12 @@ public:
 
 	void InitTurn();
 
-	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange);
+	UFUNCTION()
+	void EndTurn();
+
+	void EndCombat();
+
+	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float totalDistance;
@@ -77,7 +82,6 @@ protected:
 	void OnLeftClick();
 	void StopSkillMode();
 	void EndSkillMode();
-	void EndTurn();
 	void MoveTotargetIndicator();
 	void UpdateMouseCursorLocation();
 	void UpdateSkillIndicatorLocation();
@@ -110,6 +114,7 @@ private:
 
 	int32 savedAp = -1;
 	float savedSkillRange = -1;
+	bool bIsTargeting = false;
 	bool bCanMoveCamera = true;
 
 	FVector2D LastMousePosition = FVector2D::ZeroVector;

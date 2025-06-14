@@ -55,6 +55,12 @@ public:
 	UPROPERTY(EditAnyWhere, Category = "Skill")
 	bool bIsMag = false;
 
+	UPROPERTY(EditAnyWhere, Category = "Skill")
+	bool bIsHeal = false;
+
+	UPROPERTY(EditAnyWhere, Category = "Skill")
+	bool bIsTargeting = false;
+
 	UPROPERTY(EditAnyWhere, Category = "Script")
 	FText skillName = FText::FromString(" ");
 

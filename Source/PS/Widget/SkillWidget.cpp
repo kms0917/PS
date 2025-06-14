@@ -6,6 +6,7 @@
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/SkillBase.h"
 #include "Widget/SkillButtonWidget.h"
+#include "Controller/CharacterController.h"
 
 #include "Components/UniformGridPanel.h"
 #include "Components/Button.h"
@@ -15,6 +16,15 @@
 void USkillWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	if (EndButton)
+	{
+		ACharacterController* Con = Cast<ACharacterController>(GetOwningPlayer());
+		if (Con)
+		{
+			EndButton->OnClicked.AddDynamic(Con, &ACharacterController::EndTurn);
+		}
+	}
 }
 
 void USkillWidget::UpdateWidget(ACharacterBase* ControlledCharacter)	//턴이 바뀔때마다 실행해야 함
@@ -62,4 +72,17 @@ void USkillWidget::UpdateButtons(int32 currentAp)
 			SkillButton->SetIsEnabled(currentAp >= SkillButton->skillAp);
 		}
 	}
+}
+
+void USkillWidget::SetEndButton(bool visibility)
+{
+	if (visibility)
+	{
+		EndButton->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		EndButton->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	
 }
