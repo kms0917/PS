@@ -150,7 +150,30 @@ void ABasicAIController::DoAIDamage()
 	USkillBase* selectedSkill = Cast<USkillBase>(BlackboardComp->GetValueAsObject(TEXT("SelectedSkill")));
 	if (targetCharacter)
 	{
-		targetCharacter->ReflectDamage(selectedSkill->bIsHeal);
+		// 주변 범위 감지
+		TArray<FOverlapResult> Overlaps;
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(selectedSkill->attackRange); // 예: 1000 단위 반경
+		FCollisionObjectQueryParams QueryParams;
+		QueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		GetWorld()->OverlapMultiByObjectType(
+			Overlaps,
+			targetCharacter->GetActorLocation(),
+			FQuat::Identity,
+			QueryParams,
+			Sphere
+		);
+
+		for (auto& Result : Overlaps)
+		{
+			ACharacterBase* NearbyChar = Cast<ACharacterBase>(Result.GetActor());
+			if (NearbyChar)
+			{
+				NearbyChar->TargettedOn(selectedSkill->calculatedAccuracy, selectedSkill->calculatedCritical, selectedSkill->calculatedDamage, selectedSkill->bIsMag, true, selectedSkill->bIsHeal);
+				NearbyChar->ReflectDamage(selectedSkill->bIsHeal);
+			}
+		}
+
 		BlackboardComp->SetValueAsBool(TEXT("EndMyTurn"), true);
 	}
 	else

@@ -60,6 +60,9 @@ public:
 
 	UPROPERTY(EditAnyWhere, Category = "Skill")
 	bool bIsTargeting = false;
+	
+	UPROPERTY(EditAnyWhere, Category = "Skill")
+	int32 multiTargetingNum = 3;
 
 	UPROPERTY(EditAnyWhere, Category = "Script")
 	FText skillName = FText::FromString(" ");

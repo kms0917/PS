@@ -16,18 +16,18 @@ void UDistanceWidget::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 
 	if (playerController && DistanceText && ReachableText)
 	{
-		if (playerController->playerCharacter->bIsBattle && !playerController->playerCharacter->bMyTurn)
+		if (playerController->playerCharacter->bIsBattle && (!playerController->playerCharacter->bMyTurn || playerController->bIsMoving) || playerController->bUseSkill || playerController->playerCharacter->IsMontagePlayed())
 		{
 			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
 			ReachableText->SetVisibility(ESlateVisibility::Collapsed);
 			return;
 		}
 		DistanceText->SetText(FText::FromString(FString::Printf(TEXT("%.2f m"), playerController->totalDistance)));
-		if (!playerController->bIsStop)
-		{
-			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
-		}
-		else if ((playerController->playerCharacter->bIsBattle && playerController->totalDistance > playerController->playerCharacter->currentMoveSpeed))
+		//if (!playerController->bIsStop)
+		//{
+		//	DistanceText->SetVisibility(ESlateVisibility::Collapsed);
+		//}
+		if ((playerController->playerCharacter->bIsBattle && playerController->totalDistance > playerController->playerCharacter->currentMoveSpeed))
 		{
 			DistanceText->SetVisibility(ESlateVisibility::Collapsed);
 			ReachableText->SetVisibility(ESlateVisibility::Visible);

@@ -6,7 +6,7 @@
 UHeal::UHeal()
 {
 	skillRange = 350.0f;
-	attackRange = 30.0f;
+	attackRange = 20.0f;
 	apUsage = 1;
 	accuracy = 40;
 	critical = 0;
@@ -15,6 +15,8 @@ UHeal::UHeal()
 	magnification = 1.0f;
 	bIsMag = false;
 	bIsHeal = true;
+	bIsTargeting = true;
+	multiTargetingNum = 2;
 	skillName = FText::FromString(TEXT("회복"));
 	skillScript = FText::FromString(TEXT("마력에 비례해 대상을 회복시킨다."));
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/Standing1HMagicAttack03_UE_Anim_Montage"));

@@ -29,6 +29,8 @@
 #include "Actors/SkillRange.h"
 #include "Actors/SkillIndicator.h"
 #include "Actors/MovePoint.h"
+#include "Actors/SkillIndicator.h"
+#include "Widget/SkillIndicatorWidget.h"
 
 
 ACharacterController::ACharacterController()
@@ -61,7 +63,7 @@ void ACharacterController::InitTurn()
 }
 
 //위젯에서 스킬 클릭 시 스킬모드 진입
-void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting)
+void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting, int multiTargetingNum)
 {
     if (bIsStop)
     {
@@ -69,6 +71,7 @@ void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 d
         savedSkillRange = skillRange;
         bIsSkillMode = true;
         bIsTargeting = isTargeting;
+		multiTargettingNum = multiTargetingNum;
         if (SkillRangeClass)
         {
             FVector spawnLocation = playerCharacter->GetActorLocation();
@@ -165,7 +168,7 @@ void ACharacterController::Tick(float DeltaTime)
     CheckCameraAttachtoCharacter();     //카메라 이동 보조
     UpdateCameraRotation();         //위젯 각도 조절 위한 값 저장
     CheckCharacterMove();           //멈춰있는지 여부에 따라 flag 변경해 targetIndicator에서 위젯 표시 제어
-    if (!bIsSkillMode && playerCharacter && bIsStop)
+    if (!bIsSkillMode && playerCharacter)
     {
         UpdateMouseCursorLocation();
     }
@@ -180,7 +183,7 @@ void ACharacterController::Tick(float DeltaTime)
 //우클릭 해 이동
 void ACharacterController::OnRightClick()
 {
-    if (IsMouseOverUI() || playerCharacter->IsMontagePlayed() || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn))
+    if (IsMouseOverUI() || playerCharacter->IsMontagePlayed() || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn) || bUseSkill)
     {
         return;
     }
@@ -201,15 +204,36 @@ void ACharacterController::OnLeftClick()
     
     if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
     {
-        //attackRangeIndicator->InitAttack();     //skillInstance에 데미지 받을 캐릭터들 세팅
-        attackPoint = attackRangeIndicator->GetActorLocation();
-        if (playerCharacter->bIsBattle)
+        if (bIsTargeting && multiTargettingNum > 0 && bIsMoving == true) //이동 고려x, 현재 위치에서 여러 대상 선택해 사용, bIsmoving이용해 범위 내 클릭했는지 확인해 사용
         {
-            playerCharacter->currentAp -= savedAp;
-            skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
+            if (attackRangeIndicator->overlappedCharacters.Num() == 1)
+            {
+                multiTargettingNum--;
+                targettedCharacter.Add(attackRangeIndicator->overlappedCharacters[0]);
+                if (multiTargettingNum == 0)
+                {
+                    attackPoint = attackRangeIndicator->overlappedCharacters[0]->GetActorLocation();
+                    if (playerCharacter->bIsBattle)
+                    {
+                        playerCharacter->currentAp -= savedAp;
+                        skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
+                    }
+                    MoveTotargetIndicator();
+                    EndSkillMode();
+                }
+            }
         }
-        MoveTotargetIndicator();
-        EndSkillMode();
+        else if (!bIsTargeting) //타겟팅이 아닌 광역 지점 공격일 경우
+        {
+            attackPoint = attackRangeIndicator->GetActorLocation();
+            if (playerCharacter->bIsBattle)
+            {
+                playerCharacter->currentAp -= savedAp;
+                skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
+            }
+            MoveTotargetIndicator();
+            EndSkillMode();
+        }
     }
 }
 
@@ -218,8 +242,13 @@ void ACharacterController::InitAttack()
 {
     if (attackRangeIndicator)
     {
+        if (targettedCharacter.Num() > 0)
+        {
+            attackRangeIndicator->overlappedCharacters = targettedCharacter;
+        }
         attackRangeIndicator->InitAttack();
         attackRangeIndicator->Destroy();
+        targettedCharacter.Empty();
     }
 }
 
@@ -231,6 +260,7 @@ void ACharacterController::StartCombatMode()
     //    bUseSkill = false;
     //    StopSkillMode();
     //}
+    targettedCharacter.Empty();
     bUseSkill = false;
     StopSkillMode();
     StopMovement();
@@ -249,6 +279,7 @@ void ACharacterController::EndCombat()
 void ACharacterController::StopSkillMode()
 {
     bIsSkillMode = false; 
+    bIsTargeting = false;
     savedAp = -1;
     savedSkillRange = -1;
     if (skillRangeIndicator)
@@ -259,6 +290,7 @@ void ACharacterController::StopSkillMode()
     {
         attackRangeIndicator->Destroy();
     }
+    targettedCharacter.Empty();
     playerCharacter->currentUsedSkill = nullptr;
 }
 
@@ -266,6 +298,7 @@ void ACharacterController::StopSkillMode()
 void ACharacterController::EndSkillMode()
 {
     bIsSkillMode = false;
+    bIsTargeting = false;
     savedAp = -1;
     savedSkillRange = -1;
     if (skillRangeIndicator)
@@ -297,7 +330,11 @@ void ACharacterController::EndTurn()
 //마우스 우클릭 시 이동
 void ACharacterController::MoveTotargetIndicator()
 {
-    if (bIsStop && !(targetIndicator->IsHidden()))
+    if (playerCharacter->bIsBattle && bIsMoving)
+    {
+        return;
+    }
+    if (!(targetIndicator->IsHidden()))
     {
         if (playerCharacter->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
         {
@@ -347,6 +384,10 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
     if (!HitResult.bBlockingHit) return;
 
+    FVector MouseLocation = HitResult.ImpactPoint;
+    //MouseLocation.Z += 5.0f;
+    attackRangeIndicator->SetActorLocation(MouseLocation);
+
     AActor* HitActor = HitResult.GetActor();
     if (HitActor)
     {
@@ -354,13 +395,16 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         if (HitActor->IsA(ASkillRange::StaticClass()))
         {
             targetIndicator->SetActorHiddenInGame(true);
+            attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Collapsed);
             bIsMoving = true;
         }
+        else if (bIsTargeting && !HitActor->IsA(ASkillRange::StaticClass()))
+        {
+            targetIndicator->SetActorHiddenInGame(true);
+            attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Visible);
+            return;
+        }
     }
-
-    FVector MouseLocation = HitResult.ImpactPoint;
-    MouseLocation.Z += 5.0f;
-    attackRangeIndicator->SetActorLocation(MouseLocation);
 
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSystem) return;
@@ -580,9 +624,10 @@ void ACharacterController::CheckShortMove()
 //targetIndicator까지의 네비메시 경로 표시
 void ACharacterController::SetNavPath()
 {
-    if (playerCharacter->bIsBattle && !playerCharacter->bMyTurn) return;
+    if (!targetIndicator->WasRecentlyRendered(0.0f) && playerCharacter->bIsBattle && !playerCharacter->bMyTurn || bIsTargeting) return;
+    if (playerCharacter->bIsBattle && bIsMoving || bUseSkill || playerCharacter->IsMontagePlayed()) return;
     
-    if (targetIndicator && bIsStop && !bIsMoving)
+    if (targetIndicator)
     {
         FVector CharacterLocation = playerCharacter->GetActorLocation();
         UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);

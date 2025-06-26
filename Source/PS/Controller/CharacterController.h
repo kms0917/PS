@@ -36,7 +36,7 @@ public:
 
 	void EndCombat();
 
-	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting);
+	void InitSkillMode(int32 accuracy, int32 critical, int32 damage, int32 apUsage, bool isMag, float skillRange, float attackRange, bool isHeal, bool isTargeting, int multiTargetingNum);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float totalDistance;
@@ -48,6 +48,9 @@ public:
 	bool bUseSkill = false;
 
 	ACharacterBase* playerCharacter;
+
+	UPROPERTY(EditAnywhere)
+	TArray<ACharacterBase*> targettedCharacter;
 
 	void InitAttack();
 
@@ -116,6 +119,7 @@ private:
 	float savedSkillRange = -1;
 	bool bIsTargeting = false;
 	bool bCanMoveCamera = true;
+	int multiTargettingNum = 0;
 
 	FVector2D LastMousePosition = FVector2D::ZeroVector;
 	FVector attackPoint = FVector::ZeroVector;

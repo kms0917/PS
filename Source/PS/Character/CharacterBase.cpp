@@ -27,6 +27,7 @@ ACharacterBase::ACharacterBase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 	GetCharacterMovement()->bConstrainToPlane = true;
@@ -49,12 +50,14 @@ ACharacterBase::ACharacterBase()
 	{
 		healthWidgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
 		healthWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		healthWidgetComponent->SetGenerateOverlapEvents(false);
 	}
 	static ConstructorHelpers::FClassFinder<UUserWidget> SkillInfoWidgetBP(TEXT("WidgetBlueprint'/Game/Widget/W_SkillInfoWidget'"));
 	if (SkillInfoWidgetBP.Succeeded())
 	{
 		skillInfoWidgetComponent->SetWidgetClass(SkillInfoWidgetBP.Class);
 		skillInfoWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		skillInfoWidgetComponent->SetGenerateOverlapEvents(false);
 	}
 
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
@@ -154,7 +157,7 @@ void ACharacterBase::UseSkill(int i)
 		critical = usedSkill->calculatedCritical;
 		accuracy = usedSkill->calculatedAccuracy;
 		int damage = usedSkill->calculatedDamage;
-		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange, usedSkill->bIsHeal, usedSkill->bIsTargeting);
+		playerController->InitSkillMode(accuracy, critical, damage, usedSkill->apUsage, usedSkill->bIsMag, usedSkill->skillRange, usedSkill->attackRange, usedSkill->bIsHeal, usedSkill->bIsTargeting, usedSkill->multiTargetingNum);
 	}
 }
 

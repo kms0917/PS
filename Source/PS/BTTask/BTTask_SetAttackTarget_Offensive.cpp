@@ -56,10 +56,9 @@ EBTNodeResult::Type UBTTask_SetAttackTarget_Offensive::ExecuteTask(UBehaviorTree
 			}
 		}
 	}
-
+	
 	if (LowestHPCharacter && SkillToUse)
 	{
-		LowestHPCharacter->TargettedOn(SkillToUse->calculatedAccuracy, SkillToUse->calculatedCritical, SkillToUse->calculatedDamage, SkillToUse->bIsMag, true, SkillToUse->bIsHeal);
 		BB->SetValueAsObject("TargetActor", LowestHPCharacter);
 		BB->SetValueAsVector("MovePoint", BestMovePoint);
 		BB->SetValueAsObject("SelectedSkill", SkillToUse); // 필요시
