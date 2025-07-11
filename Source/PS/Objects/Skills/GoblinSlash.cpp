@@ -15,6 +15,7 @@ UGoblinSlash::UGoblinSlash()
 	magnification = 1.0f;
 	bIsMag = false;
 	bIsHeal = false;
+	multiTargetingNum = 1;
 	skillName = FText::FromString(TEXT("기본 공격"));
 	skillScript = FText::FromString(TEXT("힘에 비례한 물리 공격"));
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/GreatSwordSlash_UE_Anim_Montage"));

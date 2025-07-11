@@ -5,13 +5,10 @@
 
 void UHealthWidget::SetHealthBar(int currnetHp, int maxHp)		//위젯을 소유한 폰에서 호출
 {
-	if (healthBar)
+	if (healthBar && healthText)
 	{
 		float percentage = static_cast<float>(currnetHp) / static_cast<float>(maxHp);
 		healthBar->SetPercent(percentage);
-	}
-	if (healthBar)
-	{
 		FText HealthTextFormat = FText::Format(NSLOCTEXT("YourNamespace", "HealthFormat", "{0} / {1}"), FText::AsNumber(currnetHp), FText::AsNumber(maxHp));
 
 		healthText->SetText(HealthTextFormat);

@@ -1,0 +1,762 @@
+[
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\ActorComponent\\EquipmentComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\ActorComponent\\EquipmentComponent.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\ActorComponent\\SkillComponent.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\ActorComponent\\SkillComponent.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\MovePoint.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\MovePoint.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\SkillIndicator.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\SkillIndicator.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\SkillRange.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Actors\\SkillRange.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimInstance\\AnimInstanceBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimInstance\\AnimInstanceBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimNotify\\AnimNotify_DealDamage.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimNotify\\AnimNotify_DealDamage.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimNotify\\AnimNotify_DoAIDamage.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\AnimNotify\\AnimNotify_DoAIDamage.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTDecorator_CheckMyTurn.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTDecorator_CheckMyTurn.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_EndTurn.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_EndTurn.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_PlayAnimMontage.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_PlayAnimMontage.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_SetAttackTarget_Offensive.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_SetAttackTarget_Offensive.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_SetRandomPoint.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_SetRandomPoint.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_WaitTurnEnd.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\BTTask\\BTTask_WaitTurnEnd.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Character\\CharacterBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Character\\CharacterBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Character\\Warrior.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Character\\Warrior.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Controller\\AIController\\BasicAIController.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Controller\\AIController\\BasicAIController.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Controller\\CharacterController.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Controller\\CharacterController.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Enemy\\GoblinWarrior.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Enemy\\GoblinWarrior.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\GameMode\\NormalGameMode.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\GameMode\\NormalGameMode.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\BootsBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\BootsBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Boots\\IronBoots.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Boots\\IronBoots.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\ChestBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\ChestBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Chests\\IronChest.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Chests\\IronChest.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\EquipmentBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\EquipmentBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\GloveBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\GloveBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Gloves\\IronGlove.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Gloves\\IronGlove.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\HelmetBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\HelmetBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Helmets\\IronHelmet.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Helmets\\IronHelmet.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\LegBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\LegBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Legs\\IronLeg.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Legs\\IronLeg.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\SkillBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\SkillBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\BasicAttack.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\BasicAttack.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\GoblinSlash.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\GoblinSlash.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\Heal.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Skills\\Heal.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\WeaponBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\WeaponBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Weapons\\GoblinSword.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Weapons\\GoblinSword.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Weapons\\IronSword.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Objects\\Weapons\\IronSword.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\PS.Build.cs",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\PS.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\PS.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\DistanceWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\DistanceWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\HealthWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\HealthWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\MultiTargetSkillWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\MultiTargetSkillWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillButtonWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillButtonWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillIndicatorWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillIndicatorWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillInfoWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillInfoWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillTooltipWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillTooltipWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillWidget.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	},
+	{
+		"file": "E:\\UE5\\Project\\PS\\Source\\PS\\Widget\\SkillWidget.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\UE5\\Project\\PS\\.vscode\\compileCommands_Default\\PS.1.rsp"
+		],
+		"directory": "E:\\UE5\\UE_5.3\\Engine\\Source"
+	}
+]

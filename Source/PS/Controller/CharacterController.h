@@ -18,6 +18,8 @@ class USkillInfoWidget;
 class ASkillRange;
 class ASkillIndicator;
 class AMovePoint;
+class UMultiTargetSkillWidget;
+
 /**
  * 
  */
@@ -80,6 +82,11 @@ protected:
 	TSubclassOf<USkillWidget> skillWidgetClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	USkillWidget* skillWidgetInstance;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UMultiTargetSkillWidget> multiTargetSkillWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UMultiTargetSkillWidget* multiTargetSkillWidgetInstance;
 
 	void OnRightClick();
 	void OnLeftClick();

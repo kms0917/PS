@@ -30,6 +30,7 @@
 #include "Actors/SkillIndicator.h"
 #include "Actors/MovePoint.h"
 #include "Actors/SkillIndicator.h"
+#include "Widget/MultiTargetSkillWidget.h"
 #include "Widget/SkillIndicatorWidget.h"
 
 
@@ -58,6 +59,7 @@ void ACharacterController::InitTurn()
         skillWidgetInstance->UpdateWidget(playerCharacter); 
         skillWidgetInstance->SetVisibility(ESlateVisibility::Visible);
         skillWidgetInstance->SetEndButton(true);
+        
     }
     ResetCamera();
 }
@@ -72,6 +74,12 @@ void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 d
         bIsSkillMode = true;
         bIsTargeting = isTargeting;
 		multiTargettingNum = multiTargetingNum;
+        if (multiTargettingNum > 1 && multiTargetSkillWidgetInstance)
+        {
+            multiTargetSkillWidgetInstance->SetMultiTargetWidget(multiTargettingNum);
+            multiTargetSkillWidgetInstance->SetTargetCount(0);
+            multiTargetSkillWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+        }
         if (SkillRangeClass)
         {
             FVector spawnLocation = playerCharacter->GetActorLocation();
@@ -142,6 +150,15 @@ void ACharacterController::BeginPlay()
             skillWidgetInstance->SetEndButton(false);
         }
     }
+    if (multiTargetSkillWidgetClass)
+    {
+        multiTargetSkillWidgetInstance = CreateWidget<UMultiTargetSkillWidget>(this, multiTargetSkillWidgetClass);
+        if (multiTargetSkillWidgetInstance)
+        {
+            multiTargetSkillWidgetInstance->AddToViewport();
+            multiTargetSkillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+        }
+    }
 }
 
 void ACharacterController::SetupInputComponent()
@@ -210,6 +227,11 @@ void ACharacterController::OnLeftClick()
             {
                 multiTargettingNum--;
                 targettedCharacter.Add(attackRangeIndicator->overlappedCharacters[0]);
+                if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
+                {
+                    multiTargetSkillWidgetInstance->SetTargetCount(targettedCharacter.Num());
+                }
+                
                 if (multiTargettingNum == 0)
                 {
                     attackPoint = attackRangeIndicator->overlappedCharacters[0]->GetActorLocation();
@@ -292,6 +314,11 @@ void ACharacterController::StopSkillMode()
     }
     targettedCharacter.Empty();
     playerCharacter->currentUsedSkill = nullptr;
+    // 멀티 타겟 스킬 위젯 숨기기
+    if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
+    {
+        multiTargetSkillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }
 
 //스킬 사용으로 스킬모드 종료
@@ -310,6 +337,11 @@ void ACharacterController::EndSkillMode()
     //    attackRangeIndicator->SetActorHiddenInGame(true);
     //}
     bUseSkill = true;
+    // 멀티 타겟 스킬 위젯 숨기기
+    if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
+    {
+        multiTargetSkillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }
 
 //턴 종료 위젯에 연결해 턴 관련 변수 초기화 및 GameMode의 EndTurn 호출해야 함
@@ -409,11 +441,75 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
     if (!NavSystem) return;
 
-    FVector CharacterLocation = playerCharacter->GetActorLocation();
-    const float SearchRadius = savedSkillRange;
+    FNavLocation ProjectedMouseNavLocation;
+    if (!NavSystem->ProjectPointToNavigation(MouseLocation, ProjectedMouseNavLocation)) return;
 
-    // Fibonacci Sphere Sampling
+    FVector CharacterLocation = playerCharacter->GetActorLocation();
+    UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(this, CharacterLocation, ProjectedMouseNavLocation.Location);
+    if (!NavPath || !NavPath->IsValid()) return;
+    const float SearchRadius = savedSkillRange;
+    const float StepSize = 3.0f;
+    float ClosestDistSq = TNumericLimits<float>::Max();
+    FNavLocation BestLocation;
     TArray<FVector> Samples;
+    bool bFound = false;
+    float ShortestPath = TNumericLimits<float>::Max();
+
+    for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; ++i)
+    {
+        FVector Start = NavPath->PathPoints[i];
+        FVector End = NavPath->PathPoints[i + 1];
+        float SegmentLength = FVector::Dist(Start, End);
+        FVector Direction = (End - Start).GetSafeNormal();
+
+        int32 NumSteps = FMath::CeilToInt(SegmentLength / StepSize);
+        for (int32 Step = 0; Step <= NumSteps; ++Step)
+        {
+            FVector Point = Start + Direction * Step * StepSize;
+
+            // 조건 1: 마우스로부터의 거리
+            float DistToMouse = FVector::Dist(Point, MouseLocation);
+            if (DistToMouse > SearchRadius) continue;
+
+            // 조건 2: 장애물 없는지 라인트레이스
+            FHitResult LineHit;
+            FCollisionQueryParams TraceParams(FName(TEXT("SkillTrace")), true, this);
+            TraceParams.bReturnPhysicalMaterial = false;
+            TraceParams.AddIgnoredActor(playerCharacter);
+
+            bool bBlocked = GetWorld()->LineTraceSingleByChannel(
+                LineHit,
+                Point + FVector(0, 0, 3),
+                MouseLocation + FVector(0, 0, 3),
+                ECC_Visibility,
+                TraceParams
+            );
+
+            if (!bBlocked)
+            {
+                float DistToCharacter = FVector::Dist(Point, CharacterLocation);
+                if (DistToCharacter < ClosestDistSq)
+                {
+                    ClosestDistSq = DistToCharacter;
+					BestLocation.Location = Point;
+                    bFound = true;
+                    UNavigationPath* BestPath = NavSystem->FindPathToLocationSynchronously(
+                        this, CharacterLocation, BestLocation.Location);
+                    if (BestPath && BestPath->IsValid() && BestPath->PathPoints.Num() > 1)
+                    {
+                        float PathLength = 0.f;
+                        for (int j = 1; j < BestPath->PathPoints.Num(); ++j)
+                        {
+                            PathLength += FVector::Dist(BestPath->PathPoints[j - 1], BestPath->PathPoints[j]);
+                        }
+                        ShortestPath = PathLength;
+                    }
+                }
+            }
+        }
+    }
+        
+    // Fibonacci Sphere Sampling   
     const int NumSamples = 100;
     float Offset = 2.f / NumSamples;
     float Increment = PI * (3.f - FMath::Sqrt(5.f));
@@ -430,10 +526,6 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         FVector Sample = FVector(X, Y, Z) * SearchRadius + MouseLocation;
         Samples.Add(Sample);
     }
-
-    FNavLocation BestLocation;
-    float ShortestPath = TNumericLimits<float>::Max();
-    bool bFound = false;
 
     for (const FVector& Sample : Samples)
     {
@@ -744,6 +836,11 @@ void ACharacterController::SetBPs()
     if (SkillWidgetBP.Succeeded())
     {
         skillWidgetClass = SkillWidgetBP.Class;
+    }
+    static ConstructorHelpers::FClassFinder<UMultiTargetSkillWidget> MultiTargetSkillWidgetBP(TEXT("/Game/Widget/W_MultiTargetSkillWidget"));
+    if (MultiTargetSkillWidgetBP.Succeeded())
+    {
+        multiTargetSkillWidgetClass = MultiTargetSkillWidgetBP.Class;
     }
 }
 
