@@ -33,7 +33,7 @@ ASkillIndicator::ASkillIndicator()
     {
         DecalComponent->SetDecalMaterial(DecalMat.Object);
     }
-    DecalComponent->DecalSize = FVector(300.f, 300.f, 100.f); // XY = 반지름, Z = 얇게
+    DecalComponent->DecalSize = FVector(3.f, 3.f, 1.f); // XY = 반지름, Z = 얇게
     DecalComponent->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f)); // Z축 아래로 → 바닥 투영
     DecalComponent->SetRelativeLocation(FVector(0.f, 0.f, 10.f));
 

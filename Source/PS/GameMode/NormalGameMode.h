@@ -40,4 +40,9 @@ public:
 	TArray<ACharacterBase*> friendlyCharacters;
 	ACharacterBase* currentCharacter;		//현재 빙의중인 캐릭터, 전투시엔 적 캐릭터가 들어올 수 도 있음
 	ACharacterController* playerController;		//빙의중인 캐릭터 바꾸기 위해 필요
+private:
+	FTimerHandle CombatStartTimerHandle;
+
+	UPROPERTY()
+	float CombatStartDisplayTime = 1.0f;
 };

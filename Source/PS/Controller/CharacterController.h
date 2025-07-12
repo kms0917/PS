@@ -57,6 +57,7 @@ public:
 	void InitAttack();
 
 	void StartCombatMode();
+	void ShowCombatStartWidget();
 
 protected:
 	virtual void BeginPlay() override;
@@ -87,6 +88,11 @@ protected:
 	TSubclassOf<UMultiTargetSkillWidget> multiTargetSkillWidgetClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	UMultiTargetSkillWidget* multiTargetSkillWidgetInstance;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> battleStartWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UUserWidget* battleStartWidget;
 
 	void OnRightClick();
 	void OnLeftClick();
@@ -158,4 +164,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float MaxZoomDistance = 3000.0f;
+
+	UPROPERTY()
+	float CombatStartDisplayTime = 1.0f;
+
+	FTimerHandle CombatStartTimerHandle;
+
+	void HideCombatStartWidget();
 };

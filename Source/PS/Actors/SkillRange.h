@@ -16,10 +16,10 @@ public:
 	ASkillRange();
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshComponent;
+	UDecalComponent* DecalComponent;
 
 	void SetRadius(float radius);
-
+	float GetRadius();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

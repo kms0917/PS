@@ -156,7 +156,28 @@ void ACharacterController::BeginPlay()
         if (multiTargetSkillWidgetInstance)
         {
             multiTargetSkillWidgetInstance->AddToViewport();
+            FVector2D ViewportSize;
+            if (GEngine && GEngine->GameViewport)
+            {
+                GEngine->GameViewport->GetViewportSize(ViewportSize);
+            }
+
+            // 상대적 위치 계산
+            float CenterX = (ViewportSize.X - 300.0f) / 2.0f;
+            float CenterY = ViewportSize.Y * 0.75f;
+
+            multiTargetSkillWidgetInstance->SetPositionInViewport(FVector2D(CenterX, CenterY));
+            multiTargetSkillWidgetInstance->SetDesiredSizeInViewport(FVector2D(300.0f, 100.0f));
             multiTargetSkillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
+        }
+    }
+    if (battleStartWidgetClass)
+    {
+        battleStartWidget = CreateWidget<UUserWidget>(this, battleStartWidgetClass);
+        if (battleStartWidget)
+        {
+            battleStartWidget->AddToViewport();
+            battleStartWidget->SetVisibility(ESlateVisibility::Collapsed);
         }
     }
 }
@@ -417,25 +438,32 @@ void ACharacterController::UpdateSkillIndicatorLocation()
     if (!HitResult.bBlockingHit) return;
 
     FVector MouseLocation = HitResult.ImpactPoint;
-    //MouseLocation.Z += 5.0f;
     attackRangeIndicator->SetActorLocation(MouseLocation);
 
-    AActor* HitActor = HitResult.GetActor();
-    if (HitActor)
+    bool bIsMouseOverSkillRange = false;
+    if (skillRangeIndicator)
     {
-        // 특정 클래스인지 확인
-        if (HitActor->IsA(ASkillRange::StaticClass()))
+        const FVector SkillRangeCenter = skillRangeIndicator->GetActorLocation();
+        const float SkillRangeRadius = skillRangeIndicator->GetRadius();
+
+        const float DistanceToCenter = FVector::Dist(MouseLocation, SkillRangeCenter);
+
+        if (DistanceToCenter <= SkillRangeRadius)
         {
-            targetIndicator->SetActorHiddenInGame(true);
-            attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Collapsed);
-            bIsMoving = true;
+            bIsMouseOverSkillRange = true;
         }
-        else if (bIsTargeting && !HitActor->IsA(ASkillRange::StaticClass()))
-        {
-            targetIndicator->SetActorHiddenInGame(true);
-            attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Visible);
-            return;
-        }
+    }
+    if (bIsMouseOverSkillRange)
+    {
+        targetIndicator->SetActorHiddenInGame(true);
+        attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Collapsed);
+        bIsMoving = true;
+    }
+    else if (bIsTargeting && !bIsMouseOverSkillRange)
+    {
+        targetIndicator->SetActorHiddenInGame(true);
+        attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Visible);
+        return;
     }
 
     UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
@@ -716,8 +744,12 @@ void ACharacterController::CheckShortMove()
 //targetIndicator까지의 네비메시 경로 표시
 void ACharacterController::SetNavPath()
 {
-    if (!targetIndicator->WasRecentlyRendered(0.0f) && playerCharacter->bIsBattle && !playerCharacter->bMyTurn || bIsTargeting) return;
-    if (playerCharacter->bIsBattle && bIsMoving || bUseSkill || playerCharacter->IsMontagePlayed()) return;
+    if (!targetIndicator->WasRecentlyRendered(0.0f) && playerCharacter->bIsBattle && !playerCharacter->bMyTurn || bIsTargeting || playerCharacter->bIsBattle && bIsMoving || bUseSkill || playerCharacter->IsMontagePlayed())
+    {
+        FlushDebugStrings(GetWorld());
+        FlushPersistentDebugLines(GetWorld());
+        return;
+    }
     
     if (targetIndicator)
     {
@@ -777,6 +809,32 @@ void ACharacterController::SetNavPath()
             }
         }
     }
+}
+
+//전투 시작시 보여줄 위젯 표시
+void ACharacterController::ShowCombatStartWidget()
+{
+	if (battleStartWidget)
+	{
+		battleStartWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+    GetWorld()->GetTimerManager().SetTimer(
+        CombatStartTimerHandle,
+        this,
+        &ACharacterController::HideCombatStartWidget,
+        CombatStartDisplayTime,
+        false // 반복 안함
+    );
+}
+
+//전투 시작위젯 가리기
+void ACharacterController::HideCombatStartWidget()
+{
+    if (battleStartWidget)
+    {
+        battleStartWidget->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    GetWorld()->GetTimerManager().ClearTimer(CombatStartTimerHandle);
 }
 
 //BP들 세팅
@@ -841,6 +899,11 @@ void ACharacterController::SetBPs()
     if (MultiTargetSkillWidgetBP.Succeeded())
     {
         multiTargetSkillWidgetClass = MultiTargetSkillWidgetBP.Class;
+    }
+    static ConstructorHelpers::FClassFinder<UUserWidget> BattleStartWidget(TEXT("/Game/Widget/W_BattleStartWidget"));
+    if (BattleStartWidget.Succeeded())
+    {
+        battleStartWidgetClass = BattleStartWidget.Class;
     }
 }
 

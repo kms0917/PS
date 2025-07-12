@@ -173,7 +173,14 @@ void ANormalGameMode::StartCombat(FVector BattleLocation)
 	battleCharacters.Sort([&RollMap](ACharacterBase& A, ACharacterBase& B) { return RollMap[&A] > RollMap[&B]; });
 
 	SetBattleCharactersTurnText();
-	InitTurn();
+	playerController->ShowCombatStartWidget();
+	GetWorld()->GetTimerManager().SetTimer(
+		CombatStartTimerHandle,
+		this,
+		&ANormalGameMode::InitTurn,
+		CombatStartDisplayTime,
+		false // 반복 안함
+	);
 }
 
 //playerController의 EndTurn과 AIController의 EndTurn에서 호출, battleCharacters배열정리 후 TurnText 갱신 및 전투 종료 확인 후 InitTurn호출
