@@ -59,6 +59,10 @@ void UEquipmentComponent::EquipWeapon(UWeaponBase* EquipedWeapon)
 	equipmentEvasion += weapon->evasion;
 	equipmentCritical += weapon->critical;
 	equipmentAp += weapon->ap;
+	equipmentDamageReduction += weapon->damageReduction;
+	equipmentDamageReduction_percent += weapon->damageReduction_percent;
+	equipmentDamageReinforcement += weapon->damageReinforcement;
+	equipmentDamageReinforcement_percent += weapon->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		weapon->ownerCharacter = ownerCharacter;
@@ -85,6 +89,10 @@ void UEquipmentComponent::EquipHelmet(UHelmetBase* EquipedHelmet)
 	equipmentEvasion += helmet->evasion;
 	equipmentCritical += helmet->critical;
 	equipmentAp += helmet->ap;
+	equipmentDamageReduction += helmet->damageReduction;
+	equipmentDamageReduction_percent += helmet->damageReduction_percent;
+	equipmentDamageReinforcement += helmet->damageReinforcement;
+	equipmentDamageReinforcement_percent += helmet->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		helmet->ownerCharacter = ownerCharacter;
@@ -111,6 +119,10 @@ void UEquipmentComponent::EquipChest(UChestBase* EquipedChest)
 	equipmentEvasion += chest->evasion;
 	equipmentCritical += chest->critical;
 	equipmentAp += chest->ap;
+	equipmentDamageReduction += chest->damageReduction;
+	equipmentDamageReduction_percent += chest->damageReduction_percent;
+	equipmentDamageReinforcement += chest->damageReinforcement;
+	equipmentDamageReinforcement_percent += chest->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		chest->ownerCharacter = ownerCharacter;
@@ -137,6 +149,10 @@ void UEquipmentComponent::EquipGlove(UGloveBase* EquipedGlove)
 	equipmentEvasion += glove->evasion;
 	equipmentCritical += glove->critical;
 	equipmentAp += glove->ap;
+	equipmentDamageReduction += glove->damageReduction;
+	equipmentDamageReduction_percent += glove->damageReduction_percent;
+	equipmentDamageReinforcement += glove->damageReinforcement;
+	equipmentDamageReinforcement_percent += glove->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		glove->ownerCharacter = ownerCharacter;
@@ -163,6 +179,10 @@ void UEquipmentComponent::EquipLeg(ULegBase* EquipedLeg)
 	equipmentEvasion += leg->evasion;
 	equipmentCritical += leg->critical;
 	equipmentAp += leg->ap;
+	equipmentDamageReduction += leg->damageReduction;
+	equipmentDamageReduction_percent += leg->damageReduction_percent;
+	equipmentDamageReinforcement += leg->damageReinforcement;
+	equipmentDamageReinforcement_percent += leg->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		leg->ownerCharacter = ownerCharacter;
@@ -189,6 +209,10 @@ void UEquipmentComponent::EquipBoots(UBootsBase* EquipedBoots)
 	equipmentEvasion += boots->evasion;
 	equipmentCritical += boots->critical;
 	equipmentAp += boots->ap;
+	equipmentDamageReduction += boots->damageReduction;
+	equipmentDamageReduction_percent += boots->damageReduction_percent;
+	equipmentDamageReinforcement += boots->damageReinforcement;
+	equipmentDamageReinforcement_percent += boots->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		boots->ownerCharacter = ownerCharacter;
@@ -210,6 +234,10 @@ void UEquipmentComponent::UnEquipWeapon()
 	equipmentEvasion -= weapon->evasion;
 	equipmentCritical -= weapon->critical;
 	equipmentAp -= weapon->ap;
+	equipmentDamageReduction -= weapon->damageReduction;
+	equipmentDamageReduction_percent -= weapon->damageReduction_percent;
+	equipmentDamageReinforcement -= weapon->damageReinforcement;
+	equipmentDamageReinforcement_percent -= weapon->damageReinforcement_percent;
 	weapon->ownerCharacter = nullptr;
 	weapon = nullptr;
 }
@@ -229,6 +257,10 @@ void UEquipmentComponent::UnEquipHelmet()
 	equipmentEvasion -= helmet->evasion;
 	equipmentCritical -= helmet->critical;
 	equipmentAp -= helmet->ap;
+	equipmentDamageReduction -= helmet->damageReduction;
+	equipmentDamageReduction_percent -= helmet->damageReduction_percent;
+	equipmentDamageReinforcement -= helmet->damageReinforcement;
+	equipmentDamageReinforcement_percent -= helmet->damageReinforcement_percent;
 	helmet->ownerCharacter = nullptr;
 	helmet = nullptr;
 }
@@ -248,6 +280,10 @@ void UEquipmentComponent::UnEquipChest()
 	equipmentEvasion -= chest->evasion;
 	equipmentCritical -= chest->critical;
 	equipmentAp -= chest->ap;
+	equipmentDamageReduction -= chest->damageReduction;
+	equipmentDamageReduction_percent -= chest->damageReduction_percent;
+	equipmentDamageReinforcement -= chest->damageReinforcement;
+	equipmentDamageReinforcement_percent -= chest->damageReinforcement_percent;
 	chest->ownerCharacter = nullptr;
 	chest = nullptr;
 }
@@ -267,6 +303,10 @@ void UEquipmentComponent::UnEquipGlove()
 	equipmentEvasion -= glove->evasion;
 	equipmentCritical -= glove->critical;
 	equipmentAp -= glove->ap;
+	equipmentDamageReduction -= glove->damageReduction;
+	equipmentDamageReduction_percent -= glove->damageReduction_percent;
+	equipmentDamageReinforcement -= glove->damageReinforcement;
+	equipmentDamageReinforcement_percent -= glove->damageReinforcement_percent;
 	glove->ownerCharacter = nullptr;
 	glove = nullptr;
 }
@@ -286,6 +326,10 @@ void UEquipmentComponent::UnEquipLeg()
 	equipmentEvasion -= leg->evasion;
 	equipmentCritical -= leg->critical;
 	equipmentAp -= leg->ap;
+	equipmentDamageReduction -= leg->damageReduction;
+	equipmentDamageReduction_percent -= leg->damageReduction_percent;
+	equipmentDamageReinforcement -= leg->damageReinforcement;
+	equipmentDamageReinforcement_percent -= leg->damageReinforcement_percent;
 	leg->ownerCharacter = nullptr;
 	leg = nullptr;
 }
@@ -305,6 +349,10 @@ void UEquipmentComponent::UnEquipBoots()
 	equipmentEvasion -= boots->evasion;
 	equipmentCritical -= boots->critical;
 	equipmentAp -= boots->ap;
+	equipmentDamageReduction -= boots->damageReduction;
+	equipmentDamageReduction_percent -= boots->damageReduction_percent;
+	equipmentDamageReinforcement -= boots->damageReinforcement;
+	equipmentDamageReinforcement_percent -= boots->damageReinforcement_percent;
 	boots->ownerCharacter = nullptr;
 	boots = nullptr;
 }
@@ -324,6 +372,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 	int32 Evasion = 0;
 	int32 Critical = 0;
 	int32 Ap = 0;
+	int32 DamageReduction = 0;
+	float DamageReduction_percent = 0;
+	int32 DamageReinforcement = 0;
+	float DamageReinforcement_percent = 0;
 	if (weapon)
 	{
 		Hp += weapon->hp;
@@ -339,6 +391,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += weapon->evasion;
 		Critical += weapon->critical;
 		Ap += weapon->ap;
+		DamageReduction += weapon->damageReduction;
+		DamageReduction_percent += weapon->damageReduction_percent;
+		DamageReinforcement += weapon->damageReinforcement;
+		DamageReinforcement_percent += weapon->damageReinforcement_percent;
 	}
 	if (helmet)
 	{
@@ -355,6 +411,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += helmet->evasion;
 		Critical += helmet->critical;
 		Ap += helmet->ap;
+		DamageReduction += helmet->damageReduction;
+		DamageReduction_percent += helmet->damageReduction_percent;
+		DamageReinforcement += helmet->damageReinforcement;
+		DamageReinforcement_percent += helmet->damageReinforcement_percent;
 	}
 	if (chest)
 	{
@@ -371,6 +431,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += chest->evasion;
 		Critical += chest->critical;
 		Ap += chest->ap;
+		DamageReduction += chest->damageReduction;
+		DamageReduction_percent += chest->damageReduction_percent;
+		DamageReinforcement += chest->damageReinforcement;
+		DamageReinforcement_percent += chest->damageReinforcement_percent;
 	}
 	if (glove)
 	{
@@ -387,6 +451,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += glove->evasion;
 		Critical += glove->critical;
 		Ap += glove->ap;
+		DamageReduction += glove->damageReduction;
+		DamageReduction_percent += glove->damageReduction_percent;
+		DamageReinforcement += glove->damageReinforcement;
+		DamageReinforcement_percent += glove->damageReinforcement_percent;
 	}
 	if (leg)
 	{
@@ -403,6 +471,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += leg->evasion;
 		Critical += leg->critical;
 		Ap += leg->ap;
+		DamageReduction += leg->damageReduction;
+		DamageReduction_percent += leg->damageReduction_percent;
+		DamageReinforcement += leg->damageReinforcement;
+		DamageReinforcement_percent += leg->damageReinforcement_percent;
 	}
 	if (boots)
 	{
@@ -419,6 +491,10 @@ void UEquipmentComponent::CalcEquipmentStats()
 		Evasion += boots->evasion;
 		Critical += boots->critical;
 		Ap += boots->ap;
+		DamageReduction += boots->damageReduction;
+		DamageReduction_percent += boots->damageReduction_percent;
+		DamageReinforcement += boots->damageReinforcement;
+		DamageReinforcement_percent += boots->damageReinforcement_percent;
 	}
 	equipmentHp = Hp;
 	equipmentStr = Str;
@@ -433,4 +509,8 @@ void UEquipmentComponent::CalcEquipmentStats()
 	equipmentEvasion = Evasion;
 	equipmentCritical = Critical;
 	equipmentAp = Ap;
+	equipmentDamageReduction = DamageReduction;
+	equipmentDamageReduction_percent = DamageReduction_percent;
+	equipmentDamageReinforcement = DamageReinforcement;
+	equipmentDamageReinforcement_percent = DamageReinforcement_percent;
 }

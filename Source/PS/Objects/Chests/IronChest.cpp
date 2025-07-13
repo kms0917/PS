@@ -18,4 +18,8 @@ UIronChest::UIronChest()
 	evasion = 0;
 	critical = 0;
 	ap = 0;
+	damageReduction = 0;
+	damageReduction_percent = 0;
+	damageReinforcement = 0;
+	damageReinforcement_percent = 0;
 }

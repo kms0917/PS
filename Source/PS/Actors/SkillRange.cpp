@@ -34,7 +34,7 @@ void ASkillRange::SetRadius(float radius)
 	{
 		// 바닥을 향하도록 회전된 데칼의 경우, DecalSize의 Y와 Z값이 반지름을 결정합니다.
 		// X값(투사 깊이)은 기존 값을 유지하고 Y, Z값만 업데이트합니다.
-		DecalComponent->DecalSize = FVector(50.0f, radius, radius);
+		DecalComponent->DecalSize = FVector(radius, radius, radius);
 		DecalComponent->MarkRenderStateDirty();
 	}
 }

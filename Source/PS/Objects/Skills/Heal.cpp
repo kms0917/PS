@@ -10,7 +10,6 @@ UHeal::UHeal()
 	apUsage = 1;
 	accuracy = 40;
 	critical = 0;
-	evasion = 0;
 	damage = 0;
 	magnification = 1.0f;
 	bIsMag = false;

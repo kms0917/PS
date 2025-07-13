@@ -44,9 +44,6 @@ public:
 	int32 critical = 0;
 
 	UPROPERTY(EditAnyWhere, Category = "Skill")
-	int32 evasion = 0;
-
-	UPROPERTY(EditAnyWhere, Category = "Skill")
 	int32 damage = 0;
 
 	UPROPERTY(EditAnyWhere, Category = "Skill")
@@ -78,7 +75,4 @@ public:
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
 	int32 calculatedCritical = 0;
-
-	UPROPERTY(EditAnyWhere, Category = "Combat")
-	int32 calculatedEvasion = 0;
 };

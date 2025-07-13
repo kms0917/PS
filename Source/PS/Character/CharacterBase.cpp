@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include  "Materials/MaterialInterface.h"
 
 #include "Widget/HealthWidget.h"
 #include "Widget/SkillInfoWidget.h"
@@ -28,6 +29,7 @@ ACharacterBase::ACharacterBase()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+	GetMesh()->SetReceivesDecals(false);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 	GetCharacterMovement()->bConstrainToPlane = true;
@@ -45,21 +47,15 @@ ACharacterBase::ACharacterBase()
 	healthWidgetComponent->SetupAttachment(RootComponent);
 	skillInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("skillInfoWidget"));
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("WidgetBlueprint'/Game/Widget/W_HealthWidget'"));
-	if (WidgetClass.Succeeded())
-	{
-		healthWidgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
-		healthWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		healthWidgetComponent->SetGenerateOverlapEvents(false);
-	}
-	static ConstructorHelpers::FClassFinder<UUserWidget> SkillInfoWidgetBP(TEXT("WidgetBlueprint'/Game/Widget/W_SkillInfoWidget'"));
-	if (SkillInfoWidgetBP.Succeeded())
-	{
-		skillInfoWidgetComponent->SetWidgetClass(SkillInfoWidgetBP.Class);
-		skillInfoWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		skillInfoWidgetComponent->SetGenerateOverlapEvents(false);
-	}
-
+	SetBPs();
+	
+	healthWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	healthWidgetComponent->SetGenerateOverlapEvents(false);
+	skillInfoWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	skillInfoWidgetComponent->SetGenerateOverlapEvents(false);
+	healthWidgetComponent->SetReceivesDecals(false);
+	skillInfoWidgetComponent->SetReceivesDecals(false);
+	
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
 
@@ -153,7 +149,6 @@ void ACharacterBase::UseSkill(int i)
 	{
 		USkillBase* usedSkill = skillComponent->skillList[i];
 		currentUsedSkill = usedSkill;
-		evasion = usedSkill->calculatedEvasion;
 		critical = usedSkill->calculatedCritical;
 		accuracy = usedSkill->calculatedAccuracy;
 		int damage = usedSkill->calculatedDamage;
@@ -170,8 +165,8 @@ void ACharacterBase::ReflectDamage(bool isHeal)
 		if (currentHp > hp)
 		{
 			currentHp = hp;
-			healthWidget->SetHealthBar(currentHp, hp);
 		}
+		healthWidget->SetHealthBar(currentHp, hp);
 		return;
 	}
 	if (FMath::RandRange(1, 100) <= savedAccuracy)
@@ -243,11 +238,17 @@ void ACharacterBase::TargettedOn(int32 accuracyRate, int32 criticalRate, int32 D
 {
 	if (isMag && !isHeal)	//마딜이면
 	{
-		Damage -= res;
+		Damage -= currentRes;
 	}
 	else if (!isHeal)
 	{
-		Damage -= def;
+		Damage -= currentDef;
+	}
+	Damage -= damageReduction;
+	Damage = Damage * (1 - damageReduction_Percent);
+	if (Damage < 0)
+	{
+		Damage = 0;
 	}
 	savedAccuracy = (((float)accuracyRate - (float)evasion) / (float)accuracyRate) * 100;
 	savedDamage = Damage;
@@ -282,7 +283,7 @@ void ACharacterBase::SetTurnText(int32 turn)
 void ACharacterBase::TurnStart()
 {
 	bMyTurn = true;
-	SetStats();
+	SetStats(false);
 	SetSkillInfo();
 }
 
@@ -290,6 +291,36 @@ void ACharacterBase::TurnStart()
 void ACharacterBase::TurnEnd()
 {
 	bMyTurn = false;
+}
+
+void ACharacterBase::SetOverlayMaterialEnabled(bool bEnable)
+{
+	// 캐릭터의 스켈레탈 메시 컴포넌트를 가져옵니다.
+	USkeletalMeshComponent* CharacterMesh = GetMesh();
+	if (!CharacterMesh)
+	{
+		return;
+	}
+
+	if (bEnable)
+	{
+		// OverlayMaterial 변수에 머티리얼이 할당되어 있는지 확인합니다.
+		if (OverlayMaterial)
+		{
+			// 스켈레탈 메시에 오버레이 머티리얼을 적용합니다.
+			CharacterMesh->SetOverlayMaterial(OverlayMaterial);
+		}
+		else
+		{
+			// 머티리얼이 할당되지 않았다면 경고 로그를 남깁니다.
+			UE_LOG(LogTemp, Warning, TEXT("%s: OverlayMaterial is not set! Please assign it in the Blueprint."), *GetName());
+		}
+	}
+	else
+	{
+		// 오버레이 머티리얼을 제거하려면 nullptr을 전달합니다.
+		CharacterMesh->SetOverlayMaterial(nullptr);
+	}
 }
 
 //위젯 각도조절
@@ -323,24 +354,46 @@ void ACharacterBase::UpdateSkillInfoWidgetLocation()
 	skillInfoWidgetComponent->SetWorldLocation(WidgetWorldLocation);
 }
 
-//skillToolTip에 띄울 값 계산
+void ACharacterBase::SetBPs()
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("WidgetBlueprint'/Game/Widget/W_HealthWidget'"));
+	if (WidgetClass.Succeeded())
+	{
+		healthWidgetComponent->SetWidgetClass(WidgetClass.Class);  // BP로 만든 위젯을 설정
+	}
+	static ConstructorHelpers::FClassFinder<UUserWidget> SkillInfoWidgetBP(TEXT("WidgetBlueprint'/Game/Widget/W_SkillInfoWidget'"));
+	if (SkillInfoWidgetBP.Succeeded())
+	{
+		skillInfoWidgetComponent->SetWidgetClass(SkillInfoWidgetBP.Class);
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> OverlayMaterialFinder(TEXT("/Game/Material/M_OutLine"));
+	if (OverlayMaterialFinder.Succeeded())
+	{
+		this->OverlayMaterial = OverlayMaterialFinder.Object;
+	}
+}
+
+//skillToolTip 및 skill내부적으로 갖는 값 계산
 int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 {
 	if (!isMag)			//물리 딜
 	{
-		return damage + currentStr * magnification + equipmentComponent->equipmentDamage;
+		return (damage + currentStr * magnification + equipmentComponent->equipmentDamage) * (1 + damageReinforcement_Percent) + damageReinforcement;
 	}
 	else				//마법 딜
 	{
-		return damage + currentMag * magnification + equipmentComponent->equipmentDamage;
+		return (damage + currentMag * magnification + equipmentComponent->equipmentDamage) * (1 + damageReinforcement_Percent) + damageReinforcement;
 	}
 }
 
 //자원 및 스탯 초기화, 매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
-void ACharacterBase::SetStats()		
+void ACharacterBase::SetStats(bool isInit)		
 {
 	currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed;
-	currentHp = hp + equipmentComponent->equipmentHp;
+	if (isInit)
+	{
+		currentHp = hp + equipmentComponent->equipmentHp;
+	}
 	currentDef = def + equipmentComponent->equipmentDef;
 	currentMag = mag + equipmentComponent->equipmentMag;
 	currentRes = res + equipmentComponent->equipmentRes;
@@ -351,6 +404,10 @@ void ACharacterBase::SetStats()
 	critical = CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
 	evasion = CalcEvasion(0);
 	accuracy = CalcAccuracy(0);
+	damageReduction = equipmentComponent->equipmentDamageReduction;
+	damageReduction_Percent = equipmentComponent->equipmentDamageReduction_percent;
+	damageReinforcement = equipmentComponent->equipmentDamageReinforcement;
+	damageReinforcement_Percent = equipmentComponent->equipmentDamageReinforcement_percent;
 }
 
 //스킬들의 내부 값들을 미리 계산, 하위 클래스의 생성자와 턴 개시 시 호출해야함
@@ -363,7 +420,6 @@ void ACharacterBase::SetSkillInfo()
 		skills[i]->calculatedDamage = CalcDamage(skills[i]->damage, skills[i]->magnification, skills[i]->bIsMag);
 		skills[i]->calculatedAccuracy = CalcAccuracy(skills[i]->accuracy);
 		skills[i]->calculatedCritical = CalcCritical(skills[i]->critical);
-		skills[i]->calculatedEvasion = CalcEvasion(skills[i]->evasion);
 	}
 }
 
@@ -418,4 +474,6 @@ void ACharacterBase::LevelUp()
 	{
 		speed += 1;
 	}
+	SetStats(false);
+	healthWidget->SetHealthBar(currentHp,hp);
 }

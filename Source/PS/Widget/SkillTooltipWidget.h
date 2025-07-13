@@ -37,7 +37,4 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* critical;
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* evasion;
 };

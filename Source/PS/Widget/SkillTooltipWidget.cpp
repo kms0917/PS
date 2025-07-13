@@ -13,13 +13,11 @@ void USkillTooltipWidget::SettingTooltip(USkillBase* skill)
 	apUsage->SetText(FText::FromString(FString::Printf(TEXT("AP : %d"), skill->apUsage)));
 	accuracy->SetText(FText::FromString(FString::Printf(TEXT("Accuracy : %d"), skill->calculatedAccuracy)));
 	critical->SetText(FText::FromString(FString::Printf(TEXT("Critical : %d"), skill->calculatedCritical)));
-	evasion->SetText(FText::FromString(FString::Printf(TEXT("Evasion : %d"), skill->calculatedEvasion)));
 	if (skill->bIsHeal)
 	{
 		dmgOrheal->SetText(FText::FromString(FString::Printf(TEXT("Heal : %d"), skill->calculatedDamage)));
 		accuracy->SetVisibility(ESlateVisibility::Hidden);
 		critical->SetVisibility(ESlateVisibility::Hidden);
-		evasion->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{

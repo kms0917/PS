@@ -55,6 +55,7 @@ ASkillIndicator::ASkillIndicator()
     WidgetComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     WidgetComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     WidgetComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    WidgetComponent->SetReceivesDecals(false);
 }
 
 // Called when the game starts or when spawned
@@ -79,6 +80,7 @@ void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* Othe
     if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
     {
         Casted->TargettedOn(accuracy, critical, damage, bIsMag, false, IsHeal);
+        Casted->SetOverlayMaterialEnabled(true);
         overlappedCharacters.Add(Casted);
     }
 }
@@ -92,7 +94,11 @@ void ASkillIndicator::OverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
         if (overlappedCharacters.Contains(Casted))
         {
             overlappedCharacters.Remove(Casted);
-            Casted->TargettedOff();
+            if (!playerController->targettedCharacter.Contains(Casted))
+            {
+                Casted->SetOverlayMaterialEnabled(false);
+                Casted->TargettedOff();
+            }
         }
     }
 }
@@ -103,7 +109,7 @@ void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, 
 
     if (DecalComponent)
     {
-        DecalComponent->DecalSize = FVector(30.0f, Scale, Scale);
+        DecalComponent->DecalSize = FVector(Scale, Scale, Scale);
     }
     if (OverlapSphere)
     {

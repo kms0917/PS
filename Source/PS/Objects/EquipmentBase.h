@@ -57,6 +57,15 @@ public:
 	int32 ap = 0;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float damageReduction_percent = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	int32 damageReduction;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	float damageReinforcement_percent = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
+	int32 damageReinforcement = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly)
 	ACharacterBase* ownerCharacter;
 	
 };

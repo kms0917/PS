@@ -15,6 +15,7 @@ class UEquipmentComponent;
 class USkillComponent;
 class USkillBase;
 class UAIPerceptionStimuliSourceComponent;
+class UMaterialInterface;
 
 UCLASS()
 class PS_API ACharacterBase : public ACharacter, public IGenericTeamAgentInterface
@@ -29,7 +30,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SetStats();			//첫 생성시와 매 턴 시작시 호출
+	void SetStats(bool isInit);			//첫 생성시와 매 턴 시작시 호출
 	void SetSkillInfo();		//첫 생성시와 매 턴 시작시 호출
 	int CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
 	int CalcEvasion(int correction);
@@ -62,6 +63,9 @@ protected:
 	int32 speedGrowth = 10;
 
 	FGenericTeamId TeamId; // 기본 무소속
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects|Material")
+	UMaterialInterface* OverlayMaterial;
 
 public:
 	// Called every frame
@@ -138,6 +142,15 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 savedCritical = 0;
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	float damageReduction_Percent = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 damageReduction = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	float damageReinforcement_Percent = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 damageReinforcement = 0;
+
 	UPROPERTY(EditAnyWhere, Transient)
 	UEquipmentComponent* equipmentComponent;
 	UPROPERTY(EditAnyWhere, Transient)
@@ -159,14 +172,17 @@ public:
 
 	UPROPERTY()
 	USkillBase* currentUsedSkill;
-	/*UPROPERTY()
-	bool bDidApplyDamage = false;*/
 
 	ACharacterController* playerController;
 
+	UFUNCTION(BlueprintCallable, Category = "Effects")
+	void SetOverlayMaterialEnabled(bool bEnable);
+
+	
 private:
 	void UpdateWidgetRotation();
 	void UpdateSkillInfoWidgetLocation();
+	void SetBPs();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* cameraComponent;

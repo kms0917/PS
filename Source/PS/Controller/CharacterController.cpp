@@ -252,7 +252,6 @@ void ACharacterController::OnLeftClick()
                 {
                     multiTargetSkillWidgetInstance->SetTargetCount(targettedCharacter.Num());
                 }
-                
                 if (multiTargettingNum == 0)
                 {
                     attackPoint = attackRangeIndicator->overlappedCharacters[0]->GetActorLocation();
@@ -288,6 +287,11 @@ void ACharacterController::InitAttack()
         if (targettedCharacter.Num() > 0)
         {
             attackRangeIndicator->overlappedCharacters = targettedCharacter;
+            for (auto Element : targettedCharacter)
+            {
+                Element->SetOverlayMaterialEnabled(false);
+                Element->TargettedOff();
+            }
         }
         attackRangeIndicator->InitAttack();
         attackRangeIndicator->Destroy();
@@ -332,6 +336,11 @@ void ACharacterController::StopSkillMode()
     if (attackRangeIndicator)
     {
         attackRangeIndicator->Destroy();
+    }
+    for (auto Element : targettedCharacter)
+    {
+        Element->SetOverlayMaterialEnabled(false);
+        Element->TargettedOff();
     }
     targettedCharacter.Empty();
     playerCharacter->currentUsedSkill = nullptr;
@@ -744,7 +753,7 @@ void ACharacterController::CheckShortMove()
 //targetIndicator까지의 네비메시 경로 표시
 void ACharacterController::SetNavPath()
 {
-    if (!targetIndicator->WasRecentlyRendered(0.0f) && playerCharacter->bIsBattle && !playerCharacter->bMyTurn || bIsTargeting || playerCharacter->bIsBattle && bIsMoving || bUseSkill || playerCharacter->IsMontagePlayed())
+    if (!targetIndicator->WasRecentlyRendered(0.0f) && playerCharacter->bIsBattle && !playerCharacter->bMyTurn || bIsTargeting || (playerCharacter->bIsBattle || bIsSkillMode) && bIsMoving || bUseSkill || playerCharacter->IsMontagePlayed())
     {
         FlushDebugStrings(GetWorld());
         FlushPersistentDebugLines(GetWorld());

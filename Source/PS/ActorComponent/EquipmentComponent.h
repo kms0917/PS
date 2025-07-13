@@ -85,6 +85,15 @@ public:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentAp = 0;
+	
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 equipmentDamageReduction = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	float equipmentDamageReduction_percent = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	int32 equipmentDamageReinforcement = 0;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
+	float equipmentDamageReinforcement_percent = 0;
 		
 	void EquipWeapon(UWeaponBase* EquipedWeapon);
 	void EquipHelmet(UHelmetBase* EquipedHelmet);

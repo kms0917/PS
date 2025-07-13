@@ -36,7 +36,7 @@ AWarrior::AWarrior()
 	SetDefaultEquipments();
 	SetDefaultSkills();
 
-	SetStats();
+	SetStats(true);
 	SetSkillInfo();
 }
 

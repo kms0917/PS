@@ -18,6 +18,7 @@ AMovePoint::AMovePoint()
 
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	WidgetComponent->SetupAttachment(SphereComponent);
+	WidgetComponent->SetReceivesDecals(false);
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("WidgetBlueprint'/Game/Widget/W_DistanceWidget'"));
 	if (WidgetClass.Succeeded())
