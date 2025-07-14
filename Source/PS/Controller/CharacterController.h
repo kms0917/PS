@@ -53,7 +53,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<ACharacterBase*> targettedCharacter;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	USkillWidget* skillWidgetInstance;
+	
 	void InitAttack();
 
 	void StartCombatMode();
@@ -81,8 +83,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<USkillWidget> skillWidgetClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	USkillWidget* skillWidgetInstance;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UMultiTargetSkillWidget> multiTargetSkillWidgetClass;

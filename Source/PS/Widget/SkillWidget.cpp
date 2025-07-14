@@ -30,7 +30,19 @@ void USkillWidget::NativeConstruct()
 void USkillWidget::UpdateWidget(ACharacterBase* ControlledCharacter)	//턴이 바뀔때마다 실행해야 함
 {
 	currentCharacter = ControlledCharacter;
-	if (!currentCharacter) { return; }
+	if (!currentCharacter || currentCharacter->skillComponent->skillList.Num() == 0)
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+		DelayHandle,
+		[this, ControlledCharacter]()
+		{
+			UpdateWidget(ControlledCharacter);
+		},
+		0.5f,    // 1.5초 후 실행
+		false     // 반복 실행
+	);
+		return;
+	}
 	SkillGridPanel->ClearChildren();
 	TArray<USkillBase*> skills = currentCharacter->skillComponent->skillList;
 	int Row = 0, Col = 0;

@@ -40,4 +40,6 @@ private:
 
 	UPROPERTY(EditAnyWhere, meta = (BindWidget))
 	class UButton* EndButton;
+
+	FTimerHandle DelayHandle;
 };

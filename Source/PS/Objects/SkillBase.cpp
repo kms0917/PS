@@ -3,6 +3,8 @@
 
 #include "Objects/SkillBase.h"
 #include "Character/CharacterBase.h"
+#include "Objects/Buff/BuffBase.h"
+#include "ActorComponent/BuffComponent.h"
 
 void USkillBase::ApllyDamage()
 {
@@ -11,6 +13,10 @@ void USkillBase::ApllyDamage()
 		if (Character)
 		{
 			Character->ReflectDamage(bIsHeal);
+			if (buff)
+			{
+				Character->buffComponent->GetBuff(buff);
+			}
 		}
 	}
 	overlappedCharacters.Empty();

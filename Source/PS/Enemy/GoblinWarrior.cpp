@@ -27,11 +27,7 @@ AGoblinWarrior::AGoblinWarrior()
 	skillGrowth = 40;
 	speedGrowth = 50;
 	ap = 1;
-	SetDefaultEquipments();
-	SetDefaultSkills();
 
-	SetStats(true);
-	SetSkillInfo();
 }
 
 void AGoblinWarrior::BeginPlay()
@@ -39,6 +35,11 @@ void AGoblinWarrior::BeginPlay()
 	Super::BeginPlay();
 
 	SetGenericTeamId(FGenericTeamId(1));
+	SetDefaultEquipments();
+	SetDefaultSkills();
+
+	SetStats(true);
+	SetSkillInfo();
 }
 
 void AGoblinWarrior::SetDefaultEquipments()

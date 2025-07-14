@@ -7,6 +7,7 @@
 #include "SkillBase.generated.h"
 
 class ACharacterBase;
+class UBuffBase;
 /**
  * 
  */
@@ -25,6 +26,9 @@ public:
 	UPROPERTY()
 	float PlayRate = 1.0f;
 
+	UPROPERTY()
+	UBuffBase* buff = nullptr;
+	
 	UFUNCTION()
 	void ApllyDamage();
 

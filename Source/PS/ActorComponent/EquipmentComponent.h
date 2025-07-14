@@ -31,61 +31,43 @@ protected:
 public:	
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UWeaponBase* weapon = nullptr;
-
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UHelmetBase* helmet = nullptr;
-
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UChestBase* chest = nullptr;
-
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UGloveBase* glove = nullptr;
-
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	ULegBase* leg = nullptr;
-
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UBootsBase* boots = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentHp = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentStr = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentMag = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentDef = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentRes = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentSkill = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentSpeed = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	float equipmentMoveSpeed = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentDamage = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentAccuracy = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentEvasion = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentCritical = 0;
-
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentAp = 0;
-	
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")
 	int32 equipmentDamageReduction = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Combat")

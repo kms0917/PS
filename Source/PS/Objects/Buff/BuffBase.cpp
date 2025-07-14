@@ -18,7 +18,8 @@ void UBuffBase::SetBuff(float MoveSpeed,
 	float DamageReduction_Percent,
 	int32 DamageReduction,
 	float DamageReinforcement_Percent,
-	int32 DamageReinforcement)
+	int32 DamageReinforcement,
+	int32 BuffCount)
 {
 	this->hp = Hp;
 	this->def = Def;
@@ -36,4 +37,28 @@ void UBuffBase::SetBuff(float MoveSpeed,
 	this->damageReinforcement_Percent = DamageReinforcement_Percent;
 	this->damageReinforcement = DamageReinforcement;
 	this->moveSpeed = MoveSpeed;
+	this->buffCount = BuffCount;
+}
+
+UBuffBase* UBuffBase::DuplicateBuff(UBuffBase* newBuff)
+{
+	newBuff->hp = this->hp;
+	newBuff->def = this->def;
+	newBuff->res = this->res;
+	newBuff->str = this->str;
+	newBuff->mag = this->mag;
+	newBuff->skill = this->skill;
+	newBuff->speed = this->speed;
+	newBuff->ap = this->ap;
+	newBuff->critical = this->critical;
+	newBuff->accuracy = this->accuracy;
+	newBuff->evade = this->evade;
+	newBuff->damageReduction_Percent = this->damageReduction_Percent;
+	newBuff->damageReduction = this->damageReduction;
+	newBuff->damageReinforcement_Percent = this->damageReinforcement_Percent;
+	newBuff->damageReinforcement = this->damageReinforcement;
+	newBuff->moveSpeed = this->moveSpeed;
+	newBuff->buffCount = this->buffCount;
+
+	return newBuff;
 }

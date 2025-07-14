@@ -29,8 +29,11 @@ public:
 	float DamageReduction_Percent,
 	int32 DamageReduction,
 	float DamageReinforcement_Percent,
-	int32 DamageReinforcement);
+	int32 DamageReinforcement,
+	int32 BuffCount);
 
+	UBuffBase* DuplicateBuff(UBuffBase* newBuff);
+	
 	float moveSpeed;
 	int32 hp;
 	int32 def;
@@ -47,4 +50,5 @@ public:
 	int32 damageReduction;
 	float damageReinforcement_Percent;
 	int32 damageReinforcement;
+	int buffCount;
 };

@@ -37,7 +37,7 @@ void USkillButtonWidget::NativeDestruct()	//델리게이트 및 바인딩 해제
 		skillButton->OnClicked.Clear();
 		if (skillButton->GetToolTip())
 		{
-			skillButton->GetToolTip()->RemoveFromParent();
+			//skillButton->GetToolTip()->RemoveFromParent();
 		}
 	}
 	Super::NativeDestruct();

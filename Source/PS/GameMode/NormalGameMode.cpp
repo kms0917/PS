@@ -2,6 +2,8 @@
 
 
 #include "NormalGameMode.h"
+
+#include "ActorComponent/BuffComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/Pawn.h"
 
@@ -110,6 +112,7 @@ void ANormalGameMode::RegisterBattleCharacters(ACharacterBase* registedCharacter
     {
         battleCharacters.Add(registedCharacter);
 		registedCharacter->bIsBattle = true;
+    	registedCharacter->buffComponent->StopBuffTimer();
     }
 }
 

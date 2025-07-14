@@ -24,4 +24,5 @@ UGoblinSlash::UGoblinSlash()
 	}
 
 	PlayRate = 1.0f;
+	buff = nullptr;
 }

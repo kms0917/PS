@@ -24,4 +24,5 @@ UBasicAttack::UBasicAttack()
 	}
 
 	PlayRate = 1.0f;
+	buff = nullptr;
 }

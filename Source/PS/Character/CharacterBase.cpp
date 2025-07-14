@@ -9,7 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
-#include  "Materials/MaterialInterface.h"
+#include "Materials/MaterialInterface.h"
 
 #include "Widget/HealthWidget.h"
 #include "Widget/SkillInfoWidget.h"
@@ -19,6 +19,8 @@
 #include "Objects/SkillBase.h"
 #include "Controller/AIController/BasicAIController.h"
 #include "GameMode/NormalGameMode.h"
+#include "ActorComponent/BuffComponent.h"
+#include "Widget/SkillWidget.h"
 
 ACharacterBase::ACharacterBase()
 {
@@ -58,6 +60,7 @@ ACharacterBase::ACharacterBase()
 	
 	equipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 	skillComponent = CreateDefaultSubobject<USkillComponent>(TEXT("Skills"));
+	buffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("Buff"));
 
 	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
 	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass()); // 시야 감지 등록
@@ -283,6 +286,7 @@ void ACharacterBase::SetTurnText(int32 turn)
 void ACharacterBase::TurnStart()
 {
 	bMyTurn = true;
+	buffComponent->ReduceBuffCount();
 	SetStats(false);
 	SetSkillInfo();
 }
@@ -293,6 +297,7 @@ void ACharacterBase::TurnEnd()
 	bMyTurn = false;
 }
 
+//타겟팅 시의 시각적 효과 온오프 여부 조절
 void ACharacterBase::SetOverlayMaterialEnabled(bool bEnable)
 {
 	// 캐릭터의 스켈레탈 메시 컴포넌트를 가져옵니다.
@@ -389,25 +394,32 @@ int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 //자원 및 스탯 초기화, 매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
 void ACharacterBase::SetStats(bool isInit)		
 {
-	currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed;
-	if (isInit)
+	if (equipmentComponent && buffComponent)
 	{
-		currentHp = hp + equipmentComponent->equipmentHp;
+		currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed + buffComponent->buffedMoveSpeed;
+		if (isInit)
+		{
+			currentHp = hp + equipmentComponent->equipmentHp;
+			if (healthWidget)
+			{
+				healthWidget->SetHealthBar(currentHp, hp);
+			}
+		}
+		currentDef = def + equipmentComponent->equipmentDef + buffComponent->buffedDef;
+		currentMag = mag + equipmentComponent->equipmentMag + buffComponent->buffedMag;
+		currentRes = res + equipmentComponent->equipmentRes + buffComponent->buffedRes;
+		currentSkill = skill + equipmentComponent->equipmentSkill + buffComponent->buffedSkill;
+		currentSpeed = speed + equipmentComponent->equipmentSpeed + buffComponent->buffedSpeed;
+		currentStr = str + equipmentComponent->equipmentStr + buffComponent->buffedStr;
+		currentAp = ap + equipmentComponent->equipmentAp + buffComponent->buffedAp;
+		critical = CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
+		evasion = CalcEvasion(0);
+		accuracy = CalcAccuracy(0);
+		damageReduction = equipmentComponent->equipmentDamageReduction + buffComponent->buffedDamageReduction;
+		damageReduction_Percent = equipmentComponent->equipmentDamageReduction_percent + buffComponent->buffedDamageReduction_Percent;
+		damageReinforcement = equipmentComponent->equipmentDamageReinforcement + buffComponent->buffedDamageReinforcement;
+		damageReinforcement_Percent = equipmentComponent->equipmentDamageReinforcement_percent + buffComponent->buffedDamageReinforcement_Percent;
 	}
-	currentDef = def + equipmentComponent->equipmentDef;
-	currentMag = mag + equipmentComponent->equipmentMag;
-	currentRes = res + equipmentComponent->equipmentRes;
-	currentSkill = skill + equipmentComponent->equipmentSkill;
-	currentSpeed = speed + equipmentComponent->equipmentSpeed;
-	currentStr = str + equipmentComponent->equipmentStr;
-	currentAp = ap + equipmentComponent->equipmentAp;
-	critical = CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
-	evasion = CalcEvasion(0);
-	accuracy = CalcAccuracy(0);
-	damageReduction = equipmentComponent->equipmentDamageReduction;
-	damageReduction_Percent = equipmentComponent->equipmentDamageReduction_percent;
-	damageReinforcement = equipmentComponent->equipmentDamageReinforcement;
-	damageReinforcement_Percent = equipmentComponent->equipmentDamageReinforcement_percent;
 }
 
 //스킬들의 내부 값들을 미리 계산, 하위 클래스의 생성자와 턴 개시 시 호출해야함
@@ -426,19 +438,19 @@ void ACharacterBase::SetSkillInfo()
 //치명타 확률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcCritical(int correction)
 {
-	return (currentSkill + equipmentComponent->equipmentCritical + correction);
+	return (currentSkill + equipmentComponent->equipmentCritical + correction + buffComponent->buffedCritical);
 }
 
 //회피율 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcEvasion(int correction)
 {
-	return (currentSpeed * 1.2 + equipmentComponent->equipmentEvasion + correction);
+	return (currentSpeed * 1.2 + equipmentComponent->equipmentEvasion + correction + buffComponent->buffedEvade);
 }
 
 //명중률 계산, 위의 함수들에서 사용
 int ACharacterBase::CalcAccuracy(int correction)
 {
-	return (currentSkill * 1.2 + equipmentComponent->equipmentAccuracy + correction);
+	return (currentSkill * 1.2 + equipmentComponent->equipmentAccuracy + correction + buffComponent->buffedAccuracy);
 }
 
 //레벨업, 경험치 얻는 함수에서 사용

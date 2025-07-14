@@ -33,11 +33,6 @@ AWarrior::AWarrior()
 	skillGrowth = 55;
 	speedGrowth = 55;
 	ap = 2;
-	SetDefaultEquipments();
-	SetDefaultSkills();
-
-	SetStats(true);
-	SetSkillInfo();
 }
 
 void AWarrior::BeginPlay()
@@ -45,6 +40,11 @@ void AWarrior::BeginPlay()
 	Super::BeginPlay();
 
 	SetGenericTeamId(FGenericTeamId(0));
+	SetDefaultEquipments();
+	SetDefaultSkills();
+
+	SetStats(true);
+	SetSkillInfo();
 }
 
 void AWarrior::SetDefaultEquipments()	//추후 인벤토리 생기면 인벤토리에도 장비 추가해야함

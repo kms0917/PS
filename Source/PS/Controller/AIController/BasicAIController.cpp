@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
 #include "GenericTeamAgentInterface.h"
+#include "ActorComponent/BuffComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ABasicAIController::ABasicAIController()
@@ -189,6 +190,10 @@ void ABasicAIController::StartTurn()
 		BlackboardComp->SetValueAsBool(TEXT("IsMyTurn"), true);
 		BlackboardComp->SetValueAsObject(TEXT("TargetActor"), nullptr);
 		BlackboardComp->SetValueAsObject(TEXT("SelectedSkill"), nullptr);
+	}
+	if (ControlledPawn)
+	{
+		ControlledPawn->buffComponent->ReduceBuffCount();
 	}
 }
 

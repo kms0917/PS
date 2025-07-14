@@ -3,6 +3,8 @@
 
 #include "Objects/Skills/Heal.h"
 
+#include "Objects/Buff/BuffBase.h"
+
 UHeal::UHeal()
 {
 	skillRange = 350.0f;
@@ -15,7 +17,7 @@ UHeal::UHeal()
 	bIsMag = false;
 	bIsHeal = true;
 	bIsTargeting = true;
-	multiTargetingNum = 2;
+	multiTargetingNum = 1;
 	skillName = FText::FromString(TEXT("회복"));
 	skillScript = FText::FromString(TEXT("마력에 비례해 대상을 회복시킨다."));
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/Standing1HMagicAttack03_UE_Anim_Montage"));
@@ -25,4 +27,6 @@ UHeal::UHeal()
 	}
 
 	PlayRate = 1.0f;
+	buff = NewObject<UBuffBase>(this, UBuffBase::StaticClass(), TEXT("Heal"));
+	buff->SetBuff(0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3);
 }

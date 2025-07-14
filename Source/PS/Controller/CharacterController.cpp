@@ -145,7 +145,7 @@ void ACharacterController::BeginPlay()
         skillWidgetInstance = Cast<USkillWidget>(widget);
         if (skillWidgetInstance)
         {
-            skillWidgetInstance->UpdateWidget(playerCharacter);     //턴이 바뀔때마다 실행되야함
+            skillWidgetInstance->UpdateWidget(playerCharacter);
             skillWidgetInstance->AddToViewport();
             skillWidgetInstance->SetEndButton(false);
         }
@@ -337,12 +337,15 @@ void ACharacterController::StopSkillMode()
     {
         attackRangeIndicator->Destroy();
     }
-    for (auto Element : targettedCharacter)
+    if (targettedCharacter.Num() > 0)
     {
-        Element->SetOverlayMaterialEnabled(false);
-        Element->TargettedOff();
+        for (auto Element : targettedCharacter)
+        {
+            Element->SetOverlayMaterialEnabled(false);
+            Element->TargettedOff();
+        }
+        targettedCharacter.Empty();
     }
-    targettedCharacter.Empty();
     playerCharacter->currentUsedSkill = nullptr;
     // 멀티 타겟 스킬 위젯 숨기기
     if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
@@ -378,7 +381,7 @@ void ACharacterController::EndSkillMode()
 void ACharacterController::EndTurn()
 {
     playerCharacter->TurnEnd();
-
+    StopSkillMode();
     if (skillWidgetInstance)
     {
         skillWidgetInstance->SetVisibility(ESlateVisibility::Collapsed);
@@ -467,6 +470,7 @@ void ACharacterController::UpdateSkillIndicatorLocation()
         targetIndicator->SetActorHiddenInGame(true);
         attackRangeIndicator->usableWidget->SetVisibility(ESlateVisibility::Collapsed);
         bIsMoving = true;
+        stopPoint = FVector::ZeroVector;
     }
     else if (bIsTargeting && !bIsMouseOverSkillRange)
     {

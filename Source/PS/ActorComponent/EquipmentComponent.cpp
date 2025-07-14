@@ -67,6 +67,7 @@ void UEquipmentComponent::EquipWeapon(UWeaponBase* EquipedWeapon)
 	{
 		weapon->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipHelmet(UHelmetBase* EquipedHelmet)
@@ -97,6 +98,7 @@ void UEquipmentComponent::EquipHelmet(UHelmetBase* EquipedHelmet)
 	{
 		helmet->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipChest(UChestBase* EquipedChest)
@@ -127,6 +129,7 @@ void UEquipmentComponent::EquipChest(UChestBase* EquipedChest)
 	{
 		chest->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipGlove(UGloveBase* EquipedGlove)
@@ -157,6 +160,7 @@ void UEquipmentComponent::EquipGlove(UGloveBase* EquipedGlove)
 	{
 		glove->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipLeg(ULegBase* EquipedLeg)
@@ -187,6 +191,7 @@ void UEquipmentComponent::EquipLeg(ULegBase* EquipedLeg)
 	{
 		leg->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipBoots(UBootsBase* EquipedBoots)
@@ -217,6 +222,7 @@ void UEquipmentComponent::EquipBoots(UBootsBase* EquipedBoots)
 	{
 		boots->ownerCharacter = ownerCharacter;
 	}
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipWeapon()
@@ -240,6 +246,7 @@ void UEquipmentComponent::UnEquipWeapon()
 	equipmentDamageReinforcement_percent -= weapon->damageReinforcement_percent;
 	weapon->ownerCharacter = nullptr;
 	weapon = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipHelmet()
@@ -263,6 +270,7 @@ void UEquipmentComponent::UnEquipHelmet()
 	equipmentDamageReinforcement_percent -= helmet->damageReinforcement_percent;
 	helmet->ownerCharacter = nullptr;
 	helmet = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipChest()
@@ -286,6 +294,7 @@ void UEquipmentComponent::UnEquipChest()
 	equipmentDamageReinforcement_percent -= chest->damageReinforcement_percent;
 	chest->ownerCharacter = nullptr;
 	chest = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipGlove()
@@ -309,6 +318,7 @@ void UEquipmentComponent::UnEquipGlove()
 	equipmentDamageReinforcement_percent -= glove->damageReinforcement_percent;
 	glove->ownerCharacter = nullptr;
 	glove = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipLeg()
@@ -332,6 +342,7 @@ void UEquipmentComponent::UnEquipLeg()
 	equipmentDamageReinforcement_percent -= leg->damageReinforcement_percent;
 	leg->ownerCharacter = nullptr;
 	leg = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipBoots()
@@ -355,6 +366,7 @@ void UEquipmentComponent::UnEquipBoots()
 	equipmentDamageReinforcement_percent -= boots->damageReinforcement_percent;
 	boots->ownerCharacter = nullptr;
 	boots = nullptr;
+	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::CalcEquipmentStats()
@@ -513,4 +525,8 @@ void UEquipmentComponent::CalcEquipmentStats()
 	equipmentDamageReduction_percent = DamageReduction_percent;
 	equipmentDamageReinforcement = DamageReinforcement;
 	equipmentDamageReinforcement_percent = DamageReinforcement_percent;
+	if (ownerCharacter)
+	{
+		ownerCharacter->SetStats(false);
+	}
 }
