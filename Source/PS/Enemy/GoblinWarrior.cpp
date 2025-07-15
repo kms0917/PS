@@ -38,7 +38,7 @@ void AGoblinWarrior::BeginPlay()
 	SetDefaultEquipments();
 	SetDefaultSkills();
 
-	SetStats(true);
+	SetStats();
 	SetSkillInfo();
 }
 

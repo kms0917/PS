@@ -45,29 +45,30 @@ void UEquipmentComponent::EquipWeapon(UWeaponBase* EquipedWeapon)
 	{
 		UnEquipWeapon();
 	}
-	weapon = EquipedWeapon; 
-	equipmentHp += weapon->hp;
-	equipmentStr += weapon->str;
-	equipmentMag += weapon->mag;
-	equipmentDef += weapon->def;
-	equipmentRes += weapon->res;
-	equipmentSkill += weapon->skill;
-	equipmentSpeed += weapon->speed;
-	equipmentMoveSpeed += weapon->moveSpeed;
-	equipmentDamage += weapon->damage;
-	equipmentAccuracy += weapon->accuracy;
-	equipmentEvasion += weapon->evasion;
-	equipmentCritical += weapon->critical;
-	equipmentAp += weapon->ap;
-	equipmentDamageReduction += weapon->damageReduction;
-	equipmentDamageReduction_percent += weapon->damageReduction_percent;
-	equipmentDamageReinforcement += weapon->damageReinforcement;
-	equipmentDamageReinforcement_percent += weapon->damageReinforcement_percent;
+	weapon = EquipedWeapon;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += weapon->hp;
+	ownerCharacter->hp += weapon->hp;
+	ownerCharacter->currentStr += weapon->str;
+	ownerCharacter->currentMag += weapon->mag;
+	ownerCharacter->currentDef += weapon->def;
+	ownerCharacter->currentRes += weapon->res;
+	ownerCharacter->currentSkill += weapon->skill;
+	ownerCharacter->currentSpeed += weapon->speed;
+	ownerCharacter->currentMoveSpeed += weapon->moveSpeed;
+	ownerCharacter->currentAp += weapon->ap;
+	ownerCharacter->damageReduction += weapon->damageReduction;
+	ownerCharacter->damageReduction_Percent += weapon->damageReduction_percent;
+	ownerCharacter->damageReinforcement += weapon->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += weapon->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		weapon->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipHelmet(UHelmetBase* EquipedHelmet)
@@ -77,28 +78,29 @@ void UEquipmentComponent::EquipHelmet(UHelmetBase* EquipedHelmet)
 		UnEquipHelmet();
 	}
 	helmet = EquipedHelmet;
-	equipmentHp += helmet->hp;
-	equipmentStr += helmet->str;
-	equipmentMag += helmet->mag;
-	equipmentDef += helmet->def;
-	equipmentRes += helmet->res;
-	equipmentSkill += helmet->skill;
-	equipmentSpeed += helmet->speed;
-	equipmentMoveSpeed += helmet->moveSpeed;
-	equipmentDamage += helmet->damage;
-	equipmentAccuracy += helmet->accuracy;
-	equipmentEvasion += helmet->evasion;
-	equipmentCritical += helmet->critical;
-	equipmentAp += helmet->ap;
-	equipmentDamageReduction += helmet->damageReduction;
-	equipmentDamageReduction_percent += helmet->damageReduction_percent;
-	equipmentDamageReinforcement += helmet->damageReinforcement;
-	equipmentDamageReinforcement_percent += helmet->damageReinforcement_percent;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += helmet->hp;
+	ownerCharacter->hp += helmet->hp;
+	ownerCharacter->currentStr += helmet->str;
+	ownerCharacter->currentMag += helmet->mag;
+	ownerCharacter->currentDef += helmet->def;
+	ownerCharacter->currentRes += helmet->res;
+	ownerCharacter->currentSkill += helmet->skill;
+	ownerCharacter->currentSpeed += helmet->speed;
+	ownerCharacter->currentMoveSpeed += helmet->moveSpeed;
+	ownerCharacter->currentAp += helmet->ap;
+	ownerCharacter->damageReduction += helmet->damageReduction;
+	ownerCharacter->damageReduction_Percent += helmet->damageReduction_percent;
+	ownerCharacter->damageReinforcement += helmet->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += helmet->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		helmet->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipChest(UChestBase* EquipedChest)
@@ -108,28 +110,29 @@ void UEquipmentComponent::EquipChest(UChestBase* EquipedChest)
 		UnEquipChest();
 	}
 	chest = EquipedChest;
-	equipmentHp += chest->hp;
-	equipmentStr += chest->str;
-	equipmentMag += chest->mag;
-	equipmentDef += chest->def;
-	equipmentRes += chest->res;
-	equipmentSkill += chest->skill;
-	equipmentSpeed += chest->speed;
-	equipmentMoveSpeed += chest->moveSpeed;
-	equipmentDamage += chest->damage;
-	equipmentAccuracy += chest->accuracy;
-	equipmentEvasion += chest->evasion;
-	equipmentCritical += chest->critical;
-	equipmentAp += chest->ap;
-	equipmentDamageReduction += chest->damageReduction;
-	equipmentDamageReduction_percent += chest->damageReduction_percent;
-	equipmentDamageReinforcement += chest->damageReinforcement;
-	equipmentDamageReinforcement_percent += chest->damageReinforcement_percent;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += chest->hp;
+	ownerCharacter->hp += chest->hp;
+	ownerCharacter->currentStr += chest->str;
+	ownerCharacter->currentMag += chest->mag;
+	ownerCharacter->currentDef += chest->def;
+	ownerCharacter->currentRes += chest->res;
+	ownerCharacter->currentSkill += chest->skill;
+	ownerCharacter->currentSpeed += chest->speed;
+	ownerCharacter->currentMoveSpeed += chest->moveSpeed;
+	ownerCharacter->currentAp += chest->ap;
+	ownerCharacter->damageReduction += chest->damageReduction;
+	ownerCharacter->damageReduction_Percent += chest->damageReduction_percent;
+	ownerCharacter->damageReinforcement += chest->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += chest->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		chest->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipGlove(UGloveBase* EquipedGlove)
@@ -139,28 +142,29 @@ void UEquipmentComponent::EquipGlove(UGloveBase* EquipedGlove)
 		UnEquipGlove();
 	}
 	glove = EquipedGlove;
-	equipmentHp += glove->hp;
-	equipmentStr += glove->str;
-	equipmentMag += glove->mag;
-	equipmentDef += glove->def;
-	equipmentRes += glove->res;
-	equipmentSkill += glove->skill;
-	equipmentSpeed += glove->speed;
-	equipmentMoveSpeed += glove->moveSpeed;
-	equipmentDamage += glove->damage;
-	equipmentAccuracy += glove->accuracy;
-	equipmentEvasion += glove->evasion;
-	equipmentCritical += glove->critical;
-	equipmentAp += glove->ap;
-	equipmentDamageReduction += glove->damageReduction;
-	equipmentDamageReduction_percent += glove->damageReduction_percent;
-	equipmentDamageReinforcement += glove->damageReinforcement;
-	equipmentDamageReinforcement_percent += glove->damageReinforcement_percent;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += glove->hp;
+	ownerCharacter->hp += glove->hp;
+	ownerCharacter->currentStr += glove->str;
+	ownerCharacter->currentMag += glove->mag;
+	ownerCharacter->currentDef += glove->def;
+	ownerCharacter->currentRes += glove->res;
+	ownerCharacter->currentSkill += glove->skill;
+	ownerCharacter->currentSpeed += glove->speed;
+	ownerCharacter->currentMoveSpeed += glove->moveSpeed;
+	ownerCharacter->currentAp += glove->ap;
+	ownerCharacter->damageReduction += glove->damageReduction;
+	ownerCharacter->damageReduction_Percent += glove->damageReduction_percent;
+	ownerCharacter->damageReinforcement += glove->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += glove->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		glove->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipLeg(ULegBase* EquipedLeg)
@@ -170,28 +174,29 @@ void UEquipmentComponent::EquipLeg(ULegBase* EquipedLeg)
 		UnEquipLeg();
 	}
 	leg = EquipedLeg;
-	equipmentHp += leg->hp;
-	equipmentStr += leg->str;
-	equipmentMag += leg->mag;
-	equipmentDef += leg->def;
-	equipmentRes += leg->res;
-	equipmentSkill += leg->skill;
-	equipmentSpeed += leg->speed;
-	equipmentMoveSpeed += leg->moveSpeed;
-	equipmentDamage += leg->damage;
-	equipmentAccuracy += leg->accuracy;
-	equipmentEvasion += leg->evasion;
-	equipmentCritical += leg->critical;
-	equipmentAp += leg->ap;
-	equipmentDamageReduction += leg->damageReduction;
-	equipmentDamageReduction_percent += leg->damageReduction_percent;
-	equipmentDamageReinforcement += leg->damageReinforcement;
-	equipmentDamageReinforcement_percent += leg->damageReinforcement_percent;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += leg->hp;
+	ownerCharacter->hp += leg->hp;
+	ownerCharacter->currentStr += leg->str;
+	ownerCharacter->currentMag += leg->mag;
+	ownerCharacter->currentDef += leg->def;
+	ownerCharacter->currentRes += leg->res;
+	ownerCharacter->currentSkill += leg->skill;
+	ownerCharacter->currentSpeed += leg->speed;
+	ownerCharacter->currentMoveSpeed += leg->moveSpeed;
+	ownerCharacter->currentAp += leg->ap;
+	ownerCharacter->damageReduction += leg->damageReduction;
+	ownerCharacter->damageReduction_Percent += leg->damageReduction_percent;
+	ownerCharacter->damageReinforcement += leg->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += leg->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		leg->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::EquipBoots(UBootsBase* EquipedBoots)
@@ -201,174 +206,218 @@ void UEquipmentComponent::EquipBoots(UBootsBase* EquipedBoots)
 		UnEquipBoots();
 	}
 	boots = EquipedBoots;
-	equipmentHp += boots->hp;
-	equipmentStr += boots->str;
-	equipmentMag += boots->mag;
-	equipmentDef += boots->def;
-	equipmentRes += boots->res;
-	equipmentSkill += boots->skill;
-	equipmentSpeed += boots->speed;
-	equipmentMoveSpeed += boots->moveSpeed;
-	equipmentDamage += boots->damage;
-	equipmentAccuracy += boots->accuracy;
-	equipmentEvasion += boots->evasion;
-	equipmentCritical += boots->critical;
-	equipmentAp += boots->ap;
-	equipmentDamageReduction += boots->damageReduction;
-	equipmentDamageReduction_percent += boots->damageReduction_percent;
-	equipmentDamageReinforcement += boots->damageReinforcement;
-	equipmentDamageReinforcement_percent += boots->damageReinforcement_percent;
+	CalcEquipmentStats();
+	ownerCharacter->currentHp += boots->hp;
+	ownerCharacter->hp += boots->hp;
+	ownerCharacter->currentStr += boots->str;
+	ownerCharacter->currentMag += boots->mag;
+	ownerCharacter->currentDef += boots->def;
+	ownerCharacter->currentRes += boots->res;
+	ownerCharacter->currentSkill += boots->skill;
+	ownerCharacter->currentSpeed += boots->speed;
+	ownerCharacter->currentMoveSpeed += boots->moveSpeed;
+	ownerCharacter->currentAp += boots->ap;
+	ownerCharacter->damageReduction += boots->damageReduction;
+	ownerCharacter->damageReduction_Percent += boots->damageReduction_percent;
+	ownerCharacter->damageReinforcement += boots->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent += boots->damageReinforcement_percent;
 	if (ownerCharacter)
 	{
 		boots->ownerCharacter = ownerCharacter;
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
 	}
-	CalcEquipmentStats();
 }
 
 void UEquipmentComponent::UnEquipWeapon()
 {
-	equipmentHp -= weapon->hp;
-	equipmentStr -= weapon->str;
-	equipmentMag -= weapon->mag;
-	equipmentDef -= weapon->def;
-	equipmentRes -= weapon->res;
-	equipmentSkill -= weapon->skill;
-	equipmentSpeed -= weapon->speed;
-	equipmentMoveSpeed -= weapon->moveSpeed;
-	equipmentDamage -= weapon->damage;
-	equipmentAccuracy -= weapon->accuracy;
-	equipmentEvasion -= weapon->evasion;
-	equipmentCritical -= weapon->critical;
-	equipmentAp -= weapon->ap;
-	equipmentDamageReduction -= weapon->damageReduction;
-	equipmentDamageReduction_percent -= weapon->damageReduction_percent;
-	equipmentDamageReinforcement -= weapon->damageReinforcement;
-	equipmentDamageReinforcement_percent -= weapon->damageReinforcement_percent;
+	if (weapon == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= weapon->hp;
+	ownerCharacter->currentStr -= weapon->str;
+	ownerCharacter->currentMag -= weapon->mag;
+	ownerCharacter->currentDef -= weapon->def;
+	ownerCharacter->currentRes -= weapon->res;
+	ownerCharacter->currentSkill -= weapon->skill;
+	ownerCharacter->currentSpeed -= weapon->speed;
+	ownerCharacter->currentMoveSpeed -= weapon->moveSpeed;
+	ownerCharacter->currentAp -= weapon->ap;
+	ownerCharacter->damageReduction -= weapon->damageReduction;
+	ownerCharacter->damageReduction_Percent -= weapon->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= weapon->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= weapon->damageReinforcement_percent;
 	weapon->ownerCharacter = nullptr;
 	weapon = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
 void UEquipmentComponent::UnEquipHelmet()
 {
-	equipmentHp -= helmet->hp;
-	equipmentStr -= helmet->str;
-	equipmentMag -= helmet->mag;
-	equipmentDef -= helmet->def;
-	equipmentRes -= helmet->res;
-	equipmentSkill -= helmet->skill;
-	equipmentSpeed -= helmet->speed;
-	equipmentMoveSpeed -= helmet->moveSpeed;
-	equipmentDamage -= helmet->damage;
-	equipmentAccuracy -= helmet->accuracy;
-	equipmentEvasion -= helmet->evasion;
-	equipmentCritical -= helmet->critical;
-	equipmentAp -= helmet->ap;
-	equipmentDamageReduction -= helmet->damageReduction;
-	equipmentDamageReduction_percent -= helmet->damageReduction_percent;
-	equipmentDamageReinforcement -= helmet->damageReinforcement;
-	equipmentDamageReinforcement_percent -= helmet->damageReinforcement_percent;
+	if (helmet == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= helmet->hp;
+	ownerCharacter->currentStr -= helmet->str;
+	ownerCharacter->currentMag -= helmet->mag;
+	ownerCharacter->currentDef -= helmet->def;
+	ownerCharacter->currentRes -= helmet->res;
+	ownerCharacter->currentSkill -= helmet->skill;
+	ownerCharacter->currentSpeed -= helmet->speed;
+	ownerCharacter->currentMoveSpeed -= helmet->moveSpeed;
+	ownerCharacter->currentAp -= helmet->ap;
+	ownerCharacter->damageReduction -= helmet->damageReduction;
+	ownerCharacter->damageReduction_Percent -= helmet->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= helmet->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= helmet->damageReinforcement_percent;
 	helmet->ownerCharacter = nullptr;
 	helmet = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
 void UEquipmentComponent::UnEquipChest()
 {
-	equipmentHp -= chest->hp;
-	equipmentStr -= chest->str;
-	equipmentMag -= chest->mag;
-	equipmentDef -= chest->def;
-	equipmentRes -= chest->res;
-	equipmentSkill -= chest->skill;
-	equipmentSpeed -= chest->speed;
-	equipmentMoveSpeed -= chest->moveSpeed;
-	equipmentDamage -= chest->damage;
-	equipmentAccuracy -= chest->accuracy;
-	equipmentEvasion -= chest->evasion;
-	equipmentCritical -= chest->critical;
-	equipmentAp -= chest->ap;
-	equipmentDamageReduction -= chest->damageReduction;
-	equipmentDamageReduction_percent -= chest->damageReduction_percent;
-	equipmentDamageReinforcement -= chest->damageReinforcement;
-	equipmentDamageReinforcement_percent -= chest->damageReinforcement_percent;
+	if (chest == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= chest->hp;
+	ownerCharacter->currentStr -= chest->str;
+	ownerCharacter->currentMag -= chest->mag;
+	ownerCharacter->currentDef -= chest->def;
+	ownerCharacter->currentRes -= chest->res;
+	ownerCharacter->currentSkill -= chest->skill;
+	ownerCharacter->currentSpeed -= chest->speed;
+	ownerCharacter->currentMoveSpeed -= chest->moveSpeed;
+	ownerCharacter->currentAp -= chest->ap;
+	ownerCharacter->damageReduction -= chest->damageReduction;
+	ownerCharacter->damageReduction_Percent -= chest->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= chest->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= chest->damageReinforcement_percent;
 	chest->ownerCharacter = nullptr;
 	chest = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
 void UEquipmentComponent::UnEquipGlove()
 {
-	equipmentHp -= glove->hp;
-	equipmentStr -= glove->str;
-	equipmentMag -= glove->mag;
-	equipmentDef -= glove->def;
-	equipmentRes -= glove->res;
-	equipmentSkill -= glove->skill;
-	equipmentSpeed -= glove->speed;
-	equipmentMoveSpeed -= glove->moveSpeed;
-	equipmentDamage -= glove->damage;
-	equipmentAccuracy -= glove->accuracy;
-	equipmentEvasion -= glove->evasion;
-	equipmentCritical -= glove->critical;
-	equipmentAp -= glove->ap;
-	equipmentDamageReduction -= glove->damageReduction;
-	equipmentDamageReduction_percent -= glove->damageReduction_percent;
-	equipmentDamageReinforcement -= glove->damageReinforcement;
-	equipmentDamageReinforcement_percent -= glove->damageReinforcement_percent;
+	if (glove == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= glove->hp;
+	ownerCharacter->currentStr -= glove->str;
+	ownerCharacter->currentMag -= glove->mag;
+	ownerCharacter->currentDef -= glove->def;
+	ownerCharacter->currentRes -= glove->res;
+	ownerCharacter->currentSkill -= glove->skill;
+	ownerCharacter->currentSpeed -= glove->speed;
+	ownerCharacter->currentMoveSpeed -= glove->moveSpeed;
+	ownerCharacter->currentAp -= glove->ap;
+	ownerCharacter->damageReduction -= glove->damageReduction;
+	ownerCharacter->damageReduction_Percent -= glove->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= glove->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= glove->damageReinforcement_percent;
 	glove->ownerCharacter = nullptr;
 	glove = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
 void UEquipmentComponent::UnEquipLeg()
 {
-	equipmentHp -= leg->hp;
-	equipmentStr -= leg->str;
-	equipmentMag -= leg->mag;
-	equipmentDef -= leg->def;
-	equipmentRes -= leg->res;
-	equipmentSkill -= leg->skill;
-	equipmentSpeed -= leg->speed;
-	equipmentMoveSpeed -= leg->moveSpeed;
-	equipmentDamage -= leg->damage;
-	equipmentAccuracy -= leg->accuracy;
-	equipmentEvasion -= leg->evasion;
-	equipmentCritical -= leg->critical;
-	equipmentAp -= leg->ap;
-	equipmentDamageReduction -= leg->damageReduction;
-	equipmentDamageReduction_percent -= leg->damageReduction_percent;
-	equipmentDamageReinforcement -= leg->damageReinforcement;
-	equipmentDamageReinforcement_percent -= leg->damageReinforcement_percent;
+	if (leg == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= leg->hp;
+	ownerCharacter->currentStr -= leg->str;
+	ownerCharacter->currentMag -= leg->mag;
+	ownerCharacter->currentDef -= leg->def;
+	ownerCharacter->currentRes -= leg->res;
+	ownerCharacter->currentSkill -= leg->skill;
+	ownerCharacter->currentSpeed -= leg->speed;
+	ownerCharacter->currentMoveSpeed -= leg->moveSpeed;
+	ownerCharacter->currentAp -= leg->ap;
+	ownerCharacter->damageReduction -= leg->damageReduction;
+	ownerCharacter->damageReduction_Percent -= leg->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= leg->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= leg->damageReinforcement_percent;
 	leg->ownerCharacter = nullptr;
 	leg = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
 void UEquipmentComponent::UnEquipBoots()
 {
-	equipmentHp -= boots->hp;
-	equipmentStr -= boots->str;
-	equipmentMag -= boots->mag;
-	equipmentDef -= boots->def;
-	equipmentRes -= boots->res;
-	equipmentSkill -= boots->skill;
-	equipmentSpeed -= boots->speed;
-	equipmentMoveSpeed -= boots->moveSpeed;
-	equipmentDamage -= boots->damage;
-	equipmentAccuracy -= boots->accuracy;
-	equipmentEvasion -= boots->evasion;
-	equipmentCritical -= boots->critical;
-	equipmentAp -= boots->ap;
-	equipmentDamageReduction -= boots->damageReduction;
-	equipmentDamageReduction_percent -= boots->damageReduction_percent;
-	equipmentDamageReinforcement -= boots->damageReinforcement;
-	equipmentDamageReinforcement_percent -= boots->damageReinforcement_percent;
+	if (boots == nullptr)
+	{
+		return;
+	}
+	ownerCharacter->hp -= boots->hp;
+	ownerCharacter->currentStr -= boots->str;
+	ownerCharacter->currentMag -= boots->mag;
+	ownerCharacter->currentDef -= boots->def;
+	ownerCharacter->currentRes -= boots->res;
+	ownerCharacter->currentSkill -= boots->skill;
+	ownerCharacter->currentSpeed -= boots->speed;
+	ownerCharacter->currentMoveSpeed -= boots->moveSpeed;
+	ownerCharacter->currentAp -= boots->ap;
+	ownerCharacter->damageReduction -= boots->damageReduction;
+	ownerCharacter->damageReduction_Percent -= boots->damageReduction_percent;
+	ownerCharacter->damageReinforcement -= boots->damageReinforcement;
+	ownerCharacter->damageReinforcement_Percent -= boots->damageReinforcement_percent;
 	boots->ownerCharacter = nullptr;
 	boots = nullptr;
 	CalcEquipmentStats();
+	if (ownerCharacter)
+	{
+		ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+		ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+		ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+		ownerCharacter->SetHealthWidget();
+	}
 }
 
+//스탯 상세보기 위젯에서 보여주기 위함, 실제 스탯 반영x
 void UEquipmentComponent::CalcEquipmentStats()
 {
 	int32 Hp = 0;
@@ -525,8 +574,4 @@ void UEquipmentComponent::CalcEquipmentStats()
 	equipmentDamageReduction_percent = DamageReduction_percent;
 	equipmentDamageReinforcement = DamageReinforcement;
 	equipmentDamageReinforcement_percent = DamageReinforcement_percent;
-	if (ownerCharacter)
-	{
-		ownerCharacter->SetStats(false);
-	}
 }

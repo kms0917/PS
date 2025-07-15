@@ -32,9 +32,6 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void SetSkillInfo();		//첫 생성시와 매 턴 시작시 호출
-	int CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
-	int CalcEvasion(int correction);
-	int CalcAccuracy(int correction);
 	int CalcDamage(int damage, float magnification, bool isMag);
 	void LevelUp();		//GetEXP 후 호출
 
@@ -74,7 +71,12 @@ public:
 	void OnSkillAutoMoveFinished(FVector attackPoint);
 	bool IsMontagePlayed();
 
-	void SetStats(bool isInit);			//첫 생성시와 매 턴 시작시 호출
+	void SetStats();			//첫 생성시 호출
+	int CalcCritical(int correction);	//CalcDMG까지 스킬 사용 시 호출
+	int CalcEvasion(int correction);
+	int CalcAccuracy(int correction);
+	void SetHealthWidget();
+	void RestoreApandMoveSpeed();
 	void UseSkill(int i);
 	void ReflectDamage(bool isHeal);	//위의 스킬들 위젯에서 누르면 스킬에서 데미지,명중률 등 계산 후 위젯에 넘기고 위젯에서 대상 선택시 대상스탯으로 계산해 finalDamage소유, 이 함수로 실제 실행되면 값 넘겨주기만함
 	void GetEXP();	//아군용

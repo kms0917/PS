@@ -12,6 +12,7 @@
 #include "ActorComponent/SkillComponent.h"
 #include "Objects/Skills/BasicAttack.h"
 #include "Objects/Skills/Heal.h"
+#include "Objects/Skills/Endurance.h"
 
 #include "GenericTeamAgentInterface.h"
 
@@ -43,7 +44,7 @@ void AWarrior::BeginPlay()
 	SetDefaultEquipments();
 	SetDefaultSkills();
 
-	SetStats(true);
+	SetStats();
 	SetSkillInfo();
 }
 
@@ -69,4 +70,6 @@ void AWarrior::SetDefaultSkills()
 	skillComponent->AddSkill(defaultSkill);
 	UHeal* defaultSkill2 = NewObject<UHeal>(this, UHeal::StaticClass(), TEXT("Heal"));
 	skillComponent->AddSkill(defaultSkill2);
+	UEndurance* defaultSkill3 = NewObject<UEndurance>(this, UEndurance::StaticClass(), TEXT("Endurance"));
+	skillComponent->AddSkill(defaultSkill3);
 }

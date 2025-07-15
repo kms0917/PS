@@ -45,6 +45,22 @@ void UBuffComponent::ReduceBuffCount()
 	{
 		Buff->buffCount -= 1;
 		UE_LOG(LogTemp, Warning, TEXT("Remain Buff Count : %d, Owner : %s"), Buff->buffCount, *ownerCharacter->GetName());
+		if (Buff->buffCount <= 0)
+		{
+			ownerCharacter->hp -= Buff->hp;
+			ownerCharacter->currentStr -= Buff->str;
+			ownerCharacter->currentMag -= Buff->mag;
+			ownerCharacter->currentDef -= Buff->def;
+			ownerCharacter->currentRes -= Buff->res;
+			ownerCharacter->currentSkill -= Buff->skill;
+			ownerCharacter->currentSpeed -= Buff->speed;
+			ownerCharacter->currentMoveSpeed -= Buff->moveSpeed;
+			ownerCharacter->currentAp -= Buff->ap;
+			ownerCharacter->damageReduction -= Buff->damageReduction;
+			ownerCharacter->damageReduction_Percent -= Buff->damageReduction_Percent;
+			ownerCharacter->damageReinforcement -= Buff->damageReinforcement;
+			ownerCharacter->damageReinforcement_Percent -= Buff->damageReinforcement_Percent;
+		}
 	}
 	// 조건에 맞는 항목들을 한 번에 제거
 	int32 RemovedCount = buffList.RemoveAll([](const UBuffBase* Buff)
@@ -55,24 +71,49 @@ void UBuffComponent::ReduceBuffCount()
 	if (RemovedCount > 0)
 	{
 		CalcBuffStats();
+		if (ownerCharacter)
+		{
+			ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+			ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+			ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+			ownerCharacter->SetHealthWidget();
+		}
 	}
 }
 
 //버프 추가, 만약 버프를 얻었을때가 전투중이 아니라면 타이머 작동
 void UBuffComponent::GetBuff(UBuffBase* Buff)
 {
-	UBuffBase* newbuff = NewObject<UBuffBase>(this, UBuffBase::StaticClass(), Buff->GetFName());
-	buffList.Add(Buff->DuplicateBuff(newbuff));
+	UBuffBase* newbuff = Buff->DuplicateBuff(NewObject<UBuffBase>(this, UBuffBase::StaticClass(), Buff->GetFName()));
+	if (!buffList.Contains(newbuff))	//새로운 버프가 추가될경우 list에 추가 및 턴 갱신, 같은 이름의 버프가 들어오면 위의 newBuff는 이전의 버프 포인터를 반환하고,Duplicate에서 Couont 리셋해줌
+	{
+		buffList.Add(newbuff);
+		if (ownerCharacter)
+		{
+			ownerCharacter->currentHp += newbuff->hp;
+			ownerCharacter->hp += newbuff->hp;
+			ownerCharacter->currentStr += newbuff->str;
+			ownerCharacter->currentMag += newbuff->mag;
+			ownerCharacter->currentDef += newbuff->def;
+			ownerCharacter->currentRes += newbuff->res;
+			ownerCharacter->currentSkill += newbuff->skill;
+			ownerCharacter->currentSpeed += newbuff->speed;
+			ownerCharacter->currentMoveSpeed += newbuff->moveSpeed;
+			ownerCharacter->currentAp += newbuff->ap;
+			ownerCharacter->damageReduction += newbuff->damageReduction;
+			ownerCharacter->damageReduction_Percent += newbuff->damageReduction_Percent;
+			ownerCharacter->damageReinforcement += newbuff->damageReinforcement;
+			ownerCharacter->damageReinforcement_Percent += newbuff->damageReinforcement_Percent;
+			ownerCharacter->accuracy = ownerCharacter->CalcAccuracy(0);
+			ownerCharacter->evasion = ownerCharacter->CalcEvasion(0);
+			ownerCharacter->critical = ownerCharacter->CalcCritical(0);
+			ownerCharacter->SetHealthWidget();
+		}
+	}
 	CalcBuffStats();
 	if (ownerCharacter && !ownerCharacter->bIsBattle)
 	{
-		GetWorld()->GetTimerManager().SetTimer(
-			buffCountReduceTimer,
-			this,
-			&UBuffComponent::ReduceBuffCount,
-			5.0f,
-			true
-			);
+		StartBuffTimer();
 	}
 }
 
@@ -85,7 +126,18 @@ void UBuffComponent::StopBuffTimer()
 	}
 }
 
-//모든 버프들의 총 스탯을 계산
+void UBuffComponent::StartBuffTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+			buffCountReduceTimer,
+			this,
+			&UBuffComponent::ReduceBuffCount,
+			5.0f,
+			true
+			);
+}
+
+//모든 버프들의 총 스탯을 계산, 스탯 상세보기 위젯에서 보여주기 위함, 실제 스탯 반영x
 void UBuffComponent::CalcBuffStats()
 {
 	buffedMoveSpeed = 0.0f;
@@ -126,10 +178,6 @@ void UBuffComponent::CalcBuffStats()
 			buffedDamageReinforcement_Percent += Buff->damageReinforcement_Percent;
 			buffedDamageReinforcement += Buff->damageReinforcement;
 		}
-	}
-	if (ownerCharacter)
-	{
-		ownerCharacter->SetStats(false);
 	}
 }
 

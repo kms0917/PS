@@ -5,6 +5,8 @@
 #include "Character/CharacterBase.h"
 #include "Objects/Buff/BuffBase.h"
 #include "ActorComponent/BuffComponent.h"
+#include "Controller/CharacterController.h"
+#include "Widget/SkillWidget.h"
 
 void USkillBase::ApllyDamage()
 {
@@ -16,6 +18,7 @@ void USkillBase::ApllyDamage()
 			if (buff)
 			{
 				Character->buffComponent->GetBuff(buff);
+				Character->playerController->skillWidgetInstance->UpdateButtons(Character->currentAp);
 			}
 		}
 	}

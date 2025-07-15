@@ -22,9 +22,12 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	//아래 스탯들은 스탯 상세보기 지원을 위해 저장, 실제 스탯에 반영x
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	float buffedMoveSpeed;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
+	int32 buffedAp;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 buffedHp;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
@@ -39,8 +42,6 @@ public:
 	int32 buffedSkill;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 buffedSpeed;
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
-	int32 buffedAp;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 buffedCritical;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
@@ -59,6 +60,7 @@ public:
 	void ReduceBuffCount();
 	void GetBuff(UBuffBase* Buff);
 	void StopBuffTimer();
+	void StartBuffTimer();
 
 private:
 	void CalcBuffStats();

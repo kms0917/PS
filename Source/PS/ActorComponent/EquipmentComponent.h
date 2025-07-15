@@ -42,6 +42,7 @@ public:
 	UPROPERTY(EditAnyWhere, Transient, Category = "Equipment")
 	UBootsBase* boots = nullptr;
 
+	//아래의 값들은 위젯에서 상세보기를 지원하기 위해 저장, 실제 스탯에는 영향x
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")
 	int32 equipmentHp = 0;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Stats")

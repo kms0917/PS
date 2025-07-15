@@ -124,6 +124,8 @@ void ANormalGameMode::ClearBattleCharacters()
 	{
 		battleCharacters[i]->bIsBattle = false;
 		battleCharacters[i]->currentAp = battleCharacters[i]->ap;
+		battleCharacters[i]->buffComponent->StartBuffTimer();
+		battleCharacters[i]->RestoreApandMoveSpeed();
 	}
     battleCharacters.Empty();
 }

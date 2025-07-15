@@ -76,7 +76,7 @@ void ACharacterBase::BeginPlay()
 	healthWidget = Cast<UHealthWidget>(healthWidgetComponent->GetWidget());
 	if (healthWidget)
 	{
-		healthWidget->SetHealthBar(currentHp, hp);
+		SetHealthWidget();
 		healthWidget->SetTurnText(-1);					//비워놓기, 전투 시작 시 채워야 함
 		healthWidgetComponent->SetDrawSize(FVector2D(250.0f, 30.0f));
 		healthWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
@@ -169,7 +169,7 @@ void ACharacterBase::ReflectDamage(bool isHeal)
 		{
 			currentHp = hp;
 		}
-		healthWidget->SetHealthBar(currentHp, hp);
+		SetHealthWidget();
 		return;
 	}
 	if (FMath::RandRange(1, 100) <= savedAccuracy)
@@ -287,7 +287,7 @@ void ACharacterBase::TurnStart()
 {
 	bMyTurn = true;
 	buffComponent->ReduceBuffCount();
-	SetStats(false);
+	RestoreApandMoveSpeed();
 	SetSkillInfo();
 }
 
@@ -391,35 +391,40 @@ int ACharacterBase::CalcDamage(int damage, float magnification, bool isMag)
 	}
 }
 
-//자원 및 스탯 초기화, 매 턴 개시 및 하위 클래스 생성자에서 호출, 추후 여러 턴에 걸쳐 지속되는 버프 만들 시 수정 필요
-void ACharacterBase::SetStats(bool isInit)		
+//자원 및 스탯 초기화, 하위 클래스 생성자에서 호출
+void ACharacterBase::SetStats()		
 {
 	if (equipmentComponent && buffComponent)
 	{
-		currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed + buffComponent->buffedMoveSpeed;
-		if (isInit)
+		currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed;
+		currentAp = ap + equipmentComponent->equipmentAp;
+		
+		hp = hp + equipmentComponent->equipmentHp;
+		currentHp = hp;
+		if (healthWidget)
 		{
-			currentHp = hp + equipmentComponent->equipmentHp;
-			if (healthWidget)
-			{
-				healthWidget->SetHealthBar(currentHp, hp);
-			}
+			healthWidget->SetHealthBar(currentHp, hp);
 		}
-		currentDef = def + equipmentComponent->equipmentDef + buffComponent->buffedDef;
-		currentMag = mag + equipmentComponent->equipmentMag + buffComponent->buffedMag;
-		currentRes = res + equipmentComponent->equipmentRes + buffComponent->buffedRes;
-		currentSkill = skill + equipmentComponent->equipmentSkill + buffComponent->buffedSkill;
-		currentSpeed = speed + equipmentComponent->equipmentSpeed + buffComponent->buffedSpeed;
-		currentStr = str + equipmentComponent->equipmentStr + buffComponent->buffedStr;
-		currentAp = ap + equipmentComponent->equipmentAp + buffComponent->buffedAp;
+		currentDef = def + equipmentComponent->equipmentDef;
+		currentMag = mag + equipmentComponent->equipmentMag;
+		currentRes = res + equipmentComponent->equipmentRes;
+		currentSkill = skill + equipmentComponent->equipmentSkill;
+		currentSpeed = speed + equipmentComponent->equipmentSpeed;
+		currentStr = str + equipmentComponent->equipmentStr;
 		critical = CalcCritical(0);	//이 3종의 함수는 스킬의 추가 보정값이 없는경우 호출x, 있을때만 스킬에서 추가로 호출해서 스킬의 보정값 사용함
 		evasion = CalcEvasion(0);
 		accuracy = CalcAccuracy(0);
-		damageReduction = equipmentComponent->equipmentDamageReduction + buffComponent->buffedDamageReduction;
-		damageReduction_Percent = equipmentComponent->equipmentDamageReduction_percent + buffComponent->buffedDamageReduction_Percent;
-		damageReinforcement = equipmentComponent->equipmentDamageReinforcement + buffComponent->buffedDamageReinforcement;
-		damageReinforcement_Percent = equipmentComponent->equipmentDamageReinforcement_percent + buffComponent->buffedDamageReinforcement_Percent;
+		damageReduction = equipmentComponent->equipmentDamageReduction;
+		damageReduction_Percent = equipmentComponent->equipmentDamageReduction_percent;
+		damageReinforcement = equipmentComponent->equipmentDamageReinforcement;
+		damageReinforcement_Percent = equipmentComponent->equipmentDamageReinforcement_percent;
 	}
+}
+
+void ACharacterBase::RestoreApandMoveSpeed()
+{
+	currentMoveSpeed = moveSpeed + equipmentComponent->equipmentMoveSpeed + buffComponent->buffedMoveSpeed;
+	currentAp = ap + equipmentComponent->equipmentAp + buffComponent->buffedAp;
 }
 
 //스킬들의 내부 값들을 미리 계산, 하위 클래스의 생성자와 턴 개시 시 호출해야함
@@ -435,22 +440,34 @@ void ACharacterBase::SetSkillInfo()
 	}
 }
 
-//치명타 확률 계산, 위의 함수들에서 사용
+//치명타 확률 계산, 렙업, 장비, 버프 로 스탯이 바뀔 시 사용
 int ACharacterBase::CalcCritical(int correction)
 {
 	return (currentSkill + equipmentComponent->equipmentCritical + correction + buffComponent->buffedCritical);
 }
 
-//회피율 계산, 위의 함수들에서 사용
+//회피율 계산, 렙업, 장비, 버프 로 스탯이 바뀔 시 사용
 int ACharacterBase::CalcEvasion(int correction)
 {
 	return (currentSpeed * 1.2 + equipmentComponent->equipmentEvasion + correction + buffComponent->buffedEvade);
 }
 
-//명중률 계산, 위의 함수들에서 사용
+//명중률 계산, 렙업, 장비, 버프 로 스탯이 바뀔 시 사용
 int ACharacterBase::CalcAccuracy(int correction)
 {
 	return (currentSkill * 1.2 + equipmentComponent->equipmentAccuracy + correction + buffComponent->buffedAccuracy);
+}
+
+void ACharacterBase::SetHealthWidget()
+{
+	if (healthWidget)
+	{
+		if (hp <= currentHp)
+		{
+			currentHp = hp;
+		}
+		healthWidget->SetHealthBar(currentHp, hp);
+	}
 }
 
 //레벨업, 경험치 얻는 함수에서 사용
@@ -461,31 +478,40 @@ void ACharacterBase::LevelUp()
 	if (FMath::RandRange(1, MaxGrowth) <= hpGrowth)
 	{
 		hp += 1;
+		currentHp += 1;
+		SetHealthWidget();
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= strGrowth)
 	{
 		str += 1;
+		currentStr += 1;
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= magGrowth)
 	{
 		mag += 1;
+		currentMag += 1;
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= defGrowth)
 	{
 		def += 1;
+		currentDef += 1;
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= resGrowth)
 	{
 		res += 1;
+		currentRes += 1;
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= skillGrowth)
 	{
 		skill += 1;
+		currentSkill += 1;
 	}
 	if (FMath::RandRange(1, MaxGrowth) <= speedGrowth)
 	{
 		speed += 1;
+		currentSpeed += 1;
 	}
-	SetStats(false);
-	healthWidget->SetHealthBar(currentHp,hp);
+	CalcCritical(0);
+	CalcAccuracy(0);
+	CalcEvasion(0);
 }

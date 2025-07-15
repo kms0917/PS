@@ -35,6 +35,7 @@ public:
 	UBuffBase* DuplicateBuff(UBuffBase* newBuff);
 	
 	float moveSpeed;
+	int32 ap;
 	int32 hp;
 	int32 def;
 	int32 res;
@@ -42,7 +43,6 @@ public:
 	int32 mag;
 	int32 skill;
 	int32 speed;
-	int32 ap;
 	int32 critical;
 	int32 accuracy;
 	int32 evade;
