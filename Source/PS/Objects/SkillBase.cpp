@@ -2,6 +2,8 @@
 
 
 #include "Objects/SkillBase.h"
+
+#include "NiagaraFunctionLibrary.h"
 #include "Character/CharacterBase.h"
 #include "Objects/Buff/BuffBase.h"
 #include "ActorComponent/BuffComponent.h"
@@ -19,6 +21,10 @@ void USkillBase::ApllyDamage()
 			{
 				Character->buffComponent->GetBuff(buff);
 				Character->playerController->skillWidgetInstance->UpdateButtons(Character->currentAp);
+			}
+			if (skillEffectParticle)
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), skillEffectParticle, Character->GetActorLocation(), Character->GetActorRotation());
 			}
 		}
 	}

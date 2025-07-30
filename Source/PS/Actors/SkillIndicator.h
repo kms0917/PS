@@ -37,6 +37,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* OverlapSphere;
 
@@ -51,13 +58,7 @@ protected:
 
 	ACharacterBase* playerCharacter;
 
-private:	
-	UFUNCTION()
-	void OverlapWithCharacter(AActor* OverlappedActor, AActor* OtherActor);
-
-	UFUNCTION()
-	void OverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
-
+private:
 	class ACharacterController* playerController;
 
 };

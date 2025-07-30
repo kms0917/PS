@@ -50,6 +50,7 @@ public:
 	bool bUseSkill = false;
 
 	ACharacterBase* playerCharacter;
+	ASkillIndicator* attackRangeIndicator;
 
 	UPROPERTY(EditAnywhere)
 	TArray<ACharacterBase*> targettedCharacter;
@@ -94,6 +95,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	UUserWidget* battleStartWidget;
 
+	FVector moveStartLocation = FVector::ZeroVector;
+
 	void OnRightClick();
 	void OnLeftClick();
 	void StopSkillMode();
@@ -116,7 +119,6 @@ private:
 
 	UPROPERTY()
 	TSubclassOf<AActor> AttackRangeClass;
-	ASkillIndicator* attackRangeIndicator;
 
 	ANormalGameMode* gameMode;
 

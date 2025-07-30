@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include "SkillBase.generated.h"
 
 class ACharacterBase;
 class UBuffBase;
+class AProjectileBase;
 /**
  * 
  */
@@ -60,6 +63,9 @@ public:
 	bool bIsHeal = false;
 
 	UPROPERTY(EditAnyWhere, Category = "Skill")
+	bool bIsBuff = false;
+
+	UPROPERTY(EditAnyWhere, Category = "Skill")
 	bool bIsTargeting = false;
 	
 	UPROPERTY(EditAnyWhere, Category = "Skill")
@@ -79,4 +85,13 @@ public:
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
 	int32 calculatedCritical = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	TSubclassOf<AProjectileBase> projectile = nullptr;		//스킬이펙트가 있거나 이게 있거나 해야 함
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UNiagaraSystem* selfEffectParticle;			//스킬 사용자에게 생기는 이펙트, skillmode에 들어가면 사용
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UNiagaraSystem* skillEffectParticle;		//스킬이펙트
 };

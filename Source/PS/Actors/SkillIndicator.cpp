@@ -17,16 +17,16 @@ ASkillIndicator::ASkillIndicator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-    DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("RangeDecal"));
-    RootComponent = DecalComponent;
-
+    
     OverlapSphere = CreateDefaultSubobject<USphereComponent>(TEXT("OverlapSphere"));
-    OverlapSphere->SetupAttachment(RootComponent);
     OverlapSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     OverlapSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     OverlapSphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
     OverlapSphere->SetGenerateOverlapEvents(true);
+    RootComponent = OverlapSphere;
+
+    DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("RangeDecal"));
+    DecalComponent->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> DecalMat(TEXT("/Game/Material/M_SkillIndicator"));
     if (DecalMat.Succeeded())
@@ -62,10 +62,13 @@ ASkillIndicator::ASkillIndicator()
 void ASkillIndicator::BeginPlay()
 {
 	Super::BeginPlay();
-	
-    OnActorBeginOverlap.AddDynamic(this, &ASkillIndicator::OverlapWithCharacter);
-    OnActorEndOverlap.AddDynamic(this, &ASkillIndicator::OverlapEnd);
-
+    
+    if (OverlapSphere)
+    {
+        OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &ASkillIndicator::OnSphereOverlapBegin);
+        OverlapSphere->OnComponentEndOverlap.AddDynamic(this, &ASkillIndicator::OnSphereOverlapEnd);
+    }
+    
     playerController = Cast<ACharacterController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
     playerCharacter = playerController->playerCharacter;
 
@@ -73,8 +76,10 @@ void ASkillIndicator::BeginPlay()
     usableWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* OtherActor)
+void ASkillIndicator::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    // 함수 내용은 거의 동일합니다.
     if (!OtherActor || OtherActor == this) return;
     
     if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
@@ -85,8 +90,10 @@ void ASkillIndicator::OverlapWithCharacter(AActor* OverlappedActor, AActor* Othe
     }
 }
 
-void ASkillIndicator::OverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+void ASkillIndicator::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+    // 함수 내용은 거의 동일합니다.
     if (!OtherActor || OtherActor == this) return;
 
     if (ACharacterBase* Casted = Cast<ACharacterBase>(OtherActor))
@@ -94,7 +101,7 @@ void ASkillIndicator::OverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
         if (overlappedCharacters.Contains(Casted))
         {
             overlappedCharacters.Remove(Casted);
-            if (!playerController->targettedCharacter.Contains(Casted))
+            if (playerController && !playerController->targettedCharacter.Contains(Casted)) // playerController 유효성 검사 추가
             {
                 Casted->SetOverlayMaterialEnabled(false);
                 Casted->TargettedOff();
@@ -113,7 +120,7 @@ void ASkillIndicator::SetSkillIndicator(int32 accuracyRate, int32 criticalRate, 
     }
     if (OverlapSphere)
     {
-        OverlapSphere->InitSphereRadius(attackRange);
+        OverlapSphere->SetSphereRadius(attackRange);
     }
     IsHeal = isHeal;
     accuracy = accuracyRate;

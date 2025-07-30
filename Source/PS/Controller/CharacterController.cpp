@@ -238,6 +238,15 @@ void ACharacterController::OnRightClick()
 //좌클릭 해 공격
 void ACharacterController::OnLeftClick()
 {
+    if (!bIsStop)
+    {
+        StopMovement();
+        if (bUseSkill)
+        {
+            StopSkillMode();
+        }
+        return;
+    }
     if (!bIsSkillMode || (playerCharacter->bIsBattle && !playerCharacter->bMyTurn)) return;
     
     if (attackRangeIndicator && targetIndicator && stopPoint == FVector::ZeroVector)
@@ -255,12 +264,7 @@ void ACharacterController::OnLeftClick()
                 if (multiTargettingNum == 0)
                 {
                     attackPoint = attackRangeIndicator->overlappedCharacters[0]->GetActorLocation();
-                    if (playerCharacter->bIsBattle)
-                    {
-                        playerCharacter->currentAp -= savedAp;
-                        skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
-                    }
-                    MoveTotargetIndicator();
+                    //MoveTotargetIndicator();
                     EndSkillMode();
                 }
             }
@@ -268,11 +272,6 @@ void ACharacterController::OnLeftClick()
         else if (!bIsTargeting) //타겟팅이 아닌 광역 지점 공격일 경우
         {
             attackPoint = attackRangeIndicator->GetActorLocation();
-            if (playerCharacter->bIsBattle)
-            {
-                playerCharacter->currentAp -= savedAp;
-                skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
-            }
             MoveTotargetIndicator();
             EndSkillMode();
         }
@@ -282,6 +281,12 @@ void ACharacterController::OnLeftClick()
 //애님 노티파이에서 공격 할 때 사용
 void ACharacterController::InitAttack()
 {
+    playerCharacter->currentAp -= savedAp;
+    savedAp = -1;
+    if (playerCharacter->bIsBattle)
+    {
+        skillWidgetInstance->UpdateButtons(playerCharacter->currentAp);
+    }
     if (attackRangeIndicator)
     {
         if (targettedCharacter.Num() > 0)
@@ -327,6 +332,8 @@ void ACharacterController::StopSkillMode()
 {
     bIsSkillMode = false; 
     bIsTargeting = false;
+    bUseSkill = false;
+    bIsMoving = false;
     savedAp = -1;
     savedSkillRange = -1;
     if (skillRangeIndicator)
@@ -346,7 +353,10 @@ void ACharacterController::StopSkillMode()
         }
         targettedCharacter.Empty();
     }
-    playerCharacter->currentUsedSkill = nullptr;
+    if (playerCharacter)
+    {
+        playerCharacter->currentUsedSkill = nullptr;
+    }
     // 멀티 타겟 스킬 위젯 숨기기
     if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
     {
@@ -359,16 +369,11 @@ void ACharacterController::EndSkillMode()
 {
     bIsSkillMode = false;
     bIsTargeting = false;
-    savedAp = -1;
     savedSkillRange = -1;
     if (skillRangeIndicator)
     {
         skillRangeIndicator->Destroy();
     }
-    //if (attackRangeIndicator)
-    //{
-    //    attackRangeIndicator->SetActorHiddenInGame(true);
-    //}
     bUseSkill = true;
     // 멀티 타겟 스킬 위젯 숨기기
     if (multiTargetSkillWidgetInstance->GetVisibility() == ESlateVisibility::Visible)
@@ -399,15 +404,16 @@ void ACharacterController::MoveTotargetIndicator()
     {
         return;
     }
-    if (!(targetIndicator->IsHidden()))
+    if (!targetIndicator->IsHidden())
     {
-        if (playerCharacter->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
+        moveStartLocation = playerCharacter->GetActorLocation();
+        /*if (playerCharacter->bIsBattle && stopPoint != FVector::ZeroVector && !bIsSkillMode)  // 배틀 모드일 때 이동 거리 제한 적용
         {
-            UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
-            playerCharacter->currentMoveSpeed = 0;
+            //UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, stopPoint);
 
         }
-        else if (stopPoint == FVector::ZeroVector) // 일반 모드에서는 마우스 클릭 위치로 바로 이동
+        else */
+        if (stopPoint == FVector::ZeroVector) // 일반 모드에서는 마우스 클릭 위치로 바로 이동
         {
             if (totalDistance <= 0.50)
             {
@@ -417,10 +423,6 @@ void ACharacterController::MoveTotargetIndicator()
             else
             {
                 UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, targetIndicator->GetActorLocation());
-            }
-            if (playerCharacter->bIsBattle)
-            {
-                playerCharacter->currentMoveSpeed -= totalDistance;
             }
         }
     }
@@ -460,7 +462,20 @@ void ACharacterController::UpdateSkillIndicatorLocation()
 
         const float DistanceToCenter = FVector::Dist(MouseLocation, SkillRangeCenter);
 
-        if (DistanceToCenter <= SkillRangeRadius)
+        FHitResult LineHitCheck;
+        FCollisionQueryParams TraceParam(FName(TEXT("InBooundTrace")), true, this);
+        TraceParam.bReturnPhysicalMaterial = false;
+        TraceParam.AddIgnoredActor(playerCharacter);
+
+        bool bBlocked = GetWorld()->LineTraceSingleByChannel(
+            LineHitCheck,
+            SkillRangeCenter + FVector(0, 0, 3),
+            MouseLocation + FVector(0, 0, 3),
+            ECC_Visibility,
+            TraceParam
+        );
+        
+        if (DistanceToCenter <= SkillRangeRadius && !bBlocked)
         {
             bIsMouseOverSkillRange = true;
         }
@@ -717,6 +732,37 @@ void ACharacterController::CheckCharacterMove()
 {
     if (playerCharacter && playerCharacter->GetVelocity().SizeSquared() <= 0.0f)
     {
+        if (moveStartLocation != FVector::ZeroVector && bIsMoving)
+        {
+            const FVector endLocation = playerCharacter->GetActorLocation();
+            UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+
+            // 네비게이션 시스템이 있고, 시작점과 도착점이 유의미하게 다를 경우
+            if (NavSystem)
+            {
+                // 시작점부터 도착점까지의 네비게이션 경로를 계산합니다.
+                UNavigationPath* NavPath = NavSystem->FindPathToLocationSynchronously(this, moveStartLocation, endLocation);
+
+                if (NavPath && NavPath->IsValid() && NavPath->PathPoints.Num() > 1)
+                {
+                    float pathLength = 0.0f;
+                    // 경로의 각 지점 사이의 거리를 모두 더해 총 길이를 구합니다.
+                    for (int32 i = 0; i < NavPath->PathPoints.Num() - 1; ++i)
+                    {
+                        pathLength += FVector::Dist(NavPath->PathPoints[i], NavPath->PathPoints[i + 1]);
+                    }
+
+                    // 경로 길이(cm)를 미터 단위로 변환하여 이동력을 계산합니다.
+                    const float moveCost = pathLength / 100.0f;
+
+                    // 캐릭터의 현재 이동력에서 소모된 양을 차감합니다.
+                    playerCharacter->currentMoveSpeed -= moveCost;
+                    // 이동력이 0 미만으로 내려가지 않도록 보정합니다.
+                    playerCharacter->currentMoveSpeed = FMath::Max(0.0f, playerCharacter->currentMoveSpeed);
+                }
+            }
+            moveStartLocation = FVector::ZeroVector;
+        }
         bIsStop = true;
         if (bUseSkill && bIsMoving)
         {

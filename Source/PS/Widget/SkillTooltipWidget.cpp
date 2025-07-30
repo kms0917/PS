@@ -19,6 +19,12 @@ void USkillTooltipWidget::SettingTooltip(USkillBase* skill)
 		accuracy->SetVisibility(ESlateVisibility::Hidden);
 		critical->SetVisibility(ESlateVisibility::Hidden);
 	}
+	else if (skill->bIsBuff)
+	{
+		dmgOrheal->SetVisibility(ESlateVisibility::Hidden);
+		accuracy->SetVisibility(ESlateVisibility::Hidden);
+		critical->SetVisibility(ESlateVisibility::Hidden);
+	}
 	else
 	{
 		dmgOrheal->SetText(FText::FromString(FString::Printf(TEXT("Damage : %d"), skill->calculatedDamage)));

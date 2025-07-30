@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/WidgetComponent.h"
 #include "GenericTeamAgentInterface.h"
+#include "NiagaraComponent.h"
 #include "CharacterBase.generated.h"
 
 class UHealthWidget;
@@ -86,6 +87,8 @@ public:
 	void SetTurnText(int32 turn);
 	void TurnStart();
 	void TurnEnd();
+	void StartContinuousSelfEffect(UNiagaraSystem* EffectToLoop);	//이펙트 시작
+	void StopContinuousSelfEffect();								//이펙트 종료
 
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamId) override { TeamId = NewTeamId; }
@@ -160,6 +163,9 @@ public:
 	USkillComponent* skillComponent;
 	UPROPERTY(EditAnyWhere, Transient)
 	UBuffComponent* buffComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UNiagaraComponent* selfEffectComponent;
 	
 	UPROPERTY()
 	UWidgetComponent* skillInfoWidgetComponent;					//공격 범위 안에 들어갈 시 공격 정보를 띄움
@@ -168,13 +174,11 @@ public:
 
 	UPROPERTY()
 	bool bIsTargeted = true;
-
 	UPROPERTY()
 	bool bMyTurn = false;
-
 	UPROPERTY()
 	bool bIsBattle = false;
-
+	
 	UPROPERTY()
 	USkillBase* currentUsedSkill;
 

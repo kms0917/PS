@@ -16,6 +16,7 @@ UHeal::UHeal()
 	magnification = 1.0f;
 	bIsMag = false;
 	bIsHeal = true;
+	bIsBuff = false;
 	bIsTargeting = true;
 	multiTargetingNum = 1;
 	skillName = FText::FromString(TEXT("회복"));

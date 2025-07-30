@@ -10,6 +10,8 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "Materials/MaterialInterface.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 #include "Widget/HealthWidget.h"
 #include "Widget/SkillInfoWidget.h"
@@ -65,6 +67,9 @@ ACharacterBase::ACharacterBase()
 	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
 	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass()); // 시야 감지 등록
 	StimuliSource->bAutoRegister = true;
+
+	selfEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailComponent"));
+	selfEffectComponent->SetupAttachment(RootComponent);
 }
 
 //위젯 및 플레이어 컨트롤러 세팅
@@ -120,6 +125,10 @@ void ACharacterBase::OnSkillAutoMoveFinished(FVector attackPoint)
 		if (AnimInstance)
 		{
 			AnimInstance->Montage_Play(currentUsedSkill->skillMontage, currentUsedSkill->PlayRate);
+		}
+		if (currentUsedSkill->selfEffectParticle)
+		{
+			StartContinuousSelfEffect(currentUsedSkill->selfEffectParticle);
 		}
 	}
 }
@@ -211,9 +220,6 @@ void ACharacterBase::ReflectDamage(bool isHeal)
 			MyAIController->NotifyCustomDamage();
 		}
 	}
-	savedAccuracy = 0;
-	savedDamage = 0;
-	savedCritical = 0;	//부자연스러우면 targetedOff에서 실행, 조건달아서 현재 캐릭터의 currentUsedSkill의 overlappedCharacter 확인해서 분기
 }
 
 //얻는 수치는 조절 필요, 적이 죽을때 게임모드에서 호출해서 모든 아군 캐릭터 경험치 습득해줘야함
@@ -295,6 +301,28 @@ void ACharacterBase::TurnStart()
 void ACharacterBase::TurnEnd()
 {
 	bMyTurn = false;
+}
+
+void ACharacterBase::StartContinuousSelfEffect(UNiagaraSystem* EffectToLoop)
+{
+	if (selfEffectComponent && EffectToLoop)
+	{
+		// 현재 설정된 에셋과 다를 경우에만 새로 할당합니다. (최적화)
+		if (selfEffectComponent->GetAsset() != EffectToLoop)
+		{
+			selfEffectComponent->SetAsset(EffectToLoop);
+		}
+		selfEffectComponent->Activate(true);
+	}
+}
+
+void ACharacterBase::StopContinuousSelfEffect()
+{
+	if (selfEffectComponent)
+	{
+		selfEffectComponent->SetAutoDestroy(true);
+		selfEffectComponent->DeactivateImmediate();
+	}
 }
 
 //타겟팅 시의 시각적 효과 온오프 여부 조절

@@ -12,14 +12,15 @@ UEndurance::UEndurance()
 	accuracy = 40;
 	critical = 0;
 	damage = 0;
-	magnification = 1.0f;
+	magnification = 0.0f;
 	bIsMag = false;
-	bIsHeal = true;
+	bIsHeal = false;
+	bIsBuff = true;
 	bIsTargeting = true;
 	multiTargetingNum = 1;
 	skillName = FText::FromString(TEXT("인내심"));
 	skillScript = FText::FromString(TEXT("3턴간 받는 피해 감소"));
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/Standing1HMagicAttack03_UE_Anim_Montage"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/StandingTauntBattlecry_UE_Anim_Montage"));
 	if (MontageAsset.Succeeded())
 	{
 		skillMontage = MontageAsset.Object;

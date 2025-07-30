@@ -15,6 +15,7 @@
 #include "Objects/Skills/Endurance.h"
 
 #include "GenericTeamAgentInterface.h"
+#include "Objects/Skills/FireBall.h"
 
 AWarrior::AWarrior()
 {
@@ -72,4 +73,6 @@ void AWarrior::SetDefaultSkills()
 	skillComponent->AddSkill(defaultSkill2);
 	UEndurance* defaultSkill3 = NewObject<UEndurance>(this, UEndurance::StaticClass(), TEXT("Endurance"));
 	skillComponent->AddSkill(defaultSkill3);
+	UFireBall* defaultSkill4 = NewObject<UFireBall>(this, UFireBall::StaticClass(), TEXT("Fire Ball"));
+	skillComponent->AddSkill(defaultSkill4);
 }

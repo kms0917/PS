@@ -14,6 +14,8 @@ UBasicAttack::UBasicAttack()
 	magnification = 1.0f;
 	bIsMag = false;
 	bIsHeal = false;
+	bIsBuff = false;
+	bIsTargeting = false;
 	multiTargetingNum = 1;
 	skillName = FText::FromString(TEXT("기본 공격"));
 	skillScript = FText::FromString(TEXT("힘에 비례한 물리 공격"));
