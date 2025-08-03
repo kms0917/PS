@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Controller/AIController/BasicAIController.h"
 #include "ProjectileBase.generated.h"
 
 class USphereComponent;
@@ -48,10 +49,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetProjectile(ACharacterController* playerController, USkillBase* skill, AActor* targetActor);
+	void SetProjectile(AController* playerController, USkillBase* skill, AActor* targetActor);
 
 private:
 	AActor* targetActor;
 	ACharacterController* playerController;
 	USkillBase* skill;
+	bool bIsEnemy;
+	ABasicAIController* AICon;
+	
 };

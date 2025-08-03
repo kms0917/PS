@@ -35,18 +35,20 @@ EBTNodeResult::Type UBTTask_SetAttackTarget_Offensive::ExecuteTask(UBehaviorTree
 	float LowestHP = MAX_FLT;
 	FVector BestMovePoint = FVector::ZeroVector;
 	float moveSpeed = AIPawn->currentMoveSpeed;
+	int32 MaxDamage = 0;
 
 	for (ACharacterBase* character : characters)
 	{
 		for (USkillBase* skill : skills)
 		{
 			float skillRange = skill->skillRange;
+			int32 damage = skill->calculatedDamage;
 			FVector testPoint;
 			
 			if (FindAttackPointAlongPath(AIPawn->GetActorLocation(), character, skillRange, moveSpeed, testPoint, AICon->GetPawn()))
 			{
 				float HP = character->currentHp; // 혹은 GetHealth() 등
-				if (HP < LowestHP)
+				if (HP <= LowestHP && damage > MaxDamage)
 				{
 					LowestHP = HP;
 					LowestHPCharacter = character;

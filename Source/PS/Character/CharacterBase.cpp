@@ -210,7 +210,7 @@ void ACharacterBase::ReflectDamage(bool isHeal)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("evade!"));
-		//회피시의 로직 필요
+		PlayAnimMontage(evadeMontage);
 	}
 	if (currentHp > 0 && TeamId == FGenericTeamId(1))
 	{
@@ -403,6 +403,11 @@ void ACharacterBase::SetBPs()
 	if (OverlayMaterialFinder.Succeeded())
 	{
 		this->OverlayMaterial = OverlayMaterialFinder.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MontageAsset(TEXT("/Game/Animation/Montages/DodgingRight_UE_Anim_Montage"));
+	if (MontageAsset.Succeeded())
+	{
+		evadeMontage = MontageAsset.Object;
 	}
 }
 

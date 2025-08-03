@@ -12,7 +12,7 @@ UFireBall::UFireBall()
 	apUsage = 1;
 	accuracy = 40;
 	critical = 0;
-	damage = 5;
+	damage = 20;
 	magnification = 1.0f;
 	bIsMag = true;
 	bIsHeal = false;

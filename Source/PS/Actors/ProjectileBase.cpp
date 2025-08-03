@@ -41,14 +41,27 @@ void AProjectileBase::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor*
 
 void AProjectileBase::DestroyProjectile()
 {
-	if (projectileEffect)
+	if (bIsEnemy)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), projectileEffect, this->GetActorLocation(), this->GetActorRotation());
+		if (projectileEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), projectileEffect, this->GetActorLocation(), this->GetActorRotation());
+		}
+		AICon->DoAIDamage();
+		trailEffectComponent->Deactivate();
+		Destroy();
 	}
-	trailEffectComponent->Deactivate();
-	playerController->InitAttack();
-	skill->ApllyDamage();
-	Destroy();
+	else
+	{
+		if (projectileEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), projectileEffect, this->GetActorLocation(), this->GetActorRotation());
+		}
+		trailEffectComponent->Deactivate();
+		playerController->InitAttack();
+		skill->ApllyDamage();
+		Destroy();
+	}
 }
 
 // Called every frame
@@ -72,10 +85,19 @@ void AProjectileBase::Tick(float DeltaTime)
 	}
 }
 
-void AProjectileBase::SetProjectile(ACharacterController* PlayerController, USkillBase* Skill, AActor* TargetActor)
+void AProjectileBase::SetProjectile(AController* PlayerController, USkillBase* Skill, AActor* TargetActor)
 {
-	this->playerController = PlayerController;
+
+	this->playerController = Cast<ACharacterController>(PlayerController);
+	if (!this->playerController)
+	{
+		this->AICon = Cast<ABasicAIController>(PlayerController);
+		this->bIsEnemy = true;
+	}
+	else
+	{
+		this->bIsEnemy = false;
+	}
 	this->skill = Skill;
 	this->targetActor = TargetActor;
 }
-

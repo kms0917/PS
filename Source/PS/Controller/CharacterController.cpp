@@ -88,10 +88,14 @@ void ACharacterController::InitSkillMode(int32 accuracy, int32 critical, int32 d
             {
                 skillRangeIndicator->Destroy();
             }
-            skillRangeIndicator = GetWorld()->SpawnActor<ASkillRange>(SkillRangeClass, spawnLocation, FRotator::ZeroRotator);
-            if (skillRangeIndicator)
+            UWorld* World = GetWorld();
+            if (World)
             {
-                skillRangeIndicator->SetRadius(skillRange);
+                skillRangeIndicator = World->SpawnActor<ASkillRange>(SkillRangeClass, spawnLocation, FRotator::ZeroRotator);
+                if (skillRangeIndicator)
+                {
+                    skillRangeIndicator->SetRadius(skillRange);
+                }   
             }
         }
         if (AttackRangeClass)

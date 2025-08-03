@@ -214,6 +214,16 @@ void ABasicAIController::EndTurn()
 	}
 }
 
+USkillBase* ABasicAIController::GetSelectedSkill()
+{
+	return Cast<USkillBase>(BlackboardComp->GetValueAsObject(TEXT("SelectedSkill")));
+}
+
+ACharacterBase* ABasicAIController::GetTargetCharacter()
+{
+	return Cast<ACharacterBase>(BlackboardComp->GetValueAsObject(TEXT("TargetActor")));
+}
+
 void ABasicAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Stimulus.WasSuccessfullySensed() && !(BlackboardComp->GetValueAsBool("IsInCombat")))

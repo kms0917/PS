@@ -24,6 +24,21 @@ UGoblinSlash::UGoblinSlash()
 	{
 		skillMontage = MontageAsset.Object;
 	}
+	// static ConstructorHelpers::FObjectFinder<UNiagaraSystem> selfEffectParticleFinder(TEXT("/Game/Niagara/Bottom11-01"));
+	// if (selfEffectParticleFinder.Succeeded())
+	// {
+	// 	selfEffectParticle = selfEffectParticleFinder.Object;
+	// }
+	// static ConstructorHelpers::FObjectFinder<UNiagaraSystem> skillEffectParticleFinder(TEXT("/Game/Niagara"));
+	// if (skillEffectParticleFinder.Succeeded())
+	// {
+	// 	skillEffectParticle = skillEffectParticleFinder.Object;
+	// }
+	// static ConstructorHelpers::FClassFinder<AProjectileBase> ProjectileClassFinder(TEXT("/Game/Actor/Projectiles/BP_FireBallProjectile")); // BP 경로 예시
+	// if (ProjectileClassFinder.Succeeded())
+	// {
+	// 	projectile = ProjectileClassFinder.Class;
+	// }
 
 	PlayRate = 1.0f;
 	buff = nullptr;

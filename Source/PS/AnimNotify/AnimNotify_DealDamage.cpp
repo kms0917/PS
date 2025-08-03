@@ -17,7 +17,8 @@ void UAnimNotify_DealDamage::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 
     ACharacterBase* Character = Cast<ACharacterBase>(Owner);
     if (!Character) return;
-
+    if (Character->GetGenericTeamId() == FGenericTeamId(1)) return;
+    
     if (Character->currentUsedSkill->projectile)     //투사체가 있는 경우, 스킬 이펙트 출력은 없어야하고 투사체만 발사, 투사체가 사라질때 투사체가 가진 이펙트 출력하며 위의 로직 그대로 따라가야함
     {
         TSubclassOf<AProjectileBase> ProjectileClass = Character->currentUsedSkill->projectile;

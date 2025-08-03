@@ -207,4 +207,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UAIPerceptionStimuliSourceComponent* StimuliSource;
+
+	UPROPERTY()
+	UAnimMontage* evadeMontage;	
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "Objects/SkillBase.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
@@ -37,6 +38,8 @@ public:
 	void DoAIDamage();
 	void StartTurn();
 	void EndTurn();
+	USkillBase* GetSelectedSkill();
+	ACharacterBase* GetTargetCharacter();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
